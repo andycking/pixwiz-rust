@@ -1,25 +1,59 @@
-use druid::widget::{Button, FillStrat, Flex, Image, Label};
-use druid::{AppLauncher, ImageBuf, LocalizedString, PlatformError, Widget, WidgetExt, WindowDesc};
+use druid::widget::{CrossAxisAlignment, FillStrat, Flex, Image};
+use druid::{AppLauncher, Color, Data, ImageBuf, PlatformError, Widget, WidgetExt, WindowDesc};
 
 fn main() -> Result<(), PlatformError> {
     let main_window = WindowDesc::new(ui_builder());
-    let data = 0_u32;
+    let data = PixWizState {};
     AppLauncher::with_window(main_window)
         .use_env_tracing()
         .launch(data)
 }
 
-fn ui_builder() -> impl Widget<u32> {
-    let png_data = ImageBuf::from_data(include_bytes!("./assets/move.png")).unwrap();
-    let mut img = Image::new(png_data).fill_mode(FillStrat::Cover);
+#[derive(Clone, Data)]
+struct PixWizState {}
 
-    // The label text will be computed dynamically based on the current locale and count
-    let text =
-        LocalizedString::new("hello-counter").with_arg("count", |data: &u32, _env| (*data).into());
-    let label = Label::new(text).padding(5.0).center();
-    let button = Button::new("increment")
-        .on_click(|_ctx, data, _env| *data += 1)
-        .padding(5.0);
+fn tool_pane_button(bytes: &[u8]) -> impl Widget<PixWizState> {
+    let png_data = ImageBuf::from_data(bytes).unwrap();
 
-    Flex::column().with_child(label).with_child(button).with_child(img)
+    Image::new(png_data)
+        .fill_mode(FillStrat::Cover)
+        .border(Color::BLACK, 1.0)
+}
+
+fn tool_pane_flex_row<T: Data>(
+    a: impl Widget<T> + 'static,
+    b: impl Widget<T> + 'static,
+) -> impl Widget<T> {
+    Flex::row().with_child(a).with_child(b)
+}
+
+fn build_tool_pane() -> impl Widget<PixWizState> {
+    Flex::column()
+        .cross_axis_alignment(CrossAxisAlignment::End)
+        .with_child(tool_pane_flex_row(
+            tool_pane_button(include_bytes!("./assets/marquee.png")),
+            tool_pane_button(include_bytes!("./assets/lasso.png")),
+        ))
+        .with_child(tool_pane_flex_row(
+            tool_pane_button(include_bytes!("./assets/move.png")),
+            tool_pane_button(include_bytes!("./assets/zoom.png")),
+        ))
+        .with_child(tool_pane_flex_row(
+            tool_pane_button(include_bytes!("./assets/cropper.png")),
+            tool_pane_button(include_bytes!("./assets/type.png")),
+        ))
+        .with_child(tool_pane_flex_row(
+            tool_pane_button(include_bytes!("./assets/paint.png")),
+            tool_pane_button(include_bytes!("./assets/eraser.png")),
+        ))
+        .with_child(tool_pane_flex_row(
+            tool_pane_button(include_bytes!("./assets/fill.png")),
+            tool_pane_button(include_bytes!("./assets/dropper.png")),
+        ))
+}
+
+fn ui_builder() -> impl Widget<PixWizState> {
+    Flex::column()
+        .with_child(build_tool_pane())
+        .background(Color::WHITE)
 }
