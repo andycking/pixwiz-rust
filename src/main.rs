@@ -3,7 +3,7 @@ use druid::widget::{CrossAxisAlignment, FillStrat, Flex, Image, SizedBox};
 use druid::{AppLauncher, Color, Data, ImageBuf, PlatformError, Widget, WidgetExt, WindowDesc};
 
 fn main() -> Result<(), PlatformError> {
-    let main_window = WindowDesc::new(ui_builder());
+    let main_window = WindowDesc::new(ui_builder()).title("PixWiz");
     let data = PixWizState {};
     AppLauncher::with_window(main_window)
         .use_env_tracing()
@@ -145,17 +145,9 @@ impl Widget<PixWizState> for Palette {
     }
 }
 
-fn build_palette() -> impl Widget<PixWizState> {
-    Flex::column()
-        .with_child(Palette::new())
-        .background(Color::BLACK)
-}
-
 fn build_left_pane() -> impl Widget<PixWizState> {
     Flex::column()
         .with_child(build_tools())
-        .with_default_spacer()
-        .with_child(build_palette())
 }
 
 fn build_canvas() -> impl Widget<PixWizState> {
@@ -165,8 +157,14 @@ fn build_canvas() -> impl Widget<PixWizState> {
         .border(Color::BLACK, 1.0)
 }
 
+fn build_palette() -> impl Widget<PixWizState> {
+    Flex::column()
+        .with_child(Palette::new())
+        .background(Color::BLACK)
+}
+
 fn build_right_pane() -> impl Widget<PixWizState> {
-    SizedBox::empty()
+    build_palette()
 }
 
 fn ui_builder() -> impl Widget<PixWizState> {
@@ -180,7 +178,8 @@ fn ui_builder() -> impl Widget<PixWizState> {
                 .with_default_spacer()
                 .with_child(build_canvas())
                 .with_default_spacer()
-                .with_child(build_right_pane()),
+                .with_child(build_right_pane())
+                .with_default_spacer()
         )
         .with_default_spacer()
         .background(Color::WHITE)
