@@ -62,7 +62,7 @@ fn build_tools() -> impl Widget<PixWizState> {
 }
 
 struct Palette {
-    colors: Vec<Color>,
+    colors: [u32; 256],
 }
 
 impl Palette {
@@ -83,20 +83,17 @@ impl Palette {
         druid::Rect::from_origin_size(origin, (10.0, 10.0))
     }
 
-    fn read_palette() -> Vec<Color> {
+    fn read_palette() -> [u32; 256] {
         let bytes = include_bytes!("./assets/vga.pal");
 
-        assert!(bytes.len() % 16 == 0);
+        assert!(bytes.len() == 1024);
 
-        let mut colors: Vec<Color> = Vec::new();
+        let mut colors: [u32; 256] = [0; 256];
 
         let mut i = 0;
         while i < bytes.len() {
-            let a = bytes[i + 0];
-            let r = bytes[i + 1];
-            let g = bytes[i + 2];
-            let b = bytes[i + 3];
-            colors.push(Color::rgba8(r, g, b, a));
+            let argb = [bytes[i + 0], bytes[i + 1], bytes[i + 2], bytes[i + 3]];
+            colors[i / 4] = u32::from_le_bytes(argb);
             i += 4;
         }
 
@@ -141,7 +138,8 @@ impl Widget<PixWizState> for Palette {
         let mut i = 0;
         for color in &self.colors {
             let rect = Self::idx_to_rect(i);
-            ctx.fill(rect, color);
+            let rgba = Color::from_rgba32_u32(*color);
+            ctx.fill(rect, &rgba);
             i += 1;
         }
     }
@@ -153,7 +151,9 @@ struct Canvas {
 
 impl Canvas {
     pub fn new() -> Self {
-        Self { pixels: [0; 1024] }
+        Self {
+            pixels: Self::build_checkerboard(),
+        }
     }
 
     fn idx_to_point(idx: usize) -> druid::Point {
@@ -167,7 +167,22 @@ impl Canvas {
         druid::Rect::from_origin_size(origin, (10.0, 10.0))
     }
 
-    fn build_checkerboard() {}
+    fn build_checkerboard() -> [u32; 1024] {
+        let mut pixels: [u32; 1024] = [0; 1024];
+
+        let mut i = 0;
+        for x in 0..32 {
+            for y in 0..32 {
+                pixels[i] = match (x + y) % 2 {
+                    0 => 0xb4b4b4ff,
+                    _ => 0xc8c8c8ff,
+                };
+                i += 1;
+            }
+        }
+
+        pixels
+    }
 }
 
 impl Widget<PixWizState> for Canvas {
@@ -203,7 +218,15 @@ impl Widget<PixWizState> for Canvas {
         bc.constrain(size)
     }
 
-    fn paint(&mut self, _ctx: &mut PaintCtx, _data: &PixWizState, _env: &Env) {}
+    fn paint(&mut self, ctx: &mut PaintCtx, _data: &PixWizState, _env: &Env) {
+        let mut i = 0;
+        for color in &self.pixels {
+            let rect = Self::idx_to_rect(i);
+            let rgba = Color::from_rgba32_u32(*color);
+            ctx.fill(rect, &rgba);
+            i += 1;
+        }
+    }
 }
 
 fn build_left_pane() -> impl Widget<PixWizState> {
@@ -214,6 +237,7 @@ fn build_canvas() -> impl Widget<PixWizState> {
     Flex::column()
         .with_child(Canvas::new())
         .background(Color::WHITE)
+        .border(Color::BLACK, 1.0)
 }
 
 fn build_palette() -> impl Widget<PixWizState> {
