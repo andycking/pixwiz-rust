@@ -1,9 +1,11 @@
 use druid::widget::prelude::*;
-use druid::widget::{CrossAxisAlignment, FillStrat, Flex, Image, SizedBox};
+use druid::widget::{CrossAxisAlignment, FillStrat, Flex, Image};
 use druid::{AppLauncher, Color, Data, ImageBuf, PlatformError, Widget, WidgetExt, WindowDesc};
 
 fn main() -> Result<(), PlatformError> {
-    let main_window = WindowDesc::new(ui_builder()).title("PixWiz");
+    let main_window = WindowDesc::new(ui_builder())
+        .title("PixWiz")
+        .window_size((640.0, 480.0));
     let data = PixWizState {};
     AppLauncher::with_window(main_window)
         .use_env_tracing()
@@ -70,13 +72,13 @@ impl Palette {
         }
     }
 
-    pub fn idx_to_point(idx: usize) -> druid::Point {
+    fn idx_to_point(idx: usize) -> druid::Point {
         let y = (idx / 16) as f64;
         let x = (idx % 16) as f64;
         druid::Point::new(1.0 + (x * (10.0 + 1.0)), 1.0 + (y * (10.0 + 1.0)))
     }
 
-    pub fn idx_to_rect(idx: usize) -> druid::Rect {
+    fn idx_to_rect(idx: usize) -> druid::Rect {
         let origin = Self::idx_to_point(idx);
         druid::Rect::from_origin_size(origin, (10.0, 10.0))
     }
@@ -145,16 +147,73 @@ impl Widget<PixWizState> for Palette {
     }
 }
 
+struct Canvas {
+    pixels: [u32; 1024],
+}
+
+impl Canvas {
+    pub fn new() -> Self {
+        Self { pixels: [0; 1024] }
+    }
+
+    fn idx_to_point(idx: usize) -> druid::Point {
+        let y = (idx / 32) as f64;
+        let x = (idx % 32) as f64;
+        druid::Point::new(x * 10.0, y * 10.0)
+    }
+
+    fn idx_to_rect(idx: usize) -> druid::Rect {
+        let origin = Self::idx_to_point(idx);
+        druid::Rect::from_origin_size(origin, (10.0, 10.0))
+    }
+
+    fn build_checkerboard() {}
+}
+
+impl Widget<PixWizState> for Canvas {
+    fn event(&mut self, _ctx: &mut EventCtx, _event: &Event, _data: &mut PixWizState, _env: &Env) {}
+
+    fn lifecycle(
+        &mut self,
+        _ctx: &mut LifeCycleCtx,
+        _event: &LifeCycle,
+        _data: &PixWizState,
+        _env: &Env,
+    ) {
+    }
+
+    fn update(
+        &mut self,
+        _ctx: &mut UpdateCtx,
+        _old_data: &PixWizState,
+        _data: &PixWizState,
+        _env: &Env,
+    ) {
+    }
+
+    fn layout(
+        &mut self,
+        _layout_ctx: &mut LayoutCtx,
+        bc: &BoxConstraints,
+        _data: &PixWizState,
+        _env: &Env,
+    ) -> Size {
+        let rect = Self::idx_to_rect(self.pixels.len() - 1);
+        let size = Size::new(rect.x1, rect.y1);
+        bc.constrain(size)
+    }
+
+    fn paint(&mut self, _ctx: &mut PaintCtx, _data: &PixWizState, _env: &Env) {}
+}
+
 fn build_left_pane() -> impl Widget<PixWizState> {
-    Flex::column()
-        .with_child(build_tools())
+    Flex::column().with_child(build_tools())
 }
 
 fn build_canvas() -> impl Widget<PixWizState> {
-    SizedBox::empty()
-        .width(320.0)
-        .height(320.0)
-        .border(Color::BLACK, 1.0)
+    Flex::column()
+        .with_child(Canvas::new())
+        .background(Color::WHITE)
 }
 
 fn build_palette() -> impl Widget<PixWizState> {
@@ -179,8 +238,8 @@ fn ui_builder() -> impl Widget<PixWizState> {
                 .with_child(build_canvas())
                 .with_default_spacer()
                 .with_child(build_right_pane())
-                .with_default_spacer()
+                .with_default_spacer(),
         )
         .with_default_spacer()
-        .background(Color::WHITE)
+        .background(Color::rgb8(0, 43, 54))
 }
