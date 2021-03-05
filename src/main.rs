@@ -2,16 +2,16 @@ use std::ops::{Index, IndexMut};
 use std::sync::Arc;
 
 use druid::widget::prelude::*;
-use druid::widget::{CrossAxisAlignment, FillStrat, Flex, Image, Label, Painter};
-use druid::{AppLauncher, Color, Data, ImageBuf, PlatformError, Widget, WidgetExt, WindowDesc};
+use druid::widget::{Flex};
+use druid::{Color, Data, PlatformError, Widget, WidgetExt};
 
 fn main() -> Result<(), PlatformError> {
-    let main_window = WindowDesc::new(ui_builder())
+    let main_window = druid::WindowDesc::new(ui_builder())
         .title("PixWiz")
         .window_size((800.0, 556.0))
         .resizable(false);
     let data = PixWizState::new();
-    AppLauncher::with_window(main_window)
+    druid::AppLauncher::with_window(main_window)
         .use_env_tracing()
         .launch(data)
 }
@@ -131,9 +131,9 @@ impl PixWizState {
 }
 
 fn tools_button(bytes: &[u8]) -> impl Widget<PixWizState> {
-    let png_data = ImageBuf::from_data(bytes).unwrap();
+    let png_data = druid::ImageBuf::from_data(bytes).unwrap();
 
-    Image::new(png_data).fill_mode(FillStrat::Cover)
+    druid::widget::Image::new(png_data).fill_mode(druid::widget::FillStrat::Cover)
 }
 
 fn tools_row<T: Data>(a: impl Widget<T> + 'static, b: impl Widget<T> + 'static) -> impl Widget<T> {
@@ -310,19 +310,19 @@ impl Widget<PixWizState> for Canvas {
 
 fn build_color_well() -> impl Widget<PixWizState> {
     Flex::column().with_child(
-        Painter::new(|ctx, data: &PixWizState, _env| {
+        druid::widget::Painter::new(|ctx, data: &PixWizState, _env| {
             let rect = ctx.size().to_rect();
             let rgba = Color::from_rgba32_u32(data.fg);
             ctx.fill(rect, &rgba);
         })
         .fix_size(65.0, 30.0)
-        .border(Color::rgb8(101, 123, 131), 1.0),
+        .border(Color::BLACK, 1.0)
     )
 }
 
 fn build_left_pane() -> impl Widget<PixWizState> {
     Flex::column()
-        .cross_axis_alignment(CrossAxisAlignment::End)
+        .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
         .with_child(build_tools())
         .with_default_spacer()
         .with_child(build_color_well())
@@ -348,7 +348,7 @@ fn build_right_pane() -> impl Widget<PixWizState> {
 fn build_status_bar() -> impl Widget<PixWizState> {
     Flex::row()
         .with_child(
-            Label::new(|data: &PixWizState, _env: &_| {
+            druid::widget::Label::new(|data: &PixWizState, _env: &_| {
                 format!("{:08x} {:2}:{:2}", data.fg, data.pos.0, data.pos.1)
             })
             .with_font(druid::FontDescriptor::new(druid::FontFamily::MONOSPACE))
@@ -362,11 +362,11 @@ fn build_status_bar() -> impl Widget<PixWizState> {
 
 fn ui_builder() -> impl Widget<PixWizState> {
     Flex::column()
-        .cross_axis_alignment(CrossAxisAlignment::End)
+        .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
         .with_default_spacer()
         .with_child(
             Flex::row()
-                .cross_axis_alignment(CrossAxisAlignment::Start)
+                .cross_axis_alignment(druid::widget::CrossAxisAlignment::Start)
                 .with_default_spacer()
                 .with_child(build_left_pane())
                 .with_default_spacer()
