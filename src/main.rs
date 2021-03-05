@@ -63,10 +63,57 @@ impl IndexMut<usize> for PixelState {
 }
 
 #[derive(Clone, Data)]
+struct PaletteState {
+    storage: Arc<[u32; 256]>,
+}
+
+impl PaletteState {
+    pub fn new() -> Self {
+        Self {
+            storage: Arc::new(Self::read_palette()),
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        self.storage.len()
+    }
+
+    fn read_palette() -> [u32; 256] {
+        let bytes = include_bytes!("./assets/vga.pal");
+
+        assert!(bytes.len() == 1024);
+
+        let mut palette: [u32; 256] = [0; 256];
+
+        for i in 0..palette.len() {
+            let j = i * 4;
+            let argb = [bytes[j + 0], bytes[j + 1], bytes[j + 2], bytes[j + 3]];
+            palette[i] = u32::from_le_bytes(argb);
+        }
+
+        palette
+    }
+}
+
+impl Index<usize> for PaletteState {
+    type Output = u32;
+    fn index(&self, idx: usize) -> &Self::Output {
+        &self.storage[idx]
+    }
+}
+
+impl IndexMut<usize> for PaletteState {
+    fn index_mut(&mut self, idx: usize) -> &mut Self::Output {
+        Arc::make_mut(&mut self.storage).index_mut(idx)
+    }
+}
+
+#[derive(Clone, Data)]
 struct PixWizState {
     fg: u32,
     bg: u32,
     pixels: PixelState,
+    palette: PaletteState,
 }
 
 impl PixWizState {
@@ -75,6 +122,7 @@ impl PixWizState {
             fg: Color::BLACK.as_rgba_u32(),
             bg: Color::WHITE.as_rgba_u32(),
             pixels: PixelState::new(),
+            palette: PaletteState::new(),
         }
     }
 }
@@ -125,15 +173,11 @@ fn build_tools() -> impl Widget<PixWizState> {
         .background(Color::BLACK)
 }
 
-struct Palette {
-    colors: [u32; 256],
-}
+struct Palette {}
 
 impl Palette {
     pub fn new() -> Self {
-        Self {
-            colors: Self::read_palette(),
-        }
+        Self {}
     }
 
     fn idx_to_point(idx: usize) -> druid::Point {
@@ -145,23 +189,6 @@ impl Palette {
     fn idx_to_rect(idx: usize) -> druid::Rect {
         let origin = Self::idx_to_point(idx);
         druid::Rect::from_origin_size(origin, (10.0, 10.0))
-    }
-
-    fn read_palette() -> [u32; 256] {
-        let bytes = include_bytes!("./assets/vga.pal");
-
-        assert!(bytes.len() == 1024);
-
-        let mut colors: [u32; 256] = [0; 256];
-
-        let mut i = 0;
-        while i < bytes.len() {
-            let argb = [bytes[i + 0], bytes[i + 1], bytes[i + 2], bytes[i + 3]];
-            colors[i / 4] = u32::from_le_bytes(argb);
-            i += 4;
-        }
-
-        colors
     }
 }
 
@@ -190,21 +217,19 @@ impl Widget<PixWizState> for Palette {
         &mut self,
         _layout_ctx: &mut LayoutCtx,
         bc: &BoxConstraints,
-        _data: &PixWizState,
+        data: &PixWizState,
         _env: &Env,
     ) -> Size {
-        let rect = Self::idx_to_rect(self.colors.len() - 1);
+        let rect = Self::idx_to_rect(data.palette.len() - 1);
         let size = Size::new(rect.x1 + 1.0, rect.y1 + 1.0);
         bc.constrain(size)
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, _data: &PixWizState, _env: &Env) {
-        let mut i = 0;
-        for color in &self.colors {
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &PixWizState, _env: &Env) {
+        for i in 0..data.palette.len() {
             let rect = Self::idx_to_rect(i);
-            let rgba = Color::from_rgba32_u32(*color);
+            let rgba = Color::from_rgba32_u32(data.palette[i]);
             ctx.fill(rect, &rgba);
-            i += 1;
         }
     }
 }
