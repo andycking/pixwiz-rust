@@ -174,8 +174,8 @@ impl Canvas {
         for x in 0..32 {
             for y in 0..32 {
                 pixels[i] = match (x + y) % 2 {
-                    0 => 0xb4b4b4ff,
-                    _ => 0xc8c8c8ff,
+                    0 => 0x505050ff,
+                    _ => 0x606060ff,
                 };
                 i += 1;
             }
