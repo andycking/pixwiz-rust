@@ -16,11 +16,11 @@ fn main() -> Result<(), PlatformError> {
 }
 
 #[derive(Clone, Data)]
-struct Pixels {
+struct PixelState {
     storage: Arc<[u32; 1024]>,
 }
 
-impl Pixels {
+impl PixelState {
     pub fn new() -> Self {
         Self {
             storage: Arc::new(Self::build_pixels()),
@@ -49,14 +49,14 @@ impl Pixels {
     }
 }
 
-impl Index<usize> for Pixels {
+impl Index<usize> for PixelState {
     type Output = u32;
     fn index(&self, idx: usize) -> &Self::Output {
         &self.storage[idx]
     }
 }
 
-impl IndexMut<usize> for Pixels {
+impl IndexMut<usize> for PixelState {
     fn index_mut(&mut self, idx: usize) -> &mut Self::Output {
         Arc::make_mut(&mut self.storage).index_mut(idx)
     }
@@ -66,7 +66,7 @@ impl IndexMut<usize> for Pixels {
 struct PixWizState {
     fg: u32,
     bg: u32,
-    pixels: Pixels,
+    pixels: PixelState,
 }
 
 impl PixWizState {
@@ -74,7 +74,7 @@ impl PixWizState {
         Self {
             fg: Color::BLACK.as_rgba_u32(),
             bg: Color::WHITE.as_rgba_u32(),
-            pixels: Pixels::new(),
+            pixels: PixelState::new(),
         }
     }
 }
