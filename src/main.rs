@@ -112,6 +112,7 @@ impl IndexMut<usize> for PaletteState {
 struct PixWizState {
     fg: u32,
     bg: u32,
+    pos: druid::Point,
     pixels: PixelState,
     palette: PaletteState,
 }
@@ -121,6 +122,7 @@ impl PixWizState {
         Self {
             fg: Color::BLACK.as_rgba_u32(),
             bg: Color::WHITE.as_rgba_u32(),
+            pos: druid::Point::ZERO,
             pixels: PixelState::new(),
             palette: PaletteState::new(),
         }
@@ -254,7 +256,15 @@ impl Canvas {
 }
 
 impl Widget<PixWizState> for Canvas {
-    fn event(&mut self, _ctx: &mut EventCtx, _event: &Event, _data: &mut PixWizState, _env: &Env) {}
+    fn event(&mut self, _ctx: &mut EventCtx, event: &Event, data: &mut PixWizState, _env: &Env) {
+        match event {
+            Event::MouseMove(e) => {
+                data.pos = e.pos;
+            }
+
+            _ => {}
+        }
+    }
 
     fn lifecycle(
         &mut self,
