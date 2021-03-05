@@ -2,7 +2,9 @@ use std::ops::{Index, IndexMut};
 use std::sync::Arc;
 
 use druid::widget::prelude::*;
-use druid::widget::{CrossAxisAlignment, FillStrat, Flex, Image};
+use druid::widget::{
+    CrossAxisAlignment, FillStrat, Flex, Image, Label, MainAxisAlignment, Painter,
+};
 use druid::{AppLauncher, Color, Data, ImageBuf, PlatformError, Widget, WidgetExt, WindowDesc};
 
 fn main() -> Result<(), PlatformError> {
@@ -112,7 +114,7 @@ impl IndexMut<usize> for PaletteState {
 struct PixWizState {
     fg: u32,
     bg: u32,
-    pos: druid::Point,
+    pos: (usize, usize),
     pixels: PixelState,
     palette: PaletteState,
 }
@@ -122,7 +124,7 @@ impl PixWizState {
         Self {
             fg: Color::BLACK.as_rgba_u32(),
             bg: Color::WHITE.as_rgba_u32(),
-            pos: druid::Point::ZERO,
+            pos: (0, 0),
             pixels: PixelState::new(),
             palette: PaletteState::new(),
         }
@@ -259,7 +261,9 @@ impl Widget<PixWizState> for Canvas {
     fn event(&mut self, _ctx: &mut EventCtx, event: &Event, data: &mut PixWizState, _env: &Env) {
         match event {
             Event::MouseMove(e) => {
-                data.pos = e.pos;
+                let x = std::cmp::min(e.pos.x as usize / 16 + 1, 32);
+                let y = std::cmp::min(e.pos.y as usize / 16 + 1, 32);
+                data.pos = (x, y);
             }
 
             _ => {}
@@ -305,8 +309,36 @@ impl Widget<PixWizState> for Canvas {
     }
 }
 
+fn build_color_well() -> impl Widget<PixWizState> {
+    Flex::column()
+        .with_child(
+            Painter::new(|ctx, data: &PixWizState, _env| {
+                let rect = ctx.size().to_rect();
+                let rgba = Color::from_rgba32_u32(data.fg);
+                ctx.fill(rect, &rgba);
+            })
+            .fix_size(65.0, 30.0)
+            .border(Color::BLACK, 1.0),
+        )
+        .with_child(
+            Label::new(|data: &PixWizState, _env: &_| format!("{:x}", data.fg))
+                .with_text_color(Color::from_rgba32_u32(0xeee8d5ff)),
+        )
+}
+
+fn build_pos() -> impl Widget<PixWizState> {
+    Label::new(|data: &PixWizState, _env: &_| format!("{:2}:{:2}", data.pos.0, data.pos.1))
+        .with_text_color(Color::from_rgba32_u32(0xeee8d5ff))
+}
+
 fn build_left_pane() -> impl Widget<PixWizState> {
-    Flex::column().with_child(build_tools())
+    Flex::column()
+        .cross_axis_alignment(CrossAxisAlignment::End)
+        .with_child(build_tools())
+        .with_default_spacer()
+        .with_child(build_color_well())
+        .with_default_spacer()
+        .with_child(build_pos())
 }
 
 fn build_canvas() -> impl Widget<PixWizState> {
