@@ -2,7 +2,7 @@ use std::ops::{Index, IndexMut};
 use std::sync::Arc;
 
 use druid::widget::prelude::*;
-use druid::widget::{Flex};
+use druid::widget::Flex;
 use druid::{Color, Data, PlatformError, Widget, WidgetExt};
 
 fn main() -> Result<(), PlatformError> {
@@ -316,7 +316,7 @@ fn build_color_well() -> impl Widget<PixWizState> {
             ctx.fill(rect, &rgba);
         })
         .fix_size(65.0, 30.0)
-        .border(Color::BLACK, 1.0)
+        .border(Color::BLACK, 1.0),
     )
 }
 
