@@ -109,11 +109,26 @@ impl IndexMut<usize> for PaletteState {
     }
 }
 
+#[derive(Clone, Data, PartialEq)]
+enum Tool {
+    Marquee,
+    Lasso,
+    Move,
+    Zoom,
+    Cropper,
+    Type,
+    Paint,
+    Eraser,
+    Fill,
+    Dropper,
+}
+
 #[derive(Clone, Data)]
 struct PixWizState {
     fg: u32,
     bg: u32,
     pos: (usize, usize),
+    tool: Tool,
     pixels: PixelState,
     palette: PaletteState,
 }
@@ -124,6 +139,7 @@ impl PixWizState {
             fg: Color::BLACK.as_rgba_u32(),
             bg: Color::WHITE.as_rgba_u32(),
             pos: (0, 0),
+            tool: Tool::Paint,
             pixels: PixelState::new(),
             palette: PaletteState::new(),
         }
