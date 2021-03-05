@@ -6,14 +6,26 @@ fn main() -> Result<(), PlatformError> {
     let main_window = WindowDesc::new(ui_builder())
         .title("PixWiz")
         .window_size((800.0, 528.0));
-    let data = PixWizState {};
+    let data = PixWizState::new();
     AppLauncher::with_window(main_window)
         .use_env_tracing()
         .launch(data)
 }
 
 #[derive(Clone, Data)]
-struct PixWizState {}
+struct PixWizState {
+    fg: u32,
+    bg: u32,
+}
+
+impl PixWizState {
+    pub fn new() -> Self {
+        Self {
+            fg: Color::BLACK.as_rgba_u32(),
+            bg: Color::WHITE.as_rgba_u32(),
+        }
+    }
+}
 
 fn tools_button(bytes: &[u8]) -> impl Widget<PixWizState> {
     let png_data = ImageBuf::from_data(bytes).unwrap();
