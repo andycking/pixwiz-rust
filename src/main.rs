@@ -5,7 +5,7 @@ use druid::{AppLauncher, Color, Data, ImageBuf, PlatformError, Widget, WidgetExt
 fn main() -> Result<(), PlatformError> {
     let main_window = WindowDesc::new(ui_builder())
         .title("PixWiz")
-        .window_size((640.0, 480.0));
+        .window_size((800.0, 528.0));
     let data = PixWizState {};
     AppLauncher::with_window(main_window)
         .use_env_tracing()
@@ -159,12 +159,12 @@ impl Canvas {
     fn idx_to_point(idx: usize) -> druid::Point {
         let y = (idx / 32) as f64;
         let x = (idx % 32) as f64;
-        druid::Point::new(x * 10.0, y * 10.0)
+        druid::Point::new(x * 16.0, y * 16.0)
     }
 
     fn idx_to_rect(idx: usize) -> druid::Rect {
         let origin = Self::idx_to_point(idx);
-        druid::Rect::from_origin_size(origin, (10.0, 10.0))
+        druid::Rect::from_origin_size(origin, (16.0, 16.0))
     }
 
     fn build_checkerboard() -> [u32; 1024] {
