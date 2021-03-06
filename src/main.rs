@@ -365,7 +365,9 @@ fn build_status_bar() -> impl Widget<PixWizState> {
     Flex::row()
         .with_child(
             druid::widget::Label::new(|data: &PixWizState, _env: &_| {
-                format!("{:08x} {:2}:{:2}", data.brush_color, data.pos.0, data.pos.1)
+                let color = Color::from_rgba32_u32(data.pos_color);
+                let (r, g, b, a) = color.as_rgba8();
+                format!("r:{:3} g:{:3} b:{:3} a:{:3}  {:2}:{:2}", r, g, b, a, data.pos.0, data.pos.1)
             })
             .with_font(druid::FontDescriptor::new(druid::FontFamily::MONOSPACE))
             .with_text_color(Color::BLACK)
