@@ -199,6 +199,16 @@ impl Palette {
         Self {}
     }
 
+    fn point_to_xy(pos: druid::Point) -> (usize, usize) {
+        let x = std::cmp::min(pos.x as usize / (10 + 1) + 1, 16);
+        let y = std::cmp::min(pos.y as usize / (10 + 1) + 1, 16);
+        (x, y)
+    }
+
+    fn xy_to_idx(x: usize, y: usize) -> usize {
+        (y - 1) * 16 + (x - 1)
+    }
+
     fn idx_to_point(idx: usize) -> druid::Point {
         let y = (idx / 16) as f64;
         let x = (idx % 16) as f64;
@@ -212,7 +222,16 @@ impl Palette {
 }
 
 impl Widget<PixWizState> for Palette {
-    fn event(&mut self, _ctx: &mut EventCtx, _event: &Event, _data: &mut PixWizState, _env: &Env) {}
+    fn event(&mut self, _ctx: &mut EventCtx, event: &Event, data: &mut PixWizState, _env: &Env) {
+        match event {
+            Event::MouseMove(e) => {
+                let (x, y) = Self::point_to_xy(e.pos);
+                data.pos_color = data.palette[Self::xy_to_idx(x, y)];
+            }
+
+            _ => {}
+        }
+    }
 
     fn lifecycle(
         &mut self,
@@ -260,6 +279,16 @@ impl Canvas {
         Self {}
     }
 
+    fn point_to_xy(pos: druid::Point) -> (usize, usize) {
+        let x = std::cmp::min(pos.x as usize / 16 + 1, 32);
+        let y = std::cmp::min(pos.y as usize / 16 + 1, 32);
+        (x, y)
+    }
+
+    fn xy_to_idx(x: usize, y: usize) -> usize {
+        (y - 1) * 32 + (x - 1)
+    }
+
     fn idx_to_point(idx: usize) -> druid::Point {
         let y = (idx / 32) as f64;
         let x = (idx % 32) as f64;
@@ -276,9 +305,9 @@ impl Widget<PixWizState> for Canvas {
     fn event(&mut self, _ctx: &mut EventCtx, event: &Event, data: &mut PixWizState, _env: &Env) {
         match event {
             Event::MouseMove(e) => {
-                let x = std::cmp::min(e.pos.x as usize / 16 + 1, 32);
-                let y = std::cmp::min(e.pos.y as usize / 16 + 1, 32);
+                let (x, y) = Self::point_to_xy(e.pos);
                 data.pos = (x, y);
+                data.pos_color = data.pixels[Self::xy_to_idx(x, y)]
             }
 
             _ => {}
@@ -367,7 +396,10 @@ fn build_status_bar() -> impl Widget<PixWizState> {
             druid::widget::Label::new(|data: &PixWizState, _env: &_| {
                 let color = Color::from_rgba32_u32(data.pos_color);
                 let (r, g, b, a) = color.as_rgba8();
-                format!("r:{:3} g:{:3} b:{:3} a:{:3}  {:2}:{:2}", r, g, b, a, data.pos.0, data.pos.1)
+                format!(
+                    "r:{:3} g:{:3} b:{:3} a:{:3}  {:2}:{:2}",
+                    r, g, b, a, data.pos.0, data.pos.1
+                )
             })
             .with_font(druid::FontDescriptor::new(druid::FontFamily::MONOSPACE))
             .with_text_color(Color::BLACK)
