@@ -125,8 +125,8 @@ enum Tool {
 
 #[derive(Clone, Data)]
 struct PixWizState {
-    fg: u32,
-    bg: u32,
+    brush_color: u32,
+    pos_color: u32,
     pos: (usize, usize),
     tool: Tool,
     pixels: PixelState,
@@ -136,8 +136,8 @@ struct PixWizState {
 impl PixWizState {
     pub fn new() -> Self {
         Self {
-            fg: Color::BLACK.as_rgba_u32(),
-            bg: Color::WHITE.as_rgba_u32(),
+            brush_color: Color::BLACK.as_rgba_u32(),
+            pos_color: Color::BLACK.as_rgba_u32(),
             pos: (0, 0),
             tool: Tool::Paint,
             pixels: PixelState::new(),
@@ -328,7 +328,7 @@ fn build_color_well() -> impl Widget<PixWizState> {
     Flex::column().with_child(
         druid::widget::Painter::new(|ctx, data: &PixWizState, _env| {
             let rect = ctx.size().to_rect();
-            let rgba = Color::from_rgba32_u32(data.fg);
+            let rgba = Color::from_rgba32_u32(data.brush_color);
             ctx.fill(rect, &rgba);
         })
         .fix_size(65.0, 30.0)
@@ -365,7 +365,7 @@ fn build_status_bar() -> impl Widget<PixWizState> {
     Flex::row()
         .with_child(
             druid::widget::Label::new(|data: &PixWizState, _env: &_| {
-                format!("{:08x} {:2}:{:2}", data.fg, data.pos.0, data.pos.1)
+                format!("{:08x} {:2}:{:2}", data.brush_color, data.pos.0, data.pos.1)
             })
             .with_font(druid::FontDescriptor::new(druid::FontFamily::MONOSPACE))
             .with_text_color(Color::BLACK)
