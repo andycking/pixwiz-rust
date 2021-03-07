@@ -6,11 +6,15 @@ use druid::widget::Flex;
 use druid::{Color, Data, PlatformError, Widget, WidgetExt};
 
 fn main() -> Result<(), PlatformError> {
-    let main_window = druid::WindowDesc::new(ui_builder())
+    let ui = ui_builder();
+
+    let main_window = druid::WindowDesc::new(ui)
         .title("PixWiz")
         .window_size((800.0, 556.0))
         .resizable(false);
+
     let data = PixWizState::new();
+
     druid::AppLauncher::with_window(main_window)
         .use_env_tracing()
         .launch(data)
@@ -22,6 +26,9 @@ struct PixelState {
 }
 
 impl PixelState {
+    const CHECKERBOARD_DARK_FILL: u32 = 0x505050ff;
+    const CHECKERBOARD_LIGHT_FILL: u32 = 0x606060ff;
+
     pub fn new() -> Self {
         Self {
             storage: Arc::new(Self::build_pixels()),
@@ -39,8 +46,8 @@ impl PixelState {
         for x in 0..32 {
             for y in 0..32 {
                 pixels[i] = match (x + y) % 2 {
-                    0 => 0x505050ff,
-                    _ => 0x606060ff,
+                    0 => Self::CHECKERBOARD_DARK_FILL,
+                    _ => Self::CHECKERBOARD_LIGHT_FILL,
                 };
                 i += 1;
             }
@@ -148,7 +155,6 @@ impl PixWizState {
 
 fn tools_button(bytes: &[u8]) -> impl Widget<PixWizState> {
     let png_data = druid::ImageBuf::from_data(bytes).unwrap();
-
     druid::widget::Image::new(png_data).fill_mode(druid::widget::FillStrat::Cover)
 }
 
@@ -390,41 +396,47 @@ fn build_right_pane() -> impl Widget<PixWizState> {
     build_palette()
 }
 
-fn build_status_bar() -> impl Widget<PixWizState> {
+fn build_top_pane() -> impl Widget<PixWizState> {
     Flex::row()
-        .with_child(
-            druid::widget::Label::new(|data: &PixWizState, _env: &_| {
-                let color = Color::from_rgba32_u32(data.pos_color);
-                let (r, g, b, a) = color.as_rgba8();
-                format!(
-                    "r:{:3} g:{:3} b:{:3} a:{:3}  {:2}:{:2}",
-                    r, g, b, a, data.pos.0, data.pos.1
-                )
-            })
-            .with_font(druid::FontDescriptor::new(druid::FontFamily::MONOSPACE))
-            .with_text_color(Color::BLACK)
-            .padding(3.0),
+        .cross_axis_alignment(druid::widget::CrossAxisAlignment::Start)
+        .with_default_spacer()
+        .with_child(build_left_pane())
+        .with_default_spacer()
+        .with_child(build_canvas())
+        .with_default_spacer()
+        .with_child(build_right_pane())
+        .with_default_spacer()
+}
+
+fn build_status_label() -> impl Widget<PixWizState> {
+    druid::widget::Label::new(|data: &PixWizState, _env: &_| {
+        let color = Color::from_rgba32_u32(data.pos_color);
+        let (r, g, b, a) = color.as_rgba8();
+        format!(
+            "r:{:3} g:{:3} b:{:3} a:{:3}  {:2}:{:2}",
+            r, g, b, a, data.pos.0, data.pos.1
         )
+    })
+    .with_font(druid::FontDescriptor::new(druid::FontFamily::MONOSPACE))
+    .with_text_color(Color::BLACK)
+    .padding(3.0)
+}
+
+fn build_status_bar() -> impl Widget<PixWizState> {
+    const STATUS_BAR_FILL: u32 = 0x657b83ff;
+
+    Flex::row()
         .main_axis_alignment(druid::widget::MainAxisAlignment::End)
         .must_fill_main_axis(true)
-        .background(Color::rgb8(101, 123, 131))
+        .with_child(build_status_label())
+        .background(druid::Color::from_rgba32_u32(STATUS_BAR_FILL))
 }
 
 fn ui_builder() -> impl Widget<PixWizState> {
     Flex::column()
         .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
         .with_default_spacer()
-        .with_child(
-            Flex::row()
-                .cross_axis_alignment(druid::widget::CrossAxisAlignment::Start)
-                .with_default_spacer()
-                .with_child(build_left_pane())
-                .with_default_spacer()
-                .with_child(build_canvas())
-                .with_default_spacer()
-                .with_child(build_right_pane())
-                .with_default_spacer(),
-        )
+        .with_child(build_top_pane())
         .with_default_spacer()
         .with_child(build_status_bar())
         .with_default_spacer()
