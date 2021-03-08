@@ -206,7 +206,7 @@ impl Palette {
         druid::Rect::from_origin_size(origin, (10.0, 10.0))
     }
 
-    fn paint_entry(ctx: &mut PaintCtx, idx: usize, value: u32) {
+    fn paint_idx(ctx: &mut PaintCtx, idx: usize, value: u32) {
         if value & 0xff != 0 {
             let rect = Self::idx_to_rect(idx);
             let rgba = Color::from_rgba32_u32(value);
@@ -259,7 +259,7 @@ impl Widget<PixWizState> for Palette {
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &PixWizState, _env: &Env) {
         for i in 0..data.palette.len() {
-            Self::paint_entry(ctx, i, data.palette[i]);
+            Self::paint_idx(ctx, i, data.palette[i]);
         }
     }
 }
@@ -295,7 +295,7 @@ impl Canvas {
         druid::Rect::from_origin_size(origin, (16.0, 16.0))
     }
 
-    fn paint_pixel(ctx: &mut PaintCtx, idx: usize, value: u32) {
+    fn paint_idx(ctx: &mut PaintCtx, idx: usize, value: u32) {
         if value & 0xff != 0 {
             let rect = Self::idx_to_rect(idx);
             let rgba = Color::from_rgba32_u32(value);
@@ -311,7 +311,7 @@ impl Canvas {
                     0 => Self::CHECKERBOARD_DARK_FILL,
                     _ => Self::CHECKERBOARD_LIGHT_FILL,
                 };
-                Self::paint_pixel(ctx, i, v);
+                Self::paint_idx(ctx, i, v);
                 i += 1;
             }
         }
@@ -365,7 +365,7 @@ impl Widget<PixWizState> for Canvas {
         self.paint_checkerboard(ctx, data, env);
 
         for i in 0..data.pixels.len() {
-            Self::paint_pixel(ctx, i, data.pixels[i]);
+            Self::paint_idx(ctx, i, data.pixels[i]);
         }
     }
 }
