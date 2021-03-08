@@ -26,34 +26,14 @@ struct PixelState {
 }
 
 impl PixelState {
-    const CHECKERBOARD_DARK_FILL: u32 = 0x505050ff;
-    const CHECKERBOARD_LIGHT_FILL: u32 = 0x606060ff;
-
     pub fn new() -> Self {
         Self {
-            storage: Arc::new(Self::build_pixels()),
+            storage: Arc::new([0; 1024]),
         }
     }
 
     pub fn len(&self) -> usize {
         self.storage.len()
-    }
-
-    fn build_pixels() -> [u32; 1024] {
-        let mut pixels: [u32; 1024] = [0; 1024];
-
-        let mut i = 0;
-        for x in 0..32 {
-            for y in 0..32 {
-                pixels[i] = match (x + y) % 2 {
-                    0 => Self::CHECKERBOARD_DARK_FILL,
-                    _ => Self::CHECKERBOARD_LIGHT_FILL,
-                };
-                i += 1;
-            }
-        }
-
-        pixels
     }
 }
 
@@ -225,6 +205,14 @@ impl Palette {
         let origin = Self::idx_to_point(idx);
         druid::Rect::from_origin_size(origin, (10.0, 10.0))
     }
+
+    fn paint_entry(ctx: &mut PaintCtx, idx: usize, value: u32) {
+        if value & 0xff != 0 {
+            let rect = Self::idx_to_rect(idx);
+            let rgba = Color::from_rgba32_u32(value);
+            ctx.fill(rect, &rgba);
+        }
+    }
 }
 
 impl Widget<PixWizState> for Palette {
@@ -271,9 +259,7 @@ impl Widget<PixWizState> for Palette {
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &PixWizState, _env: &Env) {
         for i in 0..data.palette.len() {
-            let rect = Self::idx_to_rect(i);
-            let rgba = Color::from_rgba32_u32(data.palette[i]);
-            ctx.fill(rect, &rgba);
+            Self::paint_entry(ctx, i, data.palette[i]);
         }
     }
 }
@@ -281,6 +267,9 @@ impl Widget<PixWizState> for Palette {
 struct Canvas {}
 
 impl Canvas {
+    const CHECKERBOARD_DARK_FILL: u32 = 0x505050ff;
+    const CHECKERBOARD_LIGHT_FILL: u32 = 0x606060ff;
+
     pub fn new() -> Self {
         Self {}
     }
@@ -304,6 +293,28 @@ impl Canvas {
     fn idx_to_rect(idx: usize) -> druid::Rect {
         let origin = Self::idx_to_point(idx);
         druid::Rect::from_origin_size(origin, (16.0, 16.0))
+    }
+
+    fn paint_pixel(ctx: &mut PaintCtx, idx: usize, value: u32) {
+        if value & 0xff != 0 {
+            let rect = Self::idx_to_rect(idx);
+            let rgba = Color::from_rgba32_u32(value);
+            ctx.fill(rect, &rgba);
+        }
+    }
+
+    fn paint_checkerboard(&mut self, ctx: &mut PaintCtx, data: &PixWizState, _env: &Env) {
+        let mut i = 0;
+        for x in 0..32 {
+            for y in 0..32 {
+                let v = match (x + y) % 2 {
+                    0 => Self::CHECKERBOARD_DARK_FILL,
+                    _ => Self::CHECKERBOARD_LIGHT_FILL,
+                };
+                Self::paint_pixel(ctx, i, v);
+                i += 1;
+            }
+        }
     }
 }
 
@@ -350,11 +361,11 @@ impl Widget<PixWizState> for Canvas {
         bc.constrain(size)
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, data: &PixWizState, _env: &Env) {
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &PixWizState, env: &Env) {
+        self.paint_checkerboard(ctx, data, env);
+
         for i in 0..data.pixels.len() {
-            let rect = Self::idx_to_rect(i);
-            let rgba = Color::from_rgba32_u32(data.pixels[i]);
-            ctx.fill(rect, &rgba);
+            Self::paint_pixel(ctx, i, data.pixels[i]);
         }
     }
 }
