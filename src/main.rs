@@ -97,7 +97,7 @@ impl IndexMut<usize> for PaletteState {
 }
 
 #[derive(Clone, Data, PartialEq)]
-enum Tool {
+enum ToolType {
     Marquee,
     Lasso,
     Move,
@@ -115,7 +115,7 @@ struct PixWizState {
     brush_color: u32,
     pos_color: u32,
     pos: (usize, usize),
-    tool: Tool,
+    tool_type: ToolType,
     pixels: PixelState,
     palette: PaletteState,
 }
@@ -126,10 +126,65 @@ impl PixWizState {
             brush_color: Color::BLACK.as_rgba_u32(),
             pos_color: Color::BLACK.as_rgba_u32(),
             pos: (0, 0),
-            tool: Tool::Paint,
+            tool_type: ToolType::Paint,
             pixels: PixelState::new(),
             palette: PaletteState::new(),
         }
+    }
+}
+
+#[derive(Clone, Data)]
+struct Tool {
+    image_buf: Arc<druid::ImageBuf>,
+}
+
+impl Tool {
+    pub fn new(bytes: &[u8]) -> Self {
+        let image_buf = druid::ImageBuf::from_data(bytes).unwrap();
+        //let image = druid::widget::Image::new(png_data).fill_mode(druid::widget::FillStrat::Cover);
+
+        Self {
+            image_buf: Arc::new(image_buf),
+        }
+    }
+}
+
+impl Widget<PixWizState> for Tool {
+    fn event(&mut self, _ctx: &mut EventCtx, _event: &Event, _data: &mut PixWizState, _env: &Env) {}
+
+    fn lifecycle(
+        &mut self,
+        _ctx: &mut LifeCycleCtx,
+        _event: &LifeCycle,
+        _data: &PixWizState,
+        _env: &Env,
+    ) {
+    }
+
+    fn update(
+        &mut self,
+        _ctx: &mut UpdateCtx,
+        _old_data: &PixWizState,
+        _data: &PixWizState,
+        _env: &Env,
+    ) {
+    }
+
+    fn layout(
+        &mut self,
+        _layout_ctx: &mut LayoutCtx,
+        bc: &BoxConstraints,
+        _data: &PixWizState,
+        _env: &Env,
+    ) -> Size {
+        let image_buf = Arc::as_ref(&self.image_buf);
+        let size = druid::Size::new(image_buf.width() as f64, image_buf.height() as f64);
+        bc.constrain(size)
+    }
+
+    fn paint(&mut self, ctx: &mut PaintCtx, _data: &PixWizState, _env: &Env) {
+        let image_buf = Arc::as_ref(&self.image_buf);
+        let image = image_buf.to_image(ctx.render_ctx);
     }
 }
 
