@@ -216,11 +216,23 @@ impl Palette {
 }
 
 impl Widget<PixWizState> for Palette {
-    fn event(&mut self, _ctx: &mut EventCtx, event: &Event, data: &mut PixWizState, _env: &Env) {
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut PixWizState, _env: &Env) {
         match event {
+            Event::MouseDown(e) => {
+                ctx.set_active(true);
+            }
+
             Event::MouseMove(e) => {
                 let (x, y) = Self::point_to_xy(e.pos);
                 data.pos_color = data.palette[Self::xy_to_idx(x, y)];
+            }
+
+            Event::MouseUp(e) if ctx.is_active() => {
+                if ctx.is_hot() {
+                    let (x, y) = Self::point_to_xy(e.pos);
+                    data.brush_color = data.palette[Self::xy_to_idx(x, y)];
+                }
+                ctx.set_active(false);
             }
 
             _ => {}
