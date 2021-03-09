@@ -335,12 +335,10 @@ impl Widget<PixWizState> for Palette {
                 ctx.set_active(true);
             }
 
-            Event::MouseMove(e) => {
-                match Self::point_to_xy(e.pos) {
-                    Some(xy) => data.pos_color = data.palette[Self::xy_to_idx(xy.0, xy.1)],
-                    None => data.pos_color = data.brush_color,
-                }
-            }
+            Event::MouseMove(e) => match Self::point_to_xy(e.pos) {
+                Some(xy) => data.pos_color = data.palette[Self::xy_to_idx(xy.0, xy.1)],
+                None => data.pos_color = data.brush_color,
+            },
 
             Event::MouseUp(e) if ctx.is_active() => {
                 if ctx.is_hot() {
@@ -349,7 +347,7 @@ impl Widget<PixWizState> for Palette {
                             self.current_idx = Self::xy_to_idx(xy.0, xy.1);
                             data.brush_color = data.palette[self.current_idx];
                             ctx.request_paint();
-                        },
+                        }
                         None => {}
                     }
                 }
