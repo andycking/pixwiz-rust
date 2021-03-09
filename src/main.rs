@@ -205,7 +205,7 @@ impl Widget<PixWizState> for ToolButton {
         bc.constrain(size)
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, _data: &PixWizState, _env: &Env) {
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &PixWizState, _env: &Env) {
         let image_buf = Arc::as_ref(&self.image_buf);
         let rect = druid::Rect::new(
             0.0,
@@ -215,6 +215,11 @@ impl Widget<PixWizState> for ToolButton {
         );
         let image = image_buf.to_image(ctx.render_ctx);
         ctx.draw_image(&image, rect, druid::piet::InterpolationMode::Bilinear);
+
+        let selected = data.tool_type == self.tool_type;
+        if selected {
+            ctx.stroke(rect, &druid::Color::BLACK, 2.0);
+        }
     }
 }
 
@@ -272,11 +277,13 @@ fn build_tools() -> impl Widget<PixWizState> {
         .background(Color::BLACK)
 }
 
-struct Palette {}
+struct Palette {
+    current_idx: usize,
+}
 
 impl Palette {
     pub fn new() -> Self {
-        Self {}
+        Self { current_idx: 0 }
     }
 
     fn point_to_xy(pos: druid::Point) -> (usize, usize) {
@@ -300,11 +307,15 @@ impl Palette {
         druid::Rect::from_origin_size(origin, (10.0, 10.0))
     }
 
-    fn paint_idx(ctx: &mut PaintCtx, idx: usize, value: u32) {
+    fn paint_idx(ctx: &mut PaintCtx, idx: usize, value: u32, selected: bool) {
         if value & 0xff != 0 {
             let rect = Self::idx_to_rect(idx);
             let rgba = Color::from_rgba32_u32(value);
             ctx.fill(rect, &rgba);
+
+            if selected {
+                ctx.stroke(rect, &druid::Color::BLACK, 2.0);
+            }
         }
     }
 }
@@ -324,7 +335,9 @@ impl Widget<PixWizState> for Palette {
             Event::MouseUp(e) if ctx.is_active() => {
                 if ctx.is_hot() {
                     let (x, y) = Self::point_to_xy(e.pos);
-                    data.brush_color = data.palette[Self::xy_to_idx(x, y)];
+                    self.current_idx = Self::xy_to_idx(x, y);
+                    data.brush_color = data.palette[self.current_idx];
+                    ctx.request_paint();
                 }
                 ctx.set_active(false);
             }
@@ -365,7 +378,9 @@ impl Widget<PixWizState> for Palette {
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &PixWizState, _env: &Env) {
         for i in 0..data.palette.len() {
-            Self::paint_idx(ctx, i, data.palette[i]);
+            let color = data.palette[i];
+            let selected = self.current_idx == i;
+            Self::paint_idx(ctx, i, color, selected);
         }
     }
 }
