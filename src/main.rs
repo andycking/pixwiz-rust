@@ -310,8 +310,8 @@ impl Palette {
     fn paint_idx(ctx: &mut PaintCtx, idx: usize, value: u32, selected: bool) {
         if value & 0xff != 0 {
             let rect = Self::idx_to_rect(idx);
-            let rgba = Color::from_rgba32_u32(value);
-            ctx.fill(rect, &rgba);
+            let color = Color::from_rgba32_u32(value);
+            ctx.fill(rect, &color);
 
             if selected {
                 ctx.stroke(rect, &druid::Color::BLACK, 2.0);
@@ -419,8 +419,8 @@ impl Canvas {
     fn paint_idx(ctx: &mut PaintCtx, idx: usize, value: u32) {
         if value & 0xff != 0 {
             let rect = Self::idx_to_rect(idx);
-            let rgba = Color::from_rgba32_u32(value);
-            ctx.fill(rect, &rgba);
+            let color = Color::from_rgba32_u32(value);
+            ctx.fill(rect, &color);
         }
     }
 
@@ -495,8 +495,12 @@ fn build_color_well() -> impl Widget<PixWizState> {
     Flex::column().with_child(
         druid::widget::Painter::new(|ctx, data: &PixWizState, _env| {
             let rect = ctx.size().to_rect();
-            let rgba = Color::from_rgba32_u32(data.brush_color);
-            ctx.fill(rect, &rgba);
+            let value = match data.tool_type == ToolType::Dropper {
+                true => data.pos_color,
+                _ => data.brush_color,
+            };
+            let color = Color::from_rgba32_u32(value);
+            ctx.fill(rect, &color);
         })
         .fix_size(65.0, 30.0)
         .border(Color::BLACK, 1.0),
