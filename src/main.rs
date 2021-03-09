@@ -286,10 +286,18 @@ impl Palette {
         Self { current_idx: 0 }
     }
 
-    fn point_to_xy(pos: druid::Point) -> (usize, usize) {
-        let x = std::cmp::min(pos.x as usize / (10 + 1) + 1, 16);
-        let y = std::cmp::min(pos.y as usize / (10 + 1) + 1, 16);
-        (x, y)
+    fn point_to_xy(pos: druid::Point) -> Option<(usize, usize)> {
+        if pos.x < 1.0 || pos.y < 1.0 {
+            return None;
+        }
+
+        let x = pos.x as usize / (10 + 1) + 1;
+        let y = pos.y as usize / (10 + 1) + 1;
+        if x > 16 || y > 16 {
+            return None;
+        }
+
+        Some((x, y))
     }
 
     fn xy_to_idx(x: usize, y: usize) -> usize {
@@ -328,16 +336,22 @@ impl Widget<PixWizState> for Palette {
             }
 
             Event::MouseMove(e) => {
-                let (x, y) = Self::point_to_xy(e.pos);
-                data.pos_color = data.palette[Self::xy_to_idx(x, y)];
+                match Self::point_to_xy(e.pos) {
+                    Some(xy) => data.pos_color = data.palette[Self::xy_to_idx(xy.0, xy.1)],
+                    None => data.pos_color = data.brush_color,
+                }
             }
 
             Event::MouseUp(e) if ctx.is_active() => {
                 if ctx.is_hot() {
-                    let (x, y) = Self::point_to_xy(e.pos);
-                    self.current_idx = Self::xy_to_idx(x, y);
-                    data.brush_color = data.palette[self.current_idx];
-                    ctx.request_paint();
+                    match Self::point_to_xy(e.pos) {
+                        Some(xy) => {
+                            self.current_idx = Self::xy_to_idx(xy.0, xy.1);
+                            data.brush_color = data.palette[self.current_idx];
+                            ctx.request_paint();
+                        },
+                        None => {}
+                    }
                 }
                 ctx.set_active(false);
             }
