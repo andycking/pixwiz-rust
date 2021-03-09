@@ -135,14 +135,16 @@ impl PixWizState {
 
 #[derive(Clone, Data)]
 struct ToolButton {
+    tool_type: ToolType,
     image_buf: Arc<druid::ImageBuf>,
 }
 
 impl ToolButton {
-    pub fn new(bytes: &[u8]) -> Self {
+    pub fn new(tool_type: ToolType, bytes: &[u8]) -> Self {
         let image_buf = druid::ImageBuf::from_data(bytes).unwrap();
 
         Self {
+            tool_type: tool_type,
             image_buf: Arc::new(image_buf),
         }
     }
@@ -194,7 +196,7 @@ impl Widget<PixWizState> for ToolButton {
     }
 }
 
-fn tools_row<T: Data>(a: impl Widget<T> + 'static, b: impl Widget<T> + 'static) -> impl Widget<T> {
+fn build_tools_row<T: Data>(a: impl Widget<T> + 'static, b: impl Widget<T> + 'static) -> impl Widget<T> {
     Flex::row()
         .with_spacer(1.0)
         .with_child(a)
@@ -204,32 +206,43 @@ fn tools_row<T: Data>(a: impl Widget<T> + 'static, b: impl Widget<T> + 'static) 
 }
 
 fn build_tools() -> impl Widget<PixWizState> {
+    let marquee_bytes = include_bytes!("./assets/marquee.png");
+    let lasso_bytes = include_bytes!("./assets/lasso.png");
+    let move_bytes = include_bytes!("./assets/move.png");
+    let zoom_bytes = include_bytes!("./assets/zoom.png");
+    let cropper_bytes = include_bytes!("./assets/cropper.png");
+    let type_bytes = include_bytes!("./assets/type.png");
+    let paint_bytes = include_bytes!("./assets/paint.png");
+    let eraser_bytes = include_bytes!("./assets/eraser.png");
+    let fill_bytes = include_bytes!("./assets/fill.png");
+    let dropper_bytes = include_bytes!("./assets/dropper.png");
+
     Flex::column()
         .with_spacer(1.0)
-        .with_child(tools_row(
-            ToolButton::new(include_bytes!("./assets/marquee.png")),
-            ToolButton::new(include_bytes!("./assets/lasso.png")),
-        ))
-        /*.with_spacer(1.0)
-        .with_child(tools_row(
-            ToolButton::new(include_bytes!("./assets/move.png")),
-            ToolButton::new(include_bytes!("./assets/zoom.png")),
+        .with_child(build_tools_row(
+            ToolButton::new(ToolType::Marquee, marquee_bytes),
+            ToolButton::new(ToolType::Lasso, lasso_bytes),
         ))
         .with_spacer(1.0)
-        .with_child(tools_row(
-            ToolButton::new(include_bytes!("./assets/cropper.png")),
-            ToolButton::new(include_bytes!("./assets/type.png")),
+        .with_child(build_tools_row(
+            ToolButton::new(ToolType::Move, move_bytes),
+            ToolButton::new(ToolType::Zoom, zoom_bytes),
         ))
         .with_spacer(1.0)
-        .with_child(tools_row(
-            ToolButton::new(include_bytes!("./assets/paint.png")),
-            ToolButton::new(include_bytes!("./assets/eraser.png")),
+        .with_child(build_tools_row(
+            ToolButton::new(ToolType::Cropper, cropper_bytes),
+            ToolButton::new(ToolType::Type, type_bytes),
         ))
         .with_spacer(1.0)
-        .with_child(tools_row(
-            ToolButton::new(include_bytes!("./assets/fill.png")),
-            ToolButton::new(include_bytes!("./assets/dropper.png")),
-        ))*/
+        .with_child(build_tools_row(
+            ToolButton::new(ToolType::Paint, paint_bytes),
+            ToolButton::new(ToolType::Eraser, eraser_bytes),
+        ))
+        .with_spacer(1.0)
+        .with_child(build_tools_row(
+            ToolButton::new(ToolType::Fill, fill_bytes),
+            ToolButton::new(ToolType::Dropper, dropper_bytes),
+        ))
         .with_spacer(1.0)
         .background(Color::BLACK)
 }
@@ -274,7 +287,7 @@ impl Palette {
 impl Widget<PixWizState> for Palette {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut PixWizState, _env: &Env) {
         match event {
-            Event::MouseDown(e) => {
+            Event::MouseDown(_e) => {
                 ctx.set_active(true);
             }
 
@@ -371,7 +384,7 @@ impl Canvas {
         }
     }
 
-    fn paint_checkerboard(&mut self, ctx: &mut PaintCtx, data: &PixWizState, _env: &Env) {
+    fn paint_checkerboard(&mut self, ctx: &mut PaintCtx, _data: &PixWizState, _env: &Env) {
         let mut i = 0;
         for x in 0..32 {
             for y in 0..32 {
