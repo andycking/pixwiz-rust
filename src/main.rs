@@ -420,7 +420,7 @@ impl Canvas {
     fn idx_to_point(idx: usize) -> druid::Point {
         let y = (idx / 32) as f64;
         let x = (idx % 32) as f64;
-        druid::Point::new(x * 16.0, y * 16.0)
+        druid::Point::new(1.0 + (x * 16.0), 1.0 + (y * 16.0))
     }
 
     fn idx_to_rect(idx: usize) -> druid::Rect {
@@ -437,6 +437,9 @@ impl Canvas {
     }
 
     fn paint_checkerboard(&mut self, ctx: &mut PaintCtx, _data: &PixWizState, _env: &Env) {
+        let rect = ctx.size().to_rect();
+        ctx.stroke(rect, &druid::Color::BLACK, 1.0);
+
         let mut i = 0;
         for x in 0..32 {
             for y in 0..32 {
@@ -490,7 +493,7 @@ impl Widget<PixWizState> for Canvas {
         _env: &Env,
     ) -> Size {
         let rect = Self::idx_to_rect(data.pixels.len() - 1);
-        let size = Size::new(rect.x1, rect.y1);
+        let size = Size::new(rect.x1 + 1.0, rect.y1 + 1.0);
         bc.constrain(size)
     }
 
@@ -529,9 +532,7 @@ fn build_left_pane() -> impl Widget<PixWizState> {
 }
 
 fn build_canvas() -> impl Widget<PixWizState> {
-    Flex::column()
-        .with_child(Canvas::new())
-        .border(Color::BLACK, 1.0)
+    Flex::column().with_child(Canvas::new())
 }
 
 fn build_palette() -> impl Widget<PixWizState> {
