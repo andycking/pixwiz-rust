@@ -196,7 +196,10 @@ impl Widget<PixWizState> for ToolButton {
     }
 }
 
-fn build_tools_row<T: Data>(a: impl Widget<T> + 'static, b: impl Widget<T> + 'static) -> impl Widget<T> {
+fn build_tools_row<T: Data>(
+    a: impl Widget<T> + 'static,
+    b: impl Widget<T> + 'static,
+) -> impl Widget<T> {
     Flex::row()
         .with_spacer(1.0)
         .with_child(a)
