@@ -134,14 +134,13 @@ impl PixWizState {
 }
 
 #[derive(Clone, Data)]
-struct Tool {
+struct ToolButton {
     image_buf: Arc<druid::ImageBuf>,
 }
 
-impl Tool {
+impl ToolButton {
     pub fn new(bytes: &[u8]) -> Self {
         let image_buf = druid::ImageBuf::from_data(bytes).unwrap();
-        //let image = druid::widget::Image::new(png_data).fill_mode(druid::widget::FillStrat::Cover);
 
         Self {
             image_buf: Arc::new(image_buf),
@@ -149,7 +148,7 @@ impl Tool {
     }
 }
 
-impl Widget<PixWizState> for Tool {
+impl Widget<PixWizState> for ToolButton {
     fn event(&mut self, _ctx: &mut EventCtx, _event: &Event, _data: &mut PixWizState, _env: &Env) {}
 
     fn lifecycle(
@@ -184,13 +183,15 @@ impl Widget<PixWizState> for Tool {
 
     fn paint(&mut self, ctx: &mut PaintCtx, _data: &PixWizState, _env: &Env) {
         let image_buf = Arc::as_ref(&self.image_buf);
+        let rect = druid::Rect::new(
+            0.0,
+            0.0,
+            image_buf.width() as f64,
+            image_buf.height() as f64,
+        );
         let image = image_buf.to_image(ctx.render_ctx);
+        ctx.draw_image(&image, rect, druid::piet::InterpolationMode::Bilinear);
     }
-}
-
-fn tools_button(bytes: &[u8]) -> impl Widget<PixWizState> {
-    let png_data = druid::ImageBuf::from_data(bytes).unwrap();
-    druid::widget::Image::new(png_data).fill_mode(druid::widget::FillStrat::Cover)
 }
 
 fn tools_row<T: Data>(a: impl Widget<T> + 'static, b: impl Widget<T> + 'static) -> impl Widget<T> {
@@ -206,29 +207,29 @@ fn build_tools() -> impl Widget<PixWizState> {
     Flex::column()
         .with_spacer(1.0)
         .with_child(tools_row(
-            tools_button(include_bytes!("./assets/marquee.png")),
-            tools_button(include_bytes!("./assets/lasso.png")),
+            ToolButton::new(include_bytes!("./assets/marquee.png")),
+            ToolButton::new(include_bytes!("./assets/lasso.png")),
+        ))
+        /*.with_spacer(1.0)
+        .with_child(tools_row(
+            ToolButton::new(include_bytes!("./assets/move.png")),
+            ToolButton::new(include_bytes!("./assets/zoom.png")),
         ))
         .with_spacer(1.0)
         .with_child(tools_row(
-            tools_button(include_bytes!("./assets/move.png")),
-            tools_button(include_bytes!("./assets/zoom.png")),
+            ToolButton::new(include_bytes!("./assets/cropper.png")),
+            ToolButton::new(include_bytes!("./assets/type.png")),
         ))
         .with_spacer(1.0)
         .with_child(tools_row(
-            tools_button(include_bytes!("./assets/cropper.png")),
-            tools_button(include_bytes!("./assets/type.png")),
+            ToolButton::new(include_bytes!("./assets/paint.png")),
+            ToolButton::new(include_bytes!("./assets/eraser.png")),
         ))
         .with_spacer(1.0)
         .with_child(tools_row(
-            tools_button(include_bytes!("./assets/paint.png")),
-            tools_button(include_bytes!("./assets/eraser.png")),
-        ))
-        .with_spacer(1.0)
-        .with_child(tools_row(
-            tools_button(include_bytes!("./assets/fill.png")),
-            tools_button(include_bytes!("./assets/dropper.png")),
-        ))
+            ToolButton::new(include_bytes!("./assets/fill.png")),
+            ToolButton::new(include_bytes!("./assets/dropper.png")),
+        ))*/
         .with_spacer(1.0)
         .background(Color::BLACK)
 }
