@@ -1,3 +1,4 @@
+use std::fmt;
 use std::ops::{Index, IndexMut};
 use std::sync::Arc;
 
@@ -96,7 +97,7 @@ impl IndexMut<usize> for PaletteState {
     }
 }
 
-#[derive(Clone, Data, PartialEq)]
+#[derive(Clone, Copy, Data, Debug, PartialEq)]
 enum ToolType {
     Marquee,
     Lasso,
@@ -108,6 +109,12 @@ enum ToolType {
     Eraser,
     Fill,
     Dropper,
+}
+
+impl fmt::Display for ToolType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 #[derive(Clone, Data)]
@@ -151,7 +158,22 @@ impl ToolButton {
 }
 
 impl Widget<PixWizState> for ToolButton {
-    fn event(&mut self, _ctx: &mut EventCtx, _event: &Event, _data: &mut PixWizState, _env: &Env) {}
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut PixWizState, _env: &Env) {
+        match event {
+            Event::MouseDown(_e) => {
+                ctx.set_active(true);
+            }
+
+            Event::MouseUp(_e) if ctx.is_active() => {
+                if ctx.is_hot() {
+                    data.tool_type = self.tool_type;
+                }
+                ctx.set_active(false);
+            }
+
+            _ => {}
+        }
+    }
 
     fn lifecycle(
         &mut self,
@@ -508,8 +530,8 @@ fn build_status_label() -> impl Widget<PixWizState> {
         let color = Color::from_rgba32_u32(data.pos_color);
         let (r, g, b, a) = color.as_rgba8();
         format!(
-            "r:{:3} g:{:3} b:{:3} a:{:3}  {:2}:{:2}",
-            r, g, b, a, data.pos.0, data.pos.1
+            "{:>10}  r:{:3} g:{:3} b:{:3} a:{:3}  {:2}:{:2}",
+            data.tool_type.to_string().to_lowercase(), r, g, b, a, data.pos.0, data.pos.1
         )
     })
     .with_font(druid::FontDescriptor::new(druid::FontFamily::MONOSPACE))
