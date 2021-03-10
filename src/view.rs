@@ -1,0 +1,156 @@
+use druid::widget::prelude::*;
+use druid::widget::Flex;
+use druid::{Color, Data, Widget, WidgetExt};
+
+use crate::model::AppState;
+use crate::model::ToolType;
+
+use crate::widgets::Canvas;
+use crate::widgets::Palette;
+use crate::widgets::ToolButton;
+
+pub fn build_ui() -> impl Widget<AppState> {
+    Flex::column()
+        .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
+        .with_default_spacer()
+        .with_child(build_top_pane())
+        .with_default_spacer()
+        .with_child(build_status_bar())
+        .with_default_spacer()
+        .background(Color::rgb8(0, 43, 54))
+}
+
+fn build_tools_row<T: Data>(
+    a: impl Widget<T> + 'static,
+    b: impl Widget<T> + 'static,
+) -> impl Widget<T> {
+    Flex::row()
+        .with_spacer(1.0)
+        .with_child(a)
+        .with_spacer(1.0)
+        .with_child(b)
+        .with_spacer(1.0)
+}
+
+fn build_tools() -> impl Widget<AppState> {
+    let marquee_bytes = include_bytes!("./assets/marquee.png");
+    let lasso_bytes = include_bytes!("./assets/lasso.png");
+    let move_bytes = include_bytes!("./assets/move.png");
+    let zoom_bytes = include_bytes!("./assets/zoom.png");
+    let cropper_bytes = include_bytes!("./assets/cropper.png");
+    let type_bytes = include_bytes!("./assets/type.png");
+    let paint_bytes = include_bytes!("./assets/paint.png");
+    let eraser_bytes = include_bytes!("./assets/eraser.png");
+    let fill_bytes = include_bytes!("./assets/fill.png");
+    let dropper_bytes = include_bytes!("./assets/dropper.png");
+
+    Flex::column()
+        .with_spacer(1.0)
+        .with_child(build_tools_row(
+            ToolButton::new(ToolType::Marquee, marquee_bytes),
+            ToolButton::new(ToolType::Lasso, lasso_bytes),
+        ))
+        .with_spacer(1.0)
+        .with_child(build_tools_row(
+            ToolButton::new(ToolType::Move, move_bytes),
+            ToolButton::new(ToolType::Zoom, zoom_bytes),
+        ))
+        .with_spacer(1.0)
+        .with_child(build_tools_row(
+            ToolButton::new(ToolType::Cropper, cropper_bytes),
+            ToolButton::new(ToolType::Type, type_bytes),
+        ))
+        .with_spacer(1.0)
+        .with_child(build_tools_row(
+            ToolButton::new(ToolType::Paint, paint_bytes),
+            ToolButton::new(ToolType::Eraser, eraser_bytes),
+        ))
+        .with_spacer(1.0)
+        .with_child(build_tools_row(
+            ToolButton::new(ToolType::Fill, fill_bytes),
+            ToolButton::new(ToolType::Dropper, dropper_bytes),
+        ))
+        .with_spacer(1.0)
+        .background(Color::BLACK)
+}
+
+fn build_color_well() -> impl Widget<AppState> {
+    Flex::column().with_child(
+        druid::widget::Painter::new(|ctx, data: &AppState, _env| {
+            let rect = ctx.size().to_rect();
+            let value = match data.tool_type == ToolType::Dropper {
+                true => data.pos_color,
+                _ => data.brush_color,
+            };
+            let color = Color::from_rgba32_u32(value);
+            ctx.fill(rect, &color);
+        })
+        .fix_size(65.0, 30.0)
+        .border(Color::BLACK, 1.0),
+    )
+}
+
+fn build_left_pane() -> impl Widget<AppState> {
+    Flex::column()
+        .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
+        .with_child(build_tools())
+        .with_default_spacer()
+        .with_child(build_color_well())
+        .with_default_spacer()
+}
+
+fn build_canvas() -> impl Widget<AppState> {
+    Flex::column().with_child(Canvas::new())
+}
+
+fn build_palette() -> impl Widget<AppState> {
+    Flex::column()
+        .with_child(Palette::new(include_bytes!("./assets/vga.pal")))
+        .background(Color::BLACK)
+}
+
+fn build_right_pane() -> impl Widget<AppState> {
+    build_palette()
+}
+
+fn build_top_pane() -> impl Widget<AppState> {
+    Flex::row()
+        .cross_axis_alignment(druid::widget::CrossAxisAlignment::Start)
+        .with_default_spacer()
+        .with_child(build_left_pane())
+        .with_default_spacer()
+        .with_child(build_canvas())
+        .with_default_spacer()
+        .with_child(build_right_pane())
+        .with_default_spacer()
+}
+
+fn build_status_label() -> impl Widget<AppState> {
+    druid::widget::Label::new(|data: &AppState, _env: &_| {
+        let color = Color::from_rgba32_u32(data.pos_color);
+        let (r, g, b, a) = color.as_rgba8();
+        format!(
+            "{:>10}  r:{:3} g:{:3} b:{:3} a:{:3}  {:2}:{:2}",
+            data.tool_type.to_string().to_lowercase(),
+            r,
+            g,
+            b,
+            a,
+            data.pos.0,
+            data.pos.1
+        )
+    })
+    .with_font(druid::FontDescriptor::new(druid::FontFamily::MONOSPACE))
+    .with_text_color(Color::BLACK)
+    .padding(3.0)
+}
+
+fn build_status_bar() -> impl Widget<AppState> {
+    const STATUS_BAR_FILL: u32 = 0x657b83ff;
+
+    Flex::row()
+        .main_axis_alignment(druid::widget::MainAxisAlignment::End)
+        .must_fill_main_axis(true)
+        .with_child(build_status_label())
+        .background(druid::Color::from_rgba32_u32(STATUS_BAR_FILL))
+}
