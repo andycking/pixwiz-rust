@@ -10,7 +10,7 @@ fn main() -> Result<(), PlatformError> {
     let ui = build_ui();
 
     let main_window = druid::WindowDesc::new(ui)
-        .title("PixWiz")
+        .title("Pix Wiz")
         .window_size((800.0, 556.0))
         .resizable(false);
 
