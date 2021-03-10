@@ -407,10 +407,18 @@ impl Canvas {
         Self {}
     }
 
-    fn point_to_xy(pos: druid::Point) -> (usize, usize) {
-        let x = std::cmp::min(pos.x as usize / 16 + 1, 32);
-        let y = std::cmp::min(pos.y as usize / 16 + 1, 32);
-        (x, y)
+    fn point_to_xy(pos: druid::Point) -> Option<(usize, usize)> {
+        if pos.x < 1.0 || pos.y < 1.0 {
+            return None;
+        }
+
+        let x = pos.x as usize / 16 + 1;
+        let y = pos.y as usize / 16 + 1;
+        if x > 32 || y > 32 {
+            return None;
+        }
+
+        Some((x, y))
     }
 
     fn xy_to_idx(x: usize, y: usize) -> usize {
@@ -457,11 +465,16 @@ impl Canvas {
 impl Widget<PixWizState> for Canvas {
     fn event(&mut self, _ctx: &mut EventCtx, event: &Event, data: &mut PixWizState, _env: &Env) {
         match event {
-            Event::MouseMove(e) => {
-                let (x, y) = Self::point_to_xy(e.pos);
-                data.pos = (x, y);
-                data.pos_color = data.pixels[Self::xy_to_idx(x, y)]
-            }
+            Event::MouseMove(e) => match Self::point_to_xy(e.pos) {
+                Some(xy) => {
+                    data.pos = (xy.0, xy.1);
+                    data.pos_color = data.pixels[Self::xy_to_idx(xy.0, xy.1)]
+                }
+                None => {
+                    data.pos = (0, 0);
+                    data.pos_color = data.brush_color;
+                }
+            },
 
             _ => {}
         }
