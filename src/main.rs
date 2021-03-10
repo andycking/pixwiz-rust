@@ -51,52 +51,6 @@ impl IndexMut<usize> for PixelState {
     }
 }
 
-#[derive(Clone, Data)]
-struct PaletteState {
-    storage: Arc<[u32; 256]>,
-}
-
-impl PaletteState {
-    pub fn new() -> Self {
-        Self {
-            storage: Arc::new(Self::read_palette()),
-        }
-    }
-
-    pub fn len(&self) -> usize {
-        self.storage.len()
-    }
-
-    fn read_palette() -> [u32; 256] {
-        let bytes = include_bytes!("./assets/vga.pal");
-
-        assert!(bytes.len() == 1024);
-
-        let mut palette: [u32; 256] = [0; 256];
-
-        for i in 0..palette.len() {
-            let j = i * 4;
-            let argb = [bytes[j + 0], bytes[j + 1], bytes[j + 2], bytes[j + 3]];
-            palette[i] = u32::from_le_bytes(argb);
-        }
-
-        palette
-    }
-}
-
-impl Index<usize> for PaletteState {
-    type Output = u32;
-    fn index(&self, idx: usize) -> &Self::Output {
-        &self.storage[idx]
-    }
-}
-
-impl IndexMut<usize> for PaletteState {
-    fn index_mut(&mut self, idx: usize) -> &mut Self::Output {
-        Arc::make_mut(&mut self.storage).index_mut(idx)
-    }
-}
-
 #[derive(Clone, Copy, Data, Debug, PartialEq)]
 enum ToolType {
     Marquee,
@@ -124,7 +78,6 @@ struct AppState {
     pos: (usize, usize),
     tool_type: ToolType,
     pixels: PixelState,
-    palette: PaletteState,
 }
 
 impl AppState {
@@ -135,7 +88,6 @@ impl AppState {
             pos: (0, 0),
             tool_type: ToolType::Paint,
             pixels: PixelState::new(),
-            palette: PaletteState::new(),
         }
     }
 }
@@ -273,11 +225,29 @@ fn build_tools() -> impl Widget<AppState> {
 
 struct Palette {
     current_idx: usize,
+    values: [u32; 256],
 }
 
 impl Palette {
-    pub fn new() -> Self {
-        Self { current_idx: 0 }
+    pub fn new(bytes: &[u8]) -> Self {
+        Self {
+            current_idx: 0,
+            values: Self::read_values(bytes),
+        }
+    }
+
+    fn read_values(bytes: &[u8]) -> [u32; 256] {
+        assert!(bytes.len() == 1024);
+
+        let mut values: [u32; 256] = [0; 256];
+
+        for i in 0..values.len() {
+            let j = i * 4;
+            let argb = [bytes[j + 0], bytes[j + 1], bytes[j + 2], bytes[j + 3]];
+            values[i] = u32::from_le_bytes(argb);
+        }
+
+        values
     }
 
     fn point_to_xy(pos: druid::Point) -> Option<(usize, usize)> {
@@ -330,7 +300,7 @@ impl Widget<AppState> for Palette {
             }
 
             Event::MouseMove(e) => match Self::point_to_xy(e.pos) {
-                Some(xy) => data.pos_color = data.palette[Self::xy_to_idx(xy.0, xy.1)],
+                Some(xy) => data.pos_color = self.values[Self::xy_to_idx(xy.0, xy.1)],
                 None => data.pos_color = data.brush_color,
             },
 
@@ -339,7 +309,7 @@ impl Widget<AppState> for Palette {
                     match Self::point_to_xy(e.pos) {
                         Some(xy) => {
                             self.current_idx = Self::xy_to_idx(xy.0, xy.1);
-                            data.brush_color = data.palette[self.current_idx];
+                            data.brush_color = self.values[self.current_idx];
                             ctx.request_paint();
                         }
                         None => {}
@@ -368,17 +338,17 @@ impl Widget<AppState> for Palette {
         &mut self,
         _layout_ctx: &mut LayoutCtx,
         bc: &BoxConstraints,
-        data: &AppState,
+        _data: &AppState,
         _env: &Env,
     ) -> Size {
-        let rect = Self::idx_to_rect(data.palette.len() - 1);
+        let rect = Self::idx_to_rect(self.values.len() - 1);
         let size = Size::new(rect.x1 + 1.0, rect.y1 + 1.0);
         bc.constrain(size)
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, _env: &Env) {
-        for i in 0..data.palette.len() {
-            let color = data.palette[i];
+    fn paint(&mut self, ctx: &mut PaintCtx, _data: &AppState, _env: &Env) {
+        for i in 0..self.values.len() {
+            let color = self.values[i];
             let selected = self.current_idx == i;
             Self::paint_idx(ctx, i, color, selected);
         }
@@ -532,7 +502,7 @@ fn build_canvas() -> impl Widget<AppState> {
 
 fn build_palette() -> impl Widget<AppState> {
     Flex::column()
-        .with_child(Palette::new())
+        .with_child(Palette::new(include_bytes!("./assets/vga.pal")))
         .background(Color::BLACK)
 }
 
