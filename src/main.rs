@@ -14,7 +14,7 @@ fn main() -> Result<(), PlatformError> {
         .window_size((800.0, 556.0))
         .resizable(false);
 
-    let data = PixWizState::new();
+    let data = AppState::new();
 
     druid::AppLauncher::with_window(main_window)
         .use_env_tracing()
@@ -118,7 +118,7 @@ impl fmt::Display for ToolType {
 }
 
 #[derive(Clone, Data)]
-struct PixWizState {
+struct AppState {
     brush_color: u32,
     pos_color: u32,
     pos: (usize, usize),
@@ -127,7 +127,7 @@ struct PixWizState {
     palette: PaletteState,
 }
 
-impl PixWizState {
+impl AppState {
     pub fn new() -> Self {
         Self {
             brush_color: Color::BLACK.as_rgba_u32(),
@@ -157,8 +157,8 @@ impl ToolButton {
     }
 }
 
-impl Widget<PixWizState> for ToolButton {
-    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut PixWizState, _env: &Env) {
+impl Widget<AppState> for ToolButton {
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, _env: &Env) {
         match event {
             Event::MouseDown(_e) => {
                 ctx.set_active(true);
@@ -179,25 +179,19 @@ impl Widget<PixWizState> for ToolButton {
         &mut self,
         _ctx: &mut LifeCycleCtx,
         _event: &LifeCycle,
-        _data: &PixWizState,
+        _data: &AppState,
         _env: &Env,
     ) {
     }
 
-    fn update(
-        &mut self,
-        _ctx: &mut UpdateCtx,
-        _old_data: &PixWizState,
-        _data: &PixWizState,
-        _env: &Env,
-    ) {
+    fn update(&mut self, _ctx: &mut UpdateCtx, _old_data: &AppState, _data: &AppState, _env: &Env) {
     }
 
     fn layout(
         &mut self,
         _layout_ctx: &mut LayoutCtx,
         bc: &BoxConstraints,
-        _data: &PixWizState,
+        _data: &AppState,
         _env: &Env,
     ) -> Size {
         let image_buf = Arc::as_ref(&self.image_buf);
@@ -205,7 +199,7 @@ impl Widget<PixWizState> for ToolButton {
         bc.constrain(size)
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, data: &PixWizState, _env: &Env) {
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, _env: &Env) {
         let image_buf = Arc::as_ref(&self.image_buf);
         let rect = druid::Rect::new(
             0.0,
@@ -235,7 +229,7 @@ fn build_tools_row<T: Data>(
         .with_spacer(1.0)
 }
 
-fn build_tools() -> impl Widget<PixWizState> {
+fn build_tools() -> impl Widget<AppState> {
     let marquee_bytes = include_bytes!("./assets/marquee.png");
     let lasso_bytes = include_bytes!("./assets/lasso.png");
     let move_bytes = include_bytes!("./assets/move.png");
@@ -328,8 +322,8 @@ impl Palette {
     }
 }
 
-impl Widget<PixWizState> for Palette {
-    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut PixWizState, _env: &Env) {
+impl Widget<AppState> for Palette {
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, _env: &Env) {
         match event {
             Event::MouseDown(_e) => {
                 ctx.set_active(true);
@@ -362,25 +356,19 @@ impl Widget<PixWizState> for Palette {
         &mut self,
         _ctx: &mut LifeCycleCtx,
         _event: &LifeCycle,
-        _data: &PixWizState,
+        _data: &AppState,
         _env: &Env,
     ) {
     }
 
-    fn update(
-        &mut self,
-        _ctx: &mut UpdateCtx,
-        _old_data: &PixWizState,
-        _data: &PixWizState,
-        _env: &Env,
-    ) {
+    fn update(&mut self, _ctx: &mut UpdateCtx, _old_data: &AppState, _data: &AppState, _env: &Env) {
     }
 
     fn layout(
         &mut self,
         _layout_ctx: &mut LayoutCtx,
         bc: &BoxConstraints,
-        data: &PixWizState,
+        data: &AppState,
         _env: &Env,
     ) -> Size {
         let rect = Self::idx_to_rect(data.palette.len() - 1);
@@ -388,7 +376,7 @@ impl Widget<PixWizState> for Palette {
         bc.constrain(size)
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, data: &PixWizState, _env: &Env) {
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, _env: &Env) {
         for i in 0..data.palette.len() {
             let color = data.palette[i];
             let selected = self.current_idx == i;
@@ -444,7 +432,7 @@ impl Canvas {
         }
     }
 
-    fn paint_checkerboard(&mut self, ctx: &mut PaintCtx, _data: &PixWizState, _env: &Env) {
+    fn paint_checkerboard(&mut self, ctx: &mut PaintCtx, _data: &AppState, _env: &Env) {
         let rect = ctx.size().to_rect();
         ctx.stroke(rect, &druid::Color::BLACK, 1.0);
 
@@ -462,8 +450,8 @@ impl Canvas {
     }
 }
 
-impl Widget<PixWizState> for Canvas {
-    fn event(&mut self, _ctx: &mut EventCtx, event: &Event, data: &mut PixWizState, _env: &Env) {
+impl Widget<AppState> for Canvas {
+    fn event(&mut self, _ctx: &mut EventCtx, event: &Event, data: &mut AppState, _env: &Env) {
         match event {
             Event::MouseMove(e) => match Self::point_to_xy(e.pos) {
                 Some(xy) => {
@@ -484,25 +472,19 @@ impl Widget<PixWizState> for Canvas {
         &mut self,
         _ctx: &mut LifeCycleCtx,
         _event: &LifeCycle,
-        _data: &PixWizState,
+        _data: &AppState,
         _env: &Env,
     ) {
     }
 
-    fn update(
-        &mut self,
-        _ctx: &mut UpdateCtx,
-        _old_data: &PixWizState,
-        _data: &PixWizState,
-        _env: &Env,
-    ) {
+    fn update(&mut self, _ctx: &mut UpdateCtx, _old_data: &AppState, _data: &AppState, _env: &Env) {
     }
 
     fn layout(
         &mut self,
         _layout_ctx: &mut LayoutCtx,
         bc: &BoxConstraints,
-        data: &PixWizState,
+        data: &AppState,
         _env: &Env,
     ) -> Size {
         let rect = Self::idx_to_rect(data.pixels.len() - 1);
@@ -510,7 +492,7 @@ impl Widget<PixWizState> for Canvas {
         bc.constrain(size)
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, data: &PixWizState, env: &Env) {
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, env: &Env) {
         self.paint_checkerboard(ctx, data, env);
 
         for i in 0..data.pixels.len() {
@@ -519,9 +501,9 @@ impl Widget<PixWizState> for Canvas {
     }
 }
 
-fn build_color_well() -> impl Widget<PixWizState> {
+fn build_color_well() -> impl Widget<AppState> {
     Flex::column().with_child(
-        druid::widget::Painter::new(|ctx, data: &PixWizState, _env| {
+        druid::widget::Painter::new(|ctx, data: &AppState, _env| {
             let rect = ctx.size().to_rect();
             let value = match data.tool_type == ToolType::Dropper {
                 true => data.pos_color,
@@ -535,7 +517,7 @@ fn build_color_well() -> impl Widget<PixWizState> {
     )
 }
 
-fn build_left_pane() -> impl Widget<PixWizState> {
+fn build_left_pane() -> impl Widget<AppState> {
     Flex::column()
         .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
         .with_child(build_tools())
@@ -544,21 +526,21 @@ fn build_left_pane() -> impl Widget<PixWizState> {
         .with_default_spacer()
 }
 
-fn build_canvas() -> impl Widget<PixWizState> {
+fn build_canvas() -> impl Widget<AppState> {
     Flex::column().with_child(Canvas::new())
 }
 
-fn build_palette() -> impl Widget<PixWizState> {
+fn build_palette() -> impl Widget<AppState> {
     Flex::column()
         .with_child(Palette::new())
         .background(Color::BLACK)
 }
 
-fn build_right_pane() -> impl Widget<PixWizState> {
+fn build_right_pane() -> impl Widget<AppState> {
     build_palette()
 }
 
-fn build_top_pane() -> impl Widget<PixWizState> {
+fn build_top_pane() -> impl Widget<AppState> {
     Flex::row()
         .cross_axis_alignment(druid::widget::CrossAxisAlignment::Start)
         .with_default_spacer()
@@ -570,8 +552,8 @@ fn build_top_pane() -> impl Widget<PixWizState> {
         .with_default_spacer()
 }
 
-fn build_status_label() -> impl Widget<PixWizState> {
-    druid::widget::Label::new(|data: &PixWizState, _env: &_| {
+fn build_status_label() -> impl Widget<AppState> {
+    druid::widget::Label::new(|data: &AppState, _env: &_| {
         let color = Color::from_rgba32_u32(data.pos_color);
         let (r, g, b, a) = color.as_rgba8();
         format!(
@@ -590,7 +572,7 @@ fn build_status_label() -> impl Widget<PixWizState> {
     .padding(3.0)
 }
 
-fn build_status_bar() -> impl Widget<PixWizState> {
+fn build_status_bar() -> impl Widget<AppState> {
     const STATUS_BAR_FILL: u32 = 0x657b83ff;
 
     Flex::row()
@@ -600,7 +582,7 @@ fn build_status_bar() -> impl Widget<PixWizState> {
         .background(druid::Color::from_rgba32_u32(STATUS_BAR_FILL))
 }
 
-fn ui_builder() -> impl Widget<PixWizState> {
+fn ui_builder() -> impl Widget<AppState> {
     Flex::column()
         .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
         .with_default_spacer()
