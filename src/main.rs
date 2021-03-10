@@ -7,7 +7,7 @@ use druid::widget::Flex;
 use druid::{Color, Data, PlatformError, Widget, WidgetExt};
 
 fn main() -> Result<(), PlatformError> {
-    let ui = ui_builder();
+    let ui = build_ui();
 
     let main_window = druid::WindowDesc::new(ui)
         .title("PixWiz")
@@ -552,7 +552,7 @@ fn build_status_bar() -> impl Widget<AppState> {
         .background(druid::Color::from_rgba32_u32(STATUS_BAR_FILL))
 }
 
-fn ui_builder() -> impl Widget<AppState> {
+fn build_ui() -> impl Widget<AppState> {
     Flex::column()
         .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
         .with_default_spacer()
