@@ -36,9 +36,7 @@ fn build_tools() -> impl Widget<AppState> {
     let marquee_bytes = include_bytes!("./assets/marquee.png");
     let lasso_bytes = include_bytes!("./assets/lasso.png");
     let move_bytes = include_bytes!("./assets/move.png");
-    let zoom_bytes = include_bytes!("./assets/zoom.png");
     let cropper_bytes = include_bytes!("./assets/cropper.png");
-    let type_bytes = include_bytes!("./assets/type.png");
     let paint_bytes = include_bytes!("./assets/paint.png");
     let eraser_bytes = include_bytes!("./assets/eraser.png");
     let fill_bytes = include_bytes!("./assets/fill.png");
@@ -53,12 +51,7 @@ fn build_tools() -> impl Widget<AppState> {
         .with_spacer(8.0)
         .with_child(build_tools_row(
             ToolButton::new(ToolType::Move, move_bytes),
-            ToolButton::new(ToolType::Zoom, zoom_bytes),
-        ))
-        .with_spacer(8.0)
-        .with_child(build_tools_row(
             ToolButton::new(ToolType::Cropper, cropper_bytes),
-            ToolButton::new(ToolType::Type, type_bytes),
         ))
         .with_spacer(8.0)
         .with_child(build_tools_row(
