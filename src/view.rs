@@ -25,11 +25,11 @@ fn build_tools_row<T: Data>(
     b: impl Widget<T> + 'static,
 ) -> impl Widget<T> {
     Flex::row()
-        .with_spacer(1.0)
+        .with_spacer(8.0)
         .with_child(a)
-        .with_spacer(1.0)
+        .with_spacer(8.0)
         .with_child(b)
-        .with_spacer(1.0)
+        .with_spacer(8.0)
 }
 
 fn build_tools() -> impl Widget<AppState> {
@@ -45,32 +45,32 @@ fn build_tools() -> impl Widget<AppState> {
     let dropper_bytes = include_bytes!("./assets/dropper.png");
 
     Flex::column()
-        .with_spacer(1.0)
+        .with_spacer(8.0)
         .with_child(build_tools_row(
             ToolButton::new(ToolType::Marquee, marquee_bytes),
             ToolButton::new(ToolType::Lasso, lasso_bytes),
         ))
-        .with_spacer(1.0)
+        .with_spacer(8.0)
         .with_child(build_tools_row(
             ToolButton::new(ToolType::Move, move_bytes),
             ToolButton::new(ToolType::Zoom, zoom_bytes),
         ))
-        .with_spacer(1.0)
+        .with_spacer(8.0)
         .with_child(build_tools_row(
             ToolButton::new(ToolType::Cropper, cropper_bytes),
             ToolButton::new(ToolType::Type, type_bytes),
         ))
-        .with_spacer(1.0)
+        .with_spacer(8.0)
         .with_child(build_tools_row(
             ToolButton::new(ToolType::Paint, paint_bytes),
             ToolButton::new(ToolType::Eraser, eraser_bytes),
         ))
-        .with_spacer(1.0)
+        .with_spacer(8.0)
         .with_child(build_tools_row(
             ToolButton::new(ToolType::Fill, fill_bytes),
             ToolButton::new(ToolType::Dropper, dropper_bytes),
         ))
-        .with_spacer(1.0)
+        .with_spacer(8.0)
         .background(theme::TOOLS_FILL)
 }
 
@@ -84,7 +84,7 @@ fn build_color_well() -> impl Widget<AppState> {
         let color = druid::Color::from_rgba32_u32(value);
         ctx.fill(rect, &color);
     })
-    .fix_size(65.0, 30.0)
+    .fix_size(88.0, 30.0)
     .border(theme::COLOR_WELL_STROKE, 1.0)
 }
 
@@ -95,6 +95,7 @@ fn build_left_pane() -> impl Widget<AppState> {
         .with_default_spacer()
         .with_child(build_color_well())
         .with_default_spacer()
+        .with_child(build_palette())
 }
 
 fn build_canvas() -> impl Widget<AppState> {
@@ -106,7 +107,7 @@ fn build_palette() -> impl Widget<AppState> {
 }
 
 fn build_right_pane() -> impl Widget<AppState> {
-    build_palette()
+    Flex::column()
 }
 
 fn build_main_pane() -> impl Widget<AppState> {

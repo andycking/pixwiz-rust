@@ -79,7 +79,7 @@ impl Widget<AppState> for ToolButton {
 
         let selected = data.tool_type == self.tool_type;
         if selected {
-            ctx.stroke(rect, &theme::TOOLS_STROKE_SELECTED, 2.0);
+            ctx.stroke(rect, &theme::TOOLS_STROKE_SELECTED, 4.0);
         }
     }
 }
@@ -118,7 +118,7 @@ impl Palette {
 
         let x = pos.x as usize / (10 + 1) + 1;
         let y = pos.y as usize / (10 + 1) + 1;
-        if x > 16 || y > 16 {
+        if x > 8 || y > 32 {
             return None;
         }
 
@@ -126,12 +126,12 @@ impl Palette {
     }
 
     fn xy_to_idx(x: usize, y: usize) -> usize {
-        (y - 1) * 16 + (x - 1)
+        (y - 1) * 8 + (x - 1)
     }
 
     fn idx_to_point(idx: usize) -> druid::Point {
-        let y = (idx / 16) as f64;
-        let x = (idx % 16) as f64;
+        let y = (idx / 8) as f64;
+        let x = (idx % 8) as f64;
         druid::Point::new(1.0 + (x * (10.0 + 1.0)), 1.0 + (y * (10.0 + 1.0)))
     }
 
