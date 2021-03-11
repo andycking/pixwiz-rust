@@ -119,7 +119,7 @@ fn build_preview() -> impl Widget<AppState> {
         }
     })
     .fix_size(32.0, 32.0)
-    .border(theme::COLOR_WELL_STROKE, 1.0)
+    .border(theme::PREVIEW_STROKE, 1.0)
 }
 
 fn build_right_pane() -> impl Widget<AppState> {

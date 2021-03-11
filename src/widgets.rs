@@ -79,7 +79,9 @@ impl Widget<AppState> for ToolButton {
 
         let selected = data.tool_type == self.tool_type;
         if selected {
-            ctx.stroke(rect, &theme::TOOLS_STROKE_SELECTED, 4.0);
+            ctx.stroke(rect, &theme::TOOLS_STROKE_SELECTED, 2.0);
+        } else {
+            ctx.stroke(rect, &theme::TOOLS_STROKE, 1.0);
         }
     }
 }
