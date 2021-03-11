@@ -166,15 +166,13 @@ impl Widget<AppState> for Palette {
             },
 
             Event::MouseUp(e) if ctx.is_active() => {
-                if ctx.is_hot() {
-                    match Self::point_to_xy(e.pos) {
-                        Some(xy) => {
-                            self.current_idx = Self::xy_to_idx(xy.0, xy.1);
-                            data.brush_color = self.values[self.current_idx];
-                            ctx.request_paint();
-                        }
-                        None => {}
+                match Self::point_to_xy(e.pos) {
+                    Some(xy) => {
+                        self.current_idx = Self::xy_to_idx(xy.0, xy.1);
+                        data.brush_color = self.values[self.current_idx];
+                        ctx.request_paint();
                     }
+                    None => {}
                 }
                 ctx.set_active(false);
             }
