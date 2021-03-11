@@ -276,21 +276,54 @@ impl Canvas {
             }
         }
     }
+
+    fn tool(&mut self, data: &mut AppState, x: usize, y: usize) -> bool {
+        let idx = Self::xy_to_idx(x, y);
+
+        match data.tool_type {
+            ToolType::Paint => {
+                data.pixels[idx] = data.brush_color;
+                true
+            }
+            _ => false,
+        }
+    }
 }
 
 impl Widget<AppState> for Canvas {
-    fn event(&mut self, _ctx: &mut EventCtx, event: &Event, data: &mut AppState, _env: &Env) {
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, _env: &Env) {
         match event {
+            Event::MouseDown(e) => {
+                match Self::point_to_xy(e.pos) {
+                    Some(xy) => {
+                        if self.tool(data, xy.0, xy.1) {
+                            ctx.request_paint();
+                        }
+                    }
+                    _ => {}
+                }
+                ctx.set_active(true);
+            }
+
             Event::MouseMove(e) => match Self::point_to_xy(e.pos) {
                 Some(xy) => {
+                    if ctx.is_active() {
+                        self.tool(data, xy.0, xy.1);
+                    }
+
+                    let idx = Self::xy_to_idx(xy.0, xy.1);
                     data.pos = (xy.0, xy.1);
-                    data.pos_color = data.pixels[Self::xy_to_idx(xy.0, xy.1)]
+                    data.pos_color = data.pixels[idx];
                 }
                 None => {
                     data.pos = (0, 0);
                     data.pos_color = data.brush_color;
                 }
             },
+
+            Event::MouseUp(_e) if ctx.is_active() => {
+                ctx.set_active(false);
+            }
 
             _ => {}
         }
