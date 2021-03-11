@@ -64,7 +64,6 @@ fn build_tools() -> impl Widget<AppState> {
             ToolButton::new(ToolType::Dropper, dropper_bytes),
         ))
         .with_spacer(8.0)
-        .background(theme::TOOLS_FILL)
 }
 
 fn build_color_well() -> impl Widget<AppState> {
