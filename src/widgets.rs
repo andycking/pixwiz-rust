@@ -281,10 +281,21 @@ impl Canvas {
         let idx = Self::xy_to_idx(x, y);
 
         match data.tool_type {
+            ToolType::Eraser => {
+                data.pixels[idx] = 0;
+                true
+            }
+
             ToolType::Paint => {
                 data.pixels[idx] = data.brush_color;
                 true
             }
+
+            ToolType::Dropper => {
+                data.brush_color = data.pixels[idx];
+                false
+            }
+
             _ => false,
         }
     }

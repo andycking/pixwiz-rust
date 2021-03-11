@@ -69,11 +69,7 @@ fn build_tools() -> impl Widget<AppState> {
 fn build_color_well() -> impl Widget<AppState> {
     druid::widget::Painter::new(|ctx, data: &AppState, _env| {
         let rect = ctx.size().to_rect();
-        let value = match data.tool_type == ToolType::Dropper {
-            true => data.pos_color,
-            _ => data.brush_color,
-        };
-        let color = druid::Color::from_rgba32_u32(value);
+        let color = druid::Color::from_rgba32_u32(data.brush_color);
         ctx.fill(rect, &color);
     })
     .fix_size(88.0, 30.0)
