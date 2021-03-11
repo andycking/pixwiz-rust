@@ -98,8 +98,35 @@ fn build_palette() -> impl Widget<AppState> {
     Palette::new(include_bytes!("./assets/vga.pal")).background(theme::PALETTE_FILL)
 }
 
+fn build_preview() -> impl Widget<AppState> {
+    druid::widget::Painter::new(|ctx, data: &AppState, _env| {
+        let mut i = 0;
+        for y in 0..32 {
+            for x in 0..32 {
+                let rect = druid::Rect::new(x as f64, y as f64, (x as f64) + 1.0, (y as f64) + 1.0);
+
+                let mut value = data.pixels[i];
+                value = match value & 0xff {
+                    0 => theme::CHECKERBOARD_FILL_LIGHT,
+                    _ => value,
+                };
+
+                let color = druid::Color::from_rgba32_u32(value);
+                ctx.fill(rect, &color);
+
+                i += 1;
+            }
+        }
+    })
+    .fix_size(32.0, 32.0)
+    .border(theme::COLOR_WELL_STROKE, 1.0)
+}
+
 fn build_right_pane() -> impl Widget<AppState> {
     Flex::column()
+        .with_default_spacer()
+        .with_child(build_preview())
+        .with_default_spacer()
 }
 
 fn build_main_pane() -> impl Widget<AppState> {
