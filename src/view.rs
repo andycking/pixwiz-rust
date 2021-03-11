@@ -1,10 +1,10 @@
 use druid::widget::prelude::*;
 use druid::widget::Flex;
-use druid::{Color, Data, Widget, WidgetExt};
+use druid::{Data, Widget, WidgetExt};
 
 use crate::model::AppState;
 use crate::model::ToolType;
-
+use crate::theme;
 use crate::widgets::Canvas;
 use crate::widgets::Palette;
 use crate::widgets::ToolButton;
@@ -13,11 +13,11 @@ pub fn build_ui() -> impl Widget<AppState> {
     Flex::column()
         .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
         .with_default_spacer()
-        .with_child(build_top_pane())
+        .with_child(build_main_pane())
         .with_default_spacer()
         .with_child(build_status_bar())
         .with_default_spacer()
-        .background(Color::rgb8(0, 43, 54))
+        .background(theme::MAIN_FILL)
 }
 
 fn build_tools_row<T: Data>(
@@ -71,23 +71,21 @@ fn build_tools() -> impl Widget<AppState> {
             ToolButton::new(ToolType::Dropper, dropper_bytes),
         ))
         .with_spacer(1.0)
-        .background(Color::BLACK)
+        .background(theme::TOOLS_FILL)
 }
 
 fn build_color_well() -> impl Widget<AppState> {
-    Flex::column().with_child(
-        druid::widget::Painter::new(|ctx, data: &AppState, _env| {
-            let rect = ctx.size().to_rect();
-            let value = match data.tool_type == ToolType::Dropper {
-                true => data.pos_color,
-                _ => data.brush_color,
-            };
-            let color = Color::from_rgba32_u32(value);
-            ctx.fill(rect, &color);
-        })
-        .fix_size(65.0, 30.0)
-        .border(Color::BLACK, 1.0),
-    )
+    druid::widget::Painter::new(|ctx, data: &AppState, _env| {
+        let rect = ctx.size().to_rect();
+        let value = match data.tool_type == ToolType::Dropper {
+            true => data.pos_color,
+            _ => data.brush_color,
+        };
+        let color = druid::Color::from_rgba32_u32(value);
+        ctx.fill(rect, &color);
+    })
+    .fix_size(65.0, 30.0)
+    .border(theme::COLOR_WELL_STROKE, 1.0)
 }
 
 fn build_left_pane() -> impl Widget<AppState> {
@@ -100,20 +98,18 @@ fn build_left_pane() -> impl Widget<AppState> {
 }
 
 fn build_canvas() -> impl Widget<AppState> {
-    Flex::column().with_child(Canvas::new())
+    Canvas::new()
 }
 
 fn build_palette() -> impl Widget<AppState> {
-    Flex::column()
-        .with_child(Palette::new(include_bytes!("./assets/vga.pal")))
-        .background(Color::BLACK)
+    Palette::new(include_bytes!("./assets/vga.pal")).background(theme::PALETTE_FILL)
 }
 
 fn build_right_pane() -> impl Widget<AppState> {
     build_palette()
 }
 
-fn build_top_pane() -> impl Widget<AppState> {
+fn build_main_pane() -> impl Widget<AppState> {
     Flex::row()
         .cross_axis_alignment(druid::widget::CrossAxisAlignment::Start)
         .with_default_spacer()
@@ -127,7 +123,7 @@ fn build_top_pane() -> impl Widget<AppState> {
 
 fn build_status_label() -> impl Widget<AppState> {
     druid::widget::Label::new(|data: &AppState, _env: &_| {
-        let color = Color::from_rgba32_u32(data.pos_color);
+        let color = druid::Color::from_rgba32_u32(data.pos_color);
         let (r, g, b, a) = color.as_rgba8();
         format!(
             "{:>10}  r:{:3} g:{:3} b:{:3} a:{:3}  {:2}:{:2}",
@@ -141,16 +137,14 @@ fn build_status_label() -> impl Widget<AppState> {
         )
     })
     .with_font(druid::FontDescriptor::new(druid::FontFamily::MONOSPACE))
-    .with_text_color(Color::BLACK)
+    .with_text_color(theme::STATUS_BAR_STROKE)
     .padding(3.0)
 }
 
 fn build_status_bar() -> impl Widget<AppState> {
-    const STATUS_BAR_FILL: u32 = 0x657b83ff;
-
     Flex::row()
         .main_axis_alignment(druid::widget::MainAxisAlignment::End)
         .must_fill_main_axis(true)
         .with_child(build_status_label())
-        .background(druid::Color::from_rgba32_u32(STATUS_BAR_FILL))
+        .background(theme::STATUS_BAR_FILL)
 }

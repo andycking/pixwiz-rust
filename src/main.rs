@@ -1,6 +1,7 @@
 use druid::PlatformError;
 
 mod model;
+mod theme;
 mod view;
 mod widgets;
 

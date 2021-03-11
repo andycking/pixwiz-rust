@@ -5,6 +5,7 @@ use druid::{Color, Data, Widget};
 
 use crate::model::AppState;
 use crate::model::ToolType;
+use crate::theme;
 
 #[derive(Clone, Data)]
 pub struct ToolButton {
@@ -78,7 +79,7 @@ impl Widget<AppState> for ToolButton {
 
         let selected = data.tool_type == self.tool_type;
         if selected {
-            ctx.stroke(rect, &druid::Color::BLACK, 2.0);
+            ctx.stroke(rect, &theme::TOOLS_STROKE_SELECTED, 2.0);
         }
     }
 }
@@ -146,7 +147,7 @@ impl Palette {
             ctx.fill(rect, &color);
 
             if selected {
-                ctx.stroke(rect, &druid::Color::BLACK, 2.0);
+                ctx.stroke(rect, &theme::PALETTE_STROKE_SELECTED, 2.0);
             }
         }
     }
@@ -218,9 +219,6 @@ impl Widget<AppState> for Palette {
 pub struct Canvas {}
 
 impl Canvas {
-    const CHECKERBOARD_DARK_FILL: u32 = 0x505050ff;
-    const CHECKERBOARD_LIGHT_FILL: u32 = 0x606060ff;
-
     pub fn new() -> Self {
         Self {}
     }
@@ -264,14 +262,14 @@ impl Canvas {
 
     fn paint_checkerboard(&mut self, ctx: &mut PaintCtx, _data: &AppState, _env: &Env) {
         let rect = ctx.size().to_rect();
-        ctx.stroke(rect, &druid::Color::BLACK, 1.0);
+        ctx.stroke(rect, &theme::CHECKERBOARD_STROKE, 1.0);
 
         let mut i = 0;
         for x in 0..32 {
             for y in 0..32 {
                 let v = match (x + y) % 2 {
-                    0 => Self::CHECKERBOARD_DARK_FILL,
-                    _ => Self::CHECKERBOARD_LIGHT_FILL,
+                    0 => theme::CHECKERBOARD_FILL_DARK,
+                    _ => theme::CHECKERBOARD_FILL_LIGHT,
                 };
                 Self::paint_idx(ctx, i, v);
                 i += 1;
