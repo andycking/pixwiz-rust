@@ -103,7 +103,7 @@ fn build_preview() -> impl Widget<AppState> {
 
                 let mut value = data.pixels[i];
                 value = match value & 0xff {
-                    0 => theme::CHECKERBOARD_FILL_LIGHT,
+                    0 => theme::PREVIEW_FILL,
                     _ => value,
                 };
 

@@ -1,3 +1,4 @@
+use std::cmp;
 use std::collections::VecDeque;
 use std::sync::Arc;
 
@@ -242,6 +243,10 @@ impl Canvas {
         (y - 1) * 32 + (x - 1)
     }
 
+    fn xy_to_point(x: usize, y: usize) -> druid::Point {
+        druid::Point::new(1.0 + ((x - 1) as f64 * 16.0), 1.0 + ((y - 1) as f64 * 16.0))
+    }
+
     fn idx_to_point(idx: usize) -> druid::Point {
         let y = (idx / 32) as f64;
         let x = (idx % 32) as f64;
@@ -263,14 +268,14 @@ impl Canvas {
 
     fn paint_checkerboard(ctx: &mut PaintCtx, _data: &AppState) {
         let rect = ctx.size().to_rect();
-        ctx.stroke(rect, &theme::CHECKERBOARD_STROKE, 1.0);
+        ctx.stroke(rect, &theme::CANVAS_STROKE, 1.0);
 
         let mut i = 0;
         for x in 0..32 {
             for y in 0..32 {
                 let v = match (x + y) % 2 {
-                    0 => theme::CHECKERBOARD_FILL_DARK,
-                    _ => theme::CHECKERBOARD_FILL_LIGHT,
+                    0 => theme::CANVAS_FILL_DARK,
+                    _ => theme::CANVAS_FILL_LIGHT,
                 };
                 Self::paint_idx(ctx, i, v);
                 i += 1;
@@ -284,7 +289,15 @@ impl Canvas {
         }
     }
 
-    fn paint_selection(ctx: &mut PaintCtx, data: &AppState) {}
+    fn paint_selection(ctx: &mut PaintCtx, data: &AppState) {
+        let s = data.selection;
+        if s != ((0, 0), (0, 0)) {
+            let tl = Self::xy_to_point(s.0 .0, s.0 .1);
+            let br = Self::xy_to_point(s.1 .0, s.1 .1);
+            let rect = druid::Rect::new(tl.x, tl.y, br.x + 16.0, br.y + 16.0);
+            ctx.stroke(rect, &theme::CANVAS_STROKE_SELECTED, 2.0);
+        }
+    }
 
     fn fill(data: &mut AppState, x: usize, y: usize) -> bool {
         let start_idx = Self::xy_to_idx(x, y);
@@ -341,16 +354,23 @@ impl Canvas {
             ToolType::Fill => Self::fill(data, x, y),
 
             ToolType::Marquee => {
-                let selection = (
-                    (data.start_pos.0, data.start_pos.1),
-                    (data.current_pos.0, data.current_pos.1),
+                let tl = (
+                    cmp::min(data.start_pos.0, data.current_pos.0),
+                    cmp::min(data.start_pos.1, data.current_pos.1),
                 );
 
-                if selection != data.selection {
-                    data.selection = selection;
+                let br = (
+                    cmp::max(data.start_pos.0, data.current_pos.0),
+                    cmp::max(data.start_pos.1, data.current_pos.1),
+                );
+
+                let s = (tl, br);
+
+                if s != data.selection {
+                    data.selection = s;
                 }
 
-                selection != data.selection
+                s != data.selection
             }
 
             ToolType::Paint => {
