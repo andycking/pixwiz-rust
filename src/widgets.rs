@@ -248,6 +248,7 @@ impl Canvas {
     }
 
     fn xy_to_point(x: usize, y: usize) -> druid::Point {
+        assert!(x > 0 && y > 0);
         druid::Point::new(1.0 + ((x - 1) as f64 * 16.0), 1.0 + ((y - 1) as f64 * 16.0))
     }
 
