@@ -56,7 +56,9 @@ impl fmt::Display for ToolType {
 pub struct AppState {
     pub brush_color: u32,
     pub pos_color: u32,
-    pub pos: (usize, usize),
+    pub start_pos: (usize, usize),
+    pub current_pos: (usize, usize),
+    pub selection: ((usize, usize), (usize, usize)),
     pub tool_type: ToolType,
     pub pixels: PixelState,
 }
@@ -66,7 +68,9 @@ impl AppState {
         Self {
             brush_color: Color::BLACK.as_rgba_u32(),
             pos_color: Color::BLACK.as_rgba_u32(),
-            pos: (0, 0),
+            start_pos: (0, 0),
+            current_pos: (0, 0),
+            selection: ((0, 0), (0, 0)),
             tool_type: ToolType::Paint,
             pixels: PixelState::new(),
         }

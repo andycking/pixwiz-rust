@@ -332,6 +332,19 @@ impl Canvas {
 
             ToolType::Fill => Self::fill(data, x, y),
 
+            ToolType::Marquee => {
+                let selection = (
+                    (data.start_pos.0, data.start_pos.1),
+                    (data.current_pos.0, data.current_pos.1),
+                );
+
+                if selection != data.selection {
+                    data.selection = selection;
+                }
+
+                selection != data.selection
+            }
+
             ToolType::Paint => {
                 data.pixels[idx] = data.brush_color;
                 true
@@ -348,11 +361,13 @@ impl Widget<AppState> for Canvas {
             Event::MouseDown(e) => {
                 match Self::point_to_xy(e.pos) {
                     Some(xy) => {
+                        data.start_pos = (xy.0, xy.1);
+
                         if self.tool(data, xy.0, xy.1) {
                             ctx.request_paint();
                         }
                     }
-                    _ => {}
+                    _ => data.start_pos = (0, 0),
                 }
                 ctx.set_active(true);
             }
@@ -364,11 +379,11 @@ impl Widget<AppState> for Canvas {
                     }
 
                     let idx = Self::xy_to_idx(xy.0, xy.1);
-                    data.pos = (xy.0, xy.1);
+                    data.current_pos = (xy.0, xy.1);
                     data.pos_color = data.pixels[idx];
                 }
                 None => {
-                    data.pos = (0, 0);
+                    data.current_pos = (0, 0);
                     data.pos_color = data.brush_color;
                 }
             },

@@ -142,14 +142,18 @@ fn build_status_label() -> impl Widget<AppState> {
         let color = druid::Color::from_rgba32_u32(data.pos_color);
         let (r, g, b, a) = color.as_rgba8();
         format!(
-            "{:>10}  r:{:3} g:{:3} b:{:3} a:{:3}  {:2}:{:2}",
+            "{:>10}  r:{:3} g:{:3} b:{:3} a:{:3}  {:02}:{:02}-{:02}:{:02}  {:02}:{:02}",
             data.tool_type.to_string().to_lowercase(),
             r,
             g,
             b,
             a,
-            data.pos.0,
-            data.pos.1
+            data.selection.0 .0,
+            data.selection.0 .1,
+            data.selection.1 .0,
+            data.selection.1 .1,
+            data.current_pos.0,
+            data.current_pos.1
         )
     })
     .with_font(druid::FontDescriptor::new(druid::FontFamily::MONOSPACE))
