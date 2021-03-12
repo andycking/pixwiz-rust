@@ -35,6 +35,10 @@ impl Widget<AppState> for ToolButton {
 
             Event::MouseUp(_e) if ctx.is_active() => {
                 if ctx.is_hot() {
+                    if self.tool_type == ToolType::Marquee {
+                        data.selection = ((0, 0), (0, 0));
+                        ctx.request_paint();
+                    }
                     data.tool_type = self.tool_type;
                 }
                 ctx.set_active(false);
