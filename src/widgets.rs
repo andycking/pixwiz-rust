@@ -261,7 +261,7 @@ impl Canvas {
         }
     }
 
-    fn paint_checkerboard(&mut self, ctx: &mut PaintCtx, _data: &AppState, _env: &Env) {
+    fn paint_checkerboard(ctx: &mut PaintCtx, _data: &AppState) {
         let rect = ctx.size().to_rect();
         ctx.stroke(rect, &theme::CHECKERBOARD_STROKE, 1.0);
 
@@ -277,6 +277,14 @@ impl Canvas {
             }
         }
     }
+
+    fn paint_pixels(ctx: &mut PaintCtx, data: &AppState) {
+        for i in 0..data.pixels.len() {
+            Self::paint_idx(ctx, i, data.pixels[i]);
+        }
+    }
+
+    fn paint_selection(ctx: &mut PaintCtx, data: &AppState) {}
 
     fn fill(data: &mut AppState, x: usize, y: usize) -> bool {
         let start_idx = Self::xy_to_idx(x, y);
@@ -420,11 +428,9 @@ impl Widget<AppState> for Canvas {
         bc.constrain(size)
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, env: &Env) {
-        self.paint_checkerboard(ctx, data, env);
-
-        for i in 0..data.pixels.len() {
-            Self::paint_idx(ctx, i, data.pixels[i]);
-        }
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, _env: &Env) {
+        Self::paint_checkerboard(ctx, data);
+        Self::paint_pixels(ctx, data);
+        Self::paint_selection(ctx, data);
     }
 }
