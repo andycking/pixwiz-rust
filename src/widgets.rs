@@ -281,12 +281,15 @@ impl Canvas {
         let rect = ctx.size().to_rect();
         ctx.stroke(rect, &theme::CANVAS_STROKE, 1.0);
 
+        let dark = theme::CANVAS_FILL_DARK.as_rgba_u32();
+        let light = theme::CANVAS_FILL_LIGHT.as_rgba_u32();
+
         let mut i = 0;
         for x in 0..32 {
             for y in 0..32 {
                 let v = match (x + y) % 2 {
-                    0 => theme::CANVAS_FILL_DARK,
-                    _ => theme::CANVAS_FILL_LIGHT,
+                    0 => dark,
+                    _ => light,
                 };
                 Self::paint_idx(ctx, i, v);
                 i += 1;
