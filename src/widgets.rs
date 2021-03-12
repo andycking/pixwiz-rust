@@ -290,8 +290,8 @@ impl Canvas {
     }
 
     fn paint_selection(ctx: &mut PaintCtx, data: &AppState) {
-        let s = data.selection;
-        if s != ((0, 0), (0, 0)) {
+        if data.has_selection() {
+            let s = data.selection;
             let tl = Self::xy_to_point(s.0 .0, s.0 .1);
             let br = Self::xy_to_point(s.1 .0, s.1 .1);
             let rect = druid::Rect::new(tl.x, tl.y, br.x + 16.0, br.y + 16.0);
@@ -300,6 +300,35 @@ impl Canvas {
     }
 
     fn fill(data: &mut AppState, x: usize, y: usize) -> bool {
+        if data.has_selection() {
+            Self::selection_fill(data, x, y)
+        } else {
+            Self::flood_fill(data, x, y)
+        }
+    }
+
+    fn selection_fill(data: &mut AppState, x: usize, y: usize) -> bool {
+        if x < data.selection.0 .0
+            || x > data.selection.1 .0
+            || y < data.selection.0 .1
+            || y > data.selection.1 .1
+        {
+            return false;
+        }
+
+        Self::flood_fill_work(data, x, y, data.selection)
+    }
+
+    fn flood_fill(data: &mut AppState, x: usize, y: usize) -> bool {
+        Self::flood_fill_work(data, x, y, ((1, 1), (32, 32)))
+    }
+
+    fn flood_fill_work(
+        data: &mut AppState,
+        x: usize,
+        y: usize,
+        bounds: ((usize, usize), (usize, usize)),
+    ) -> bool {
         let start_idx = Self::xy_to_idx(x, y);
         let start_color = data.pixels[start_idx];
         if start_color == data.brush_color {
@@ -317,16 +346,16 @@ impl Canvas {
             if data.pixels[idx] == start_color {
                 data.pixels[idx] = data.brush_color;
 
-                if node.0 > 1 {
+                if node.0 > bounds.0 .0 {
                     q.push_back((node.0 - 1, node.1));
                 }
-                if node.0 < 32 {
+                if node.0 < bounds.1 .0 {
                     q.push_back((node.0 + 1, node.1));
                 }
-                if node.1 > 1 {
+                if node.1 > bounds.0 .1 {
                     q.push_back((node.0, node.1 - 1));
                 }
-                if node.1 < 32 {
+                if node.1 < bounds.1 .1 {
                     q.push_back((node.0, node.1 + 1));
                 }
 
@@ -411,8 +440,10 @@ impl Widget<AppState> for Canvas {
                     data.pos_color = data.pixels[idx];
                 }
                 None => {
-                    data.current_pos = (0, 0);
-                    data.pos_color = data.brush_color;
+                    if !ctx.is_active() {
+                        data.current_pos = (0, 0);
+                        data.pos_color = data.brush_color;
+                    }
                 }
             },
 

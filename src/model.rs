@@ -75,4 +75,8 @@ impl AppState {
             pixels: PixelState::new(),
         }
     }
+
+    pub fn has_selection(&self) -> bool {
+        self.selection != ((0, 0), (0, 0))
+    }
 }
