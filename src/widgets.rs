@@ -222,11 +222,15 @@ impl Widget<AppState> for Palette {
     }
 }
 
-pub struct Canvas {}
+pub struct Canvas {
+    ants: druid::piet::StrokeStyle,
+}
 
 impl Canvas {
     pub fn new() -> Self {
-        Self {}
+        Self {
+            ants: druid::piet::StrokeStyle::new().dash(vec![4.0], 0.0),
+        }
     }
 
     fn point_to_xy(pos: druid::Point) -> Option<(usize, usize)> {
@@ -271,7 +275,7 @@ impl Canvas {
         }
     }
 
-    fn paint_checkerboard(ctx: &mut PaintCtx, _data: &AppState) {
+    fn paint_checkerboard(&self, ctx: &mut PaintCtx, _data: &AppState) {
         let rect = ctx.size().to_rect();
         ctx.stroke(rect, &theme::CANVAS_STROKE, 1.0);
 
@@ -288,19 +292,19 @@ impl Canvas {
         }
     }
 
-    fn paint_pixels(ctx: &mut PaintCtx, data: &AppState) {
+    fn paint_pixels(&self, ctx: &mut PaintCtx, data: &AppState) {
         for i in 0..data.pixels.len() {
             Self::paint_idx(ctx, i, data.pixels[i]);
         }
     }
 
-    fn paint_selection(ctx: &mut PaintCtx, data: &AppState) {
+    fn paint_selection(&self, ctx: &mut PaintCtx, data: &AppState) {
         if data.has_selection() {
             let s = data.selection;
             let tl = Self::xy_to_point(s.0 .0, s.0 .1);
             let br = Self::xy_to_point(s.1 .0, s.1 .1);
             let rect = druid::Rect::new(tl.x, tl.y, br.x + 16.0, br.y + 16.0);
-            ctx.stroke(rect, &theme::CANVAS_STROKE_SELECTED, 2.0);
+            ctx.stroke_styled(rect, &theme::CANVAS_STROKE_SELECTED, 2.0, &self.ants);
         }
     }
 
@@ -485,8 +489,8 @@ impl Widget<AppState> for Canvas {
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, _env: &Env) {
-        Self::paint_checkerboard(ctx, data);
-        Self::paint_pixels(ctx, data);
-        Self::paint_selection(ctx, data);
+        self.paint_checkerboard(ctx, data);
+        self.paint_pixels(ctx, data);
+        self.paint_selection(ctx, data);
     }
 }
