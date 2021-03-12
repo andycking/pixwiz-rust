@@ -36,14 +36,14 @@ impl IndexMut<usize> for PixelState {
 
 #[derive(Clone, Copy, Data, Debug, PartialEq)]
 pub enum ToolType {
-    Marquee,
-    Lasso,
-    Move,
     Cropper,
-    Paint,
+    Dropper,
     Eraser,
     Fill,
-    Dropper,
+    Lasso,
+    Marquee,
+    Move,
+    Paint,
 }
 
 impl fmt::Display for ToolType {
