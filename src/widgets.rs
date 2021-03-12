@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::sync::Arc;
 
 use druid::widget::prelude::*;
@@ -277,6 +278,44 @@ impl Canvas {
         }
     }
 
+    fn fill(data: &mut AppState, x: usize, y: usize) -> bool {
+        let start_idx = Self::xy_to_idx(x, y);
+        let start_color = data.pixels[start_idx];
+        if start_color == data.brush_color {
+            return false;
+        }
+
+        let mut dirty = false;
+
+        let mut q: VecDeque<(usize, usize)> = VecDeque::new();
+        q.push_back((x, y));
+        while !q.is_empty() {
+            let node = q.pop_front().unwrap();
+
+            let idx = Self::xy_to_idx(node.0, node.1);
+            if data.pixels[idx] == start_color {
+                data.pixels[idx] = data.brush_color;
+
+                if node.0 > 1 {
+                    q.push_back((node.0 - 1, node.1));
+                }
+                if node.0 < 32 {
+                    q.push_back((node.0 + 1, node.1));
+                }
+                if node.1 > 1 {
+                    q.push_back((node.0, node.1 - 1));
+                }
+                if node.1 < 32 {
+                    q.push_back((node.0, node.1 + 1));
+                }
+
+                dirty = true;
+            }
+        }
+
+        dirty
+    }
+
     fn tool(&mut self, data: &mut AppState, x: usize, y: usize) -> bool {
         let idx = Self::xy_to_idx(x, y);
 
@@ -290,6 +329,8 @@ impl Canvas {
                 data.pixels[idx] = 0;
                 true
             }
+
+            ToolType::Fill => Self::fill(data, x, y),
 
             ToolType::Paint => {
                 data.pixels[idx] = data.brush_color;
