@@ -20,4 +20,5 @@ pub const PALETTE_STROKE_SELECTED: Color = Color::BLACK;
 pub const CANVAS_FILL_DARK: u32 = 0x505050ff;
 pub const CANVAS_FILL_LIGHT: u32 = 0x606060ff;
 pub const CANVAS_STROKE: Color = MAIN_STROKE;
-pub const CANVAS_STROKE_SELECTED: Color = MAIN_STROKE;
+pub const CANVAS_STROKE_SELECTED_DARK: Color = Color::BLACK;
+pub const CANVAS_STROKE_SELECTED_LIGHT: Color = Color::WHITE;

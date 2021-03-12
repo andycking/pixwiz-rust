@@ -223,13 +223,15 @@ impl Widget<AppState> for Palette {
 }
 
 pub struct Canvas {
-    ants: druid::piet::StrokeStyle,
+    ants_dark: druid::piet::StrokeStyle,
+    ants_light: druid::piet::StrokeStyle,
 }
 
 impl Canvas {
     pub fn new() -> Self {
         Self {
-            ants: druid::piet::StrokeStyle::new().dash(vec![4.0], 0.0),
+            ants_dark: druid::piet::StrokeStyle::new().dash(vec![4.0], 0.0),
+            ants_light: druid::piet::StrokeStyle::new().dash(vec![4.0], 4.0),
         }
     }
 
@@ -301,10 +303,24 @@ impl Canvas {
     fn paint_selection(&self, ctx: &mut PaintCtx, data: &AppState) {
         if data.has_selection() {
             let s = data.selection;
+
             let tl = Self::xy_to_point(s.0 .0, s.0 .1);
             let br = Self::xy_to_point(s.1 .0, s.1 .1);
+
             let rect = druid::Rect::new(tl.x, tl.y, br.x + 16.0, br.y + 16.0);
-            ctx.stroke_styled(rect, &theme::CANVAS_STROKE_SELECTED, 2.0, &self.ants);
+
+            ctx.stroke_styled(
+                rect,
+                &theme::CANVAS_STROKE_SELECTED_DARK,
+                2.0,
+                &self.ants_dark,
+            );
+            ctx.stroke_styled(
+                rect,
+                &theme::CANVAS_STROKE_SELECTED_LIGHT,
+                2.0,
+                &self.ants_light,
+            );
         }
     }
 
