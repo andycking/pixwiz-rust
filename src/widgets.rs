@@ -264,14 +264,14 @@ impl Canvas {
         druid::Point::new(1.0 + (x * 16.0), 1.0 + (y * 16.0))
     }
 
-    fn idx_to_rect(idx: usize) -> druid::Rect {
+    fn idx_to_druid_rect(idx: usize) -> druid::Rect {
         let origin = Self::idx_to_druid_point(idx);
         druid::Rect::from_origin_size(origin, (16.0, 16.0))
     }
 
     fn paint_idx(ctx: &mut PaintCtx, idx: usize, value: u32) {
         if value & 0xff != 0 {
-            let rect = Self::idx_to_rect(idx);
+            let rect = Self::idx_to_druid_rect(idx);
             let color = druid::Color::from_rgba32_u32(value);
             ctx.fill(rect, &color);
         }
@@ -502,7 +502,7 @@ impl druid::Widget<AppState> for Canvas {
         data: &AppState,
         _env: &Env,
     ) -> Size {
-        let rect = Self::idx_to_rect(data.pixels.len() - 1);
+        let rect = Self::idx_to_druid_rect(data.pixels.len() - 1);
         let size = Size::new(rect.x1 + 1.0, rect.y1 + 1.0);
         bc.constrain(size)
     }
