@@ -235,7 +235,7 @@ impl Canvas {
         }
     }
 
-    fn druid_point_to_point(pos: druid::Point) -> Option<Point<usize>> {
+    fn druid_point_to_point(pos: druid::Point) -> Option<Point> {
         if pos.x < 1.0 || pos.y < 1.0 {
             return None;
         }
@@ -452,7 +452,7 @@ impl druid::Widget<AppState> for Canvas {
                             ctx.request_paint();
                         }
                     }
-                    _ => data.start_pos = Point::new(0, 0),
+                    _ => data.start_pos = Point::empty(),
                 }
                 ctx.set_active(true);
             }
@@ -469,7 +469,7 @@ impl druid::Widget<AppState> for Canvas {
                 }
                 None => {
                     if !ctx.is_active() {
-                        data.current_pos = Point::new(0, 0);
+                        data.current_pos = Point::empty();
                         data.pos_color = data.brush_color;
                     }
                 }
