@@ -110,6 +110,10 @@ impl<T: Default + Ord> Rect<T> {
         }
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.x0 == self.x1 && self.y0 == self.y1
+    }
+
     pub fn contains(&self, p: Point<T>) -> bool {
         p.x >= self.x0 && p.x <= self.x1 && p.y >= self.y0 && p.y <= self.y1
     }
@@ -149,9 +153,5 @@ impl AppState {
             tool_type: ToolType::Paint,
             pixels: PixelState::new(),
         }
-    }
-
-    pub fn has_selection(&self) -> bool {
-        self.selection != Rect::empty()
     }
 }
