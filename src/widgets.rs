@@ -16,6 +16,7 @@ pub struct ToolButton {
 }
 
 impl ToolButton {
+    /// Create a new tool button of the given type and with the given raw bytes.
     pub fn new(tool_type: ToolType, bytes: &[u8]) -> Self {
         let image_buf = druid::ImageBuf::from_data(bytes).unwrap();
 
@@ -98,6 +99,7 @@ pub struct Palette {
 }
 
 impl Palette {
+    /// Create a new palette with the given raw byte values.
     pub fn new(bytes: &[u8]) -> Self {
         Self {
             current_idx: 0,
@@ -105,6 +107,9 @@ impl Palette {
         }
     }
 
+    /// Read given values into palette storage. The format is RGBA8, so four bytes
+    /// per value including the alpha in the least significant position [a, r, g, b].
+    /// For now we expect it to be 256 values exactly.
     fn read_values(bytes: &[u8]) -> [u32; 256] {
         assert!(bytes.len() == 1024);
 
@@ -233,6 +238,7 @@ pub struct Canvas {
 }
 
 impl Canvas {
+    /// Create an empty canvas.
     pub fn new() -> Self {
         Self {
             ants_dark: druid::piet::StrokeStyle::new().dash(vec![4.0], 0.0),
