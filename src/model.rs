@@ -77,15 +77,49 @@ impl<T: Default + Ord> Point<T> {
     }
 }
 
-impl From<(usize, usize)> for Point<usize> {
-    fn from(item: (usize, usize)) -> Self {
+impl<T: Default + Ord> From<(T, T)> for Point<T> {
+    fn from(item: (T, T)) -> Self {
         Self::new(item.0, item.1)
     }
 }
 
-impl From<(f64, f64)> for Point<usize> {
-    fn from(item: (f64, f64)) -> Self {
-        Self::new(item.0 as usize, item.1 as usize)
+#[derive(Clone, Copy, druid::Data)]
+pub struct Rect<T> {
+    pub x0: T,
+    pub y0: T,
+    pub x1: T,
+    pub y1: T,
+}
+
+impl<T: Default> Rect<T> {
+    pub fn new(x0: T, y0: T, x1: T, y1: T) -> Self {
+        Self {
+            x0: x0,
+            y0: y0,
+            x1: x1,
+            y1: y1,
+        }
+    }
+
+    pub fn empty() -> Self {
+        Self {
+            x0: Default::default(),
+            y0: Default::default(),
+            x1: Default::default(),
+            y1: Default::default(),
+        }
+    }
+}
+
+impl<T: Default + Ord> From<((T, T), (T, T))> for Rect<T> {
+    fn from(item: ((T, T), (T, T))) -> Self {
+        Self::new(item.0 .0, item.0 .1, item.1 .0, item.1 .1)
+    }
+}
+
+impl<T: Default + Ord> From<(Point<T>, Point<T>)> for Rect<T> {
+    fn from(item: (Point<T>, Point<T>)) -> Self {
+        Self::new(item.0.x, item.0.y, item.1.x, item.1.y)
     }
 }
 
