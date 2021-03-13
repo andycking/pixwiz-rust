@@ -61,7 +61,7 @@ impl<T: Default + Ord> Point<T> {
         Self { x: x, y: y }
     }
 
-    pub fn empty() -> Self {
+    pub fn zero() -> Self {
         Self {
             x: Default::default(),
             y: Default::default(),
@@ -101,22 +101,13 @@ impl<T: Default + Ord> Rect<T> {
         }
     }
 
-    pub fn empty() -> Self {
+    pub fn zero() -> Self {
         Self {
             x0: Default::default(),
             y0: Default::default(),
             x1: Default::default(),
             y1: Default::default(),
         }
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.x0 == self.x1 && self.y0 == self.y1
-    }
-
-    pub fn is_zero(&self) -> bool {
-        let zero: T = Default::default();
-        self.x0 == zero && self.y0 == zero && self.x1 == zero && self.y1 == zero
     }
 
     pub fn contains(&self, p: Point<T>) -> bool {
@@ -142,7 +133,7 @@ pub struct AppState {
     pub pos_color: u32,
     pub start_pos: Point<usize>,
     pub current_pos: Point<usize>,
-    pub selection: Rect<usize>,
+    pub selection: Option<Rect<usize>>,
     pub tool_type: ToolType,
     pub pixels: PixelState,
 }
@@ -152,9 +143,9 @@ impl AppState {
         Self {
             brush_color: 0x0ff,
             pos_color: 0x0ff,
-            start_pos: Point::empty(),
-            current_pos: Point::empty(),
-            selection: Rect::empty(),
+            start_pos: Point::zero(),
+            current_pos: Point::zero(),
+            selection: None,
             tool_type: ToolType::Paint,
             pixels: PixelState::new(),
         }

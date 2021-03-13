@@ -36,7 +36,7 @@ impl druid::Widget<AppState> for ToolButton {
             Event::MouseUp(_e) if ctx.is_active() => {
                 if ctx.is_hot() {
                     if self.tool_type == ToolType::Marquee {
-                        data.selection = Rect::empty();
+                        data.selection = None;
                         ctx.request_paint();
                     }
                     data.tool_type = self.tool_type;
@@ -307,43 +307,44 @@ impl Canvas {
     }
 
     fn paint_selection(&self, ctx: &mut PaintCtx, data: &AppState) {
-        if !data.selection.is_zero() {
-            let s = data.selection;
+        match data.selection {
+            Some(selection) => {
+                let tl = Self::p_to_druid_point(Point::new(selection.x0, selection.y0));
+                let br = Self::p_to_druid_point(Point::new(selection.x1, selection.y1));
 
-            let tl = Self::p_to_druid_point(Point::new(s.x0, s.y0));
-            let br = Self::p_to_druid_point(Point::new(s.x1, s.y1));
+                let rect = druid::Rect::new(tl.x, tl.y, br.x + 16.0, br.y + 16.0);
 
-            let rect = druid::Rect::new(tl.x, tl.y, br.x + 16.0, br.y + 16.0);
+                ctx.stroke_styled(
+                    rect,
+                    &theme::CANVAS_STROKE_SELECTED_DARK,
+                    2.0,
+                    &self.ants_dark,
+                );
+                ctx.stroke_styled(
+                    rect,
+                    &theme::CANVAS_STROKE_SELECTED_LIGHT,
+                    2.0,
+                    &self.ants_light,
+                );
+            }
 
-            ctx.stroke_styled(
-                rect,
-                &theme::CANVAS_STROKE_SELECTED_DARK,
-                2.0,
-                &self.ants_dark,
-            );
-            ctx.stroke_styled(
-                rect,
-                &theme::CANVAS_STROKE_SELECTED_LIGHT,
-                2.0,
-                &self.ants_light,
-            );
+            _ => {}
         }
     }
 
     fn fill(data: &mut AppState, p: Point<usize>) -> bool {
-        if data.selection.is_zero() {
-            Self::flood_fill(data, p)
-        } else {
-            Self::selection_fill(data, p)
+        match data.selection {
+            Some(selection) => Self::selection_fill(data, p, selection),
+            _ => Self::flood_fill(data, p),
         }
     }
 
-    fn selection_fill(data: &mut AppState, p: Point<usize>) -> bool {
-        if !data.selection.contains(p) {
+    fn selection_fill(data: &mut AppState, p: Point<usize>, selection: Rect<usize>) -> bool {
+        if !selection.contains(p) {
             return false;
         }
 
-        Self::flood_fill_work(data, p, Rect::from(data.selection))
+        Self::flood_fill_work(data, p, selection)
     }
 
     fn flood_fill(data: &mut AppState, p: Point<usize>) -> bool {
@@ -408,13 +409,15 @@ impl Canvas {
                 let tl = Point::min(data.start_pos, data.current_pos);
                 let br = Point::max(data.start_pos, data.current_pos);
 
-                let s = Rect::from((tl, br));
+                let new_selection = Rect::from((tl, br));
 
-                if s != data.selection {
-                    data.selection = s;
+                let old_selection = data.selection.unwrap_or(Rect::zero());
+
+                if old_selection != new_selection {
+                    data.selection = Some(new_selection);
                 }
 
-                s != data.selection
+                old_selection != new_selection
             }
 
             ToolType::Paint => {
@@ -439,7 +442,7 @@ impl druid::Widget<AppState> for Canvas {
                             ctx.request_paint();
                         }
                     }
-                    _ => data.start_pos = Point::empty(),
+                    _ => data.start_pos = Point::zero(),
                 }
                 ctx.set_active(true);
             }
@@ -456,7 +459,7 @@ impl druid::Widget<AppState> for Canvas {
                 }
                 None => {
                     if !ctx.is_active() {
-                        data.current_pos = Point::empty();
+                        data.current_pos = Point::zero();
                         data.pos_color = data.brush_color;
                     }
                 }

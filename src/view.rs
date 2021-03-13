@@ -3,6 +3,7 @@ use druid::widget::Flex;
 use druid::WidgetExt;
 
 use crate::model::AppState;
+use crate::model::Rect;
 use crate::model::ToolType;
 use crate::theme;
 use crate::widgets::Canvas;
@@ -141,6 +142,7 @@ fn build_status_label() -> impl druid::Widget<AppState> {
     druid::widget::Label::new(|data: &AppState, _env: &_| {
         let color = druid::Color::from_rgba32_u32(data.pos_color);
         let (r, g, b, a) = color.as_rgba8();
+        let selection = data.selection.unwrap_or(Rect::zero());
         format!(
             "{:>10}  r:{:3} g:{:3} b:{:3} a:{:3}  {:02}:{:02}-{:02}:{:02}  {:02}:{:02}",
             data.tool_type.to_string().to_lowercase(),
@@ -148,10 +150,10 @@ fn build_status_label() -> impl druid::Widget<AppState> {
             g,
             b,
             a,
-            data.selection.x0,
-            data.selection.y0,
-            data.selection.x1,
-            data.selection.y1,
+            selection.x0,
+            selection.y0,
+            selection.x1,
+            selection.y1,
             data.current_pos.x,
             data.current_pos.y
         )
