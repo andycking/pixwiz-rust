@@ -119,6 +119,7 @@ impl Palette {
         values
     }
 
+    /// Translate from screen coordinates (typically the mouse position) to palette coordinates.
     fn screen_coords_to_palette_coords(pos: druid::Point) -> Option<Point<usize>> {
         if pos.x < 1.0 || pos.y < 1.0 {
             return None;
@@ -133,21 +134,25 @@ impl Palette {
         Some(Point::new(x, y))
     }
 
+    /// Convert coordinates to an index within the palette storage.
     fn palette_coords_to_idx(p: Point<usize>) -> usize {
         (p.y - 1) * 8 + (p.x - 1)
     }
 
+    /// Convert an index within the palette storage to screen coordinates.
     fn idx_to_screen_coords(idx: usize) -> druid::Point {
         let y = (idx / 8) as f64;
         let x = (idx % 8) as f64;
         druid::Point::new(1.0 + (x * (10.0 + 1.0)), 1.0 + (y * (10.0 + 1.0)))
     }
 
+    /// Convert an index within the palette storage to a rectanble in screen coordinates.
     fn idx_to_screen_rect(idx: usize) -> druid::Rect {
         let origin = Self::idx_to_screen_coords(idx);
         druid::Rect::from_origin_size(origin, (10.0, 10.0))
     }
 
+    /// Paint an index into palette storage into the given render context.
     fn paint_idx(ctx: &mut PaintCtx, idx: usize, value: u32, selected: bool) {
         if value & 0xff != 0 {
             let rect = Self::idx_to_screen_rect(idx);
@@ -235,7 +240,8 @@ impl Canvas {
         }
     }
 
-    fn druid_point_to_p(pos: druid::Point) -> Option<Point<usize>> {
+    /// Translate from screen coordinates (typically the mouse position) to canvas coordinates.
+    fn screen_coords_to_canvas_coords(pos: druid::Point) -> Option<Point<usize>> {
         if pos.x < 1.0 || pos.y < 1.0 {
             return None;
         }
@@ -249,11 +255,8 @@ impl Canvas {
         Some(Point::new(x, y))
     }
 
-    fn p_to_idx(p: Point<usize>) -> usize {
-        (p.y - 1) * 32 + (p.x - 1)
-    }
-
-    fn p_to_druid_point(p: Point<usize>) -> druid::Point {
+    /// Translate from canvas coordinates to screen coordinates.
+    fn canvas_coords_to_screen_coords(p: Point<usize>) -> druid::Point {
         assert!(p.x > 0 && p.y > 0);
         druid::Point::new(
             1.0 + ((p.x - 1) as f64 * 16.0),
@@ -261,25 +264,35 @@ impl Canvas {
         )
     }
 
-    fn idx_to_druid_point(idx: usize) -> druid::Point {
+    /// Convert coordinates to an index within the canvas storage.
+    fn canvas_coords_to_idx(p: Point<usize>) -> usize {
+        (p.y - 1) * 32 + (p.x - 1)
+    }
+
+    /// Convert an index within the canvas storage to screen coordinates.
+    fn idx_to_screen_coords(idx: usize) -> druid::Point {
         let y = (idx / 32) as f64;
         let x = (idx % 32) as f64;
         druid::Point::new(1.0 + (x * 16.0), 1.0 + (y * 16.0))
     }
 
-    fn idx_to_druid_rect(idx: usize) -> druid::Rect {
-        let origin = Self::idx_to_druid_point(idx);
+    /// Convert an index within the canvas storage to a rectanble in screen coordinates.
+    fn idx_to_screen_rect(idx: usize) -> druid::Rect {
+        let origin = Self::idx_to_screen_coords(idx);
         druid::Rect::from_origin_size(origin, (16.0, 16.0))
     }
 
+    /// Paint an index into canvas storage into the given render context.
     fn paint_idx(ctx: &mut PaintCtx, idx: usize, value: u32) {
         if value & 0xff != 0 {
-            let rect = Self::idx_to_druid_rect(idx);
+            let rect = Self::idx_to_screen_rect(idx);
             let color = druid::Color::from_rgba32_u32(value);
             ctx.fill(rect, &color);
         }
     }
 
+    /// Paint a checkerboard pattern for the background of the canvas into the given
+    /// render context.
     fn paint_checkerboard(&self, ctx: &mut PaintCtx, _data: &AppState) {
         let rect = ctx.size().to_rect();
         ctx.stroke(rect, &theme::CANVAS_STROKE, 1.0);
@@ -300,17 +313,20 @@ impl Canvas {
         }
     }
 
+    /// Paint pixels from storage onto the given render context. This will paint
+    /// on top of the checkboard. Pixel transparency is via alpha value.
     fn paint_pixels(&self, ctx: &mut PaintCtx, data: &AppState) {
         for i in 0..data.pixels.len() {
             Self::paint_idx(ctx, i, data.pixels[i]);
         }
     }
 
+    /// Paint the currently selected area onto the given render context.
     fn paint_selection(&self, ctx: &mut PaintCtx, data: &AppState) {
         match data.selection {
-            Some(selection) => {
-                let tl = Self::p_to_druid_point(Point::new(selection.x0, selection.y0));
-                let br = Self::p_to_druid_point(Point::new(selection.x1, selection.y1));
+            Some(s) => {
+                let tl = Self::canvas_coords_to_screen_coords(Point::new(s.x0, s.y0));
+                let br = Self::canvas_coords_to_screen_coords(Point::new(s.x1, s.y1));
 
                 let rect = druid::Rect::new(tl.x, tl.y, br.x + 16.0, br.y + 16.0);
 
@@ -332,6 +348,8 @@ impl Canvas {
         }
     }
 
+    /// Fill the canvas starting at the given point. Will pick a fill mode depending on
+    /// whether there is a selection (marquee).
     fn fill(data: &mut AppState, p: Point<usize>) -> bool {
         match data.selection {
             Some(selection) => Self::selection_fill(data, p, selection),
@@ -339,6 +357,8 @@ impl Canvas {
         }
     }
 
+    /// Fill the canvas starting at the given point out to the edge of the current
+    /// selection, while respecting color boundaries.
     fn selection_fill(data: &mut AppState, p: Point<usize>, selection: Rect<usize>) -> bool {
         if !selection.contains(p) {
             return false;
@@ -347,12 +367,16 @@ impl Canvas {
         Self::flood_fill_work(data, p, selection)
     }
 
+    /// Flood fill the canvas starting at the given point out to the edge of the
+    /// canvas, while respecting color boundaries.
     fn flood_fill(data: &mut AppState, p: Point<usize>) -> bool {
         Self::flood_fill_work(data, p, Rect::new(1, 1, 32, 32))
     }
 
+    /// Flood fill the canvas starting at the given point out to the given boundary,
+    /// while respecting color boundaries. We should really change this to a span fill.
     fn flood_fill_work(data: &mut AppState, start_pos: Point<usize>, bounds: Rect<usize>) -> bool {
-        let start_idx = Self::p_to_idx(start_pos);
+        let start_idx = Self::canvas_coords_to_idx(start_pos);
         let start_color = data.pixels[start_idx];
         if start_color == data.brush_color {
             return false;
@@ -365,7 +389,7 @@ impl Canvas {
         while !q.is_empty() {
             let node = q.pop_front().unwrap();
 
-            let idx = Self::p_to_idx(node);
+            let idx = Self::canvas_coords_to_idx(node);
             if data.pixels[idx] == start_color {
                 data.pixels[idx] = data.brush_color;
 
@@ -389,8 +413,10 @@ impl Canvas {
         dirty
     }
 
+    /// Execute a tool at the given point on the canvas. The point is in
+    /// canvas coordinates.
     fn tool(&mut self, data: &mut AppState, p: Point<usize>) -> bool {
-        let idx = Self::p_to_idx(p);
+        let idx = Self::canvas_coords_to_idx(p);
 
         match data.tool_type {
             ToolType::Dropper => {
@@ -434,7 +460,7 @@ impl druid::Widget<AppState> for Canvas {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, _env: &Env) {
         match event {
             Event::MouseDown(e) => {
-                match Self::druid_point_to_p(e.pos) {
+                match Self::screen_coords_to_canvas_coords(e.pos) {
                     Some(p) => {
                         data.start_pos = p;
 
@@ -447,13 +473,13 @@ impl druid::Widget<AppState> for Canvas {
                 ctx.set_active(true);
             }
 
-            Event::MouseMove(e) => match Self::druid_point_to_p(e.pos) {
+            Event::MouseMove(e) => match Self::screen_coords_to_canvas_coords(e.pos) {
                 Some(p) => {
                     if ctx.is_active() {
                         self.tool(data, p);
                     }
 
-                    let idx = Self::p_to_idx(p);
+                    let idx = Self::canvas_coords_to_idx(p);
                     data.current_pos = p;
                     data.pos_color = data.pixels[idx];
                 }
@@ -492,7 +518,7 @@ impl druid::Widget<AppState> for Canvas {
         data: &AppState,
         _env: &Env,
     ) -> Size {
-        let rect = Self::idx_to_druid_rect(data.pixels.len() - 1);
+        let rect = Self::idx_to_screen_rect(data.pixels.len() - 1);
         let size = Size::new(rect.x1 + 1.0, rect.y1 + 1.0);
         bc.constrain(size)
     }
