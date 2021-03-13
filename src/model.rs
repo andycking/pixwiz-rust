@@ -2,9 +2,7 @@ use std::fmt;
 use std::ops::{Index, IndexMut};
 use std::sync::Arc;
 
-use druid::{Color, Data};
-
-#[derive(Clone, Data)]
+#[derive(Clone, druid::Data)]
 pub struct PixelState {
     storage: Arc<[u32; 1024]>,
 }
@@ -34,7 +32,7 @@ impl IndexMut<usize> for PixelState {
     }
 }
 
-#[derive(Clone, Copy, Data, Debug, PartialEq)]
+#[derive(Clone, Copy, druid::Data, Debug, PartialEq)]
 pub enum ToolType {
     Cropper,
     Dropper,
@@ -52,7 +50,7 @@ impl fmt::Display for ToolType {
     }
 }
 
-#[derive(Clone, Data)]
+#[derive(Clone, druid::Data)]
 pub struct AppState {
     pub brush_color: u32,
     pub pos_color: u32,
@@ -66,8 +64,8 @@ pub struct AppState {
 impl AppState {
     pub fn new() -> Self {
         Self {
-            brush_color: Color::BLACK.as_rgba_u32(),
-            pos_color: Color::BLACK.as_rgba_u32(),
+            brush_color: 0x0ff,
+            pos_color: 0x0ff,
             start_pos: (0, 0),
             current_pos: (0, 0),
             selection: ((0, 0), (0, 0)),

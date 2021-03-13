@@ -1,6 +1,6 @@
 use druid::widget::prelude::*;
 use druid::widget::Flex;
-use druid::{Data, Widget, WidgetExt};
+use druid::WidgetExt;
 
 use crate::model::AppState;
 use crate::model::ToolType;
@@ -9,7 +9,7 @@ use crate::widgets::Canvas;
 use crate::widgets::Palette;
 use crate::widgets::ToolButton;
 
-pub fn build_ui() -> impl Widget<AppState> {
+pub fn build_ui() -> impl druid::Widget<AppState> {
     Flex::column()
         .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
         .with_default_spacer()
@@ -20,7 +20,7 @@ pub fn build_ui() -> impl Widget<AppState> {
         .background(theme::MAIN_FILL)
 }
 
-fn build_tools_row<T: Data>(
+fn build_tools_row<T: druid::Data>(
     a: impl Widget<T> + 'static,
     b: impl Widget<T> + 'static,
 ) -> impl Widget<T> {
@@ -32,7 +32,7 @@ fn build_tools_row<T: Data>(
         .with_spacer(8.0)
 }
 
-fn build_tools() -> impl Widget<AppState> {
+fn build_tools() -> impl druid::Widget<AppState> {
     let marquee_bytes = include_bytes!("./assets/marquee.png");
     let lasso_bytes = include_bytes!("./assets/lasso.png");
     let move_bytes = include_bytes!("./assets/move.png");
@@ -66,7 +66,7 @@ fn build_tools() -> impl Widget<AppState> {
         .with_spacer(8.0)
 }
 
-fn build_color_well() -> impl Widget<AppState> {
+fn build_color_well() -> impl druid::Widget<AppState> {
     druid::widget::Painter::new(|ctx, data: &AppState, _env| {
         let rect = ctx.size().to_rect();
         let color = druid::Color::from_rgba32_u32(data.brush_color);
@@ -76,7 +76,7 @@ fn build_color_well() -> impl Widget<AppState> {
     .border(theme::COLOR_WELL_STROKE, 1.0)
 }
 
-fn build_left_pane() -> impl Widget<AppState> {
+fn build_left_pane() -> impl druid::Widget<AppState> {
     Flex::column()
         .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
         .with_child(build_tools())
@@ -86,15 +86,15 @@ fn build_left_pane() -> impl Widget<AppState> {
         .with_child(build_palette())
 }
 
-fn build_canvas() -> impl Widget<AppState> {
+fn build_canvas() -> impl druid::Widget<AppState> {
     Canvas::new()
 }
 
-fn build_palette() -> impl Widget<AppState> {
+fn build_palette() -> impl druid::Widget<AppState> {
     Palette::new(include_bytes!("./assets/vga.pal")).background(theme::PALETTE_FILL)
 }
 
-fn build_preview() -> impl Widget<AppState> {
+fn build_preview() -> impl druid::Widget<AppState> {
     druid::widget::Painter::new(|ctx, data: &AppState, _env| {
         let mut i = 0;
         for y in 0..32 {
@@ -118,14 +118,14 @@ fn build_preview() -> impl Widget<AppState> {
     .border(theme::PREVIEW_STROKE, 1.0)
 }
 
-fn build_right_pane() -> impl Widget<AppState> {
+fn build_right_pane() -> impl druid::Widget<AppState> {
     Flex::column()
         .with_default_spacer()
         .with_child(build_preview())
         .with_default_spacer()
 }
 
-fn build_main_pane() -> impl Widget<AppState> {
+fn build_main_pane() -> impl druid::Widget<AppState> {
     Flex::row()
         .cross_axis_alignment(druid::widget::CrossAxisAlignment::Start)
         .with_default_spacer()
@@ -137,7 +137,7 @@ fn build_main_pane() -> impl Widget<AppState> {
         .with_default_spacer()
 }
 
-fn build_status_label() -> impl Widget<AppState> {
+fn build_status_label() -> impl druid::Widget<AppState> {
     druid::widget::Label::new(|data: &AppState, _env: &_| {
         let color = druid::Color::from_rgba32_u32(data.pos_color);
         let (r, g, b, a) = color.as_rgba8();
@@ -161,7 +161,7 @@ fn build_status_label() -> impl Widget<AppState> {
     .padding(3.0)
 }
 
-fn build_status_bar() -> impl Widget<AppState> {
+fn build_status_bar() -> impl druid::Widget<AppState> {
     Flex::row()
         .main_axis_alignment(druid::widget::MainAxisAlignment::End)
         .must_fill_main_axis(true)

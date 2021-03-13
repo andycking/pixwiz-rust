@@ -3,13 +3,12 @@ use std::collections::VecDeque;
 use std::sync::Arc;
 
 use druid::widget::prelude::*;
-use druid::{Color, Data, Widget};
 
 use crate::model::AppState;
 use crate::model::ToolType;
 use crate::theme;
 
-#[derive(Clone, Data)]
+#[derive(Clone, druid::Data)]
 pub struct ToolButton {
     tool_type: ToolType,
     image_buf: Arc<druid::ImageBuf>,
@@ -26,7 +25,7 @@ impl ToolButton {
     }
 }
 
-impl Widget<AppState> for ToolButton {
+impl druid::Widget<AppState> for ToolButton {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, _env: &Env) {
         match event {
             Event::MouseDown(_e) => {
@@ -151,7 +150,7 @@ impl Palette {
     fn paint_idx(ctx: &mut PaintCtx, idx: usize, value: u32, selected: bool) {
         if value & 0xff != 0 {
             let rect = Self::idx_to_rect(idx);
-            let color = Color::from_rgba32_u32(value);
+            let color = druid::Color::from_rgba32_u32(value);
             ctx.fill(rect, &color);
 
             if selected {
@@ -161,7 +160,7 @@ impl Palette {
     }
 }
 
-impl Widget<AppState> for Palette {
+impl druid::Widget<AppState> for Palette {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, _env: &Env) {
         match event {
             Event::MouseDown(_e) => {
@@ -272,7 +271,7 @@ impl Canvas {
     fn paint_idx(ctx: &mut PaintCtx, idx: usize, value: u32) {
         if value & 0xff != 0 {
             let rect = Self::idx_to_rect(idx);
-            let color = Color::from_rgba32_u32(value);
+            let color = druid::Color::from_rgba32_u32(value);
             ctx.fill(rect, &color);
         }
     }
@@ -440,7 +439,7 @@ impl Canvas {
     }
 }
 
-impl Widget<AppState> for Canvas {
+impl druid::Widget<AppState> for Canvas {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, _env: &Env) {
         match event {
             Event::MouseDown(e) => {
