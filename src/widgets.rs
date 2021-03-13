@@ -119,7 +119,7 @@ impl Palette {
         values
     }
 
-    fn point_to_xy(pos: druid::Point) -> Option<(usize, usize)> {
+    fn druid_point_to_p(pos: druid::Point) -> Option<Point<usize>> {
         if pos.x < 1.0 || pos.y < 1.0 {
             return None;
         }
@@ -130,27 +130,27 @@ impl Palette {
             return None;
         }
 
-        Some((x, y))
+        Some(Point::new(x, y))
     }
 
     fn xy_to_idx(x: usize, y: usize) -> usize {
         (y - 1) * 8 + (x - 1)
     }
 
-    fn idx_to_point(idx: usize) -> druid::Point {
+    fn idx_to_druid_point(idx: usize) -> druid::Point {
         let y = (idx / 8) as f64;
         let x = (idx % 8) as f64;
         druid::Point::new(1.0 + (x * (10.0 + 1.0)), 1.0 + (y * (10.0 + 1.0)))
     }
 
-    fn idx_to_rect(idx: usize) -> druid::Rect {
-        let origin = Self::idx_to_point(idx);
+    fn idx_to_druid_rect(idx: usize) -> druid::Rect {
+        let origin = Self::idx_to_druid_point(idx);
         druid::Rect::from_origin_size(origin, (10.0, 10.0))
     }
 
     fn paint_idx(ctx: &mut PaintCtx, idx: usize, value: u32, selected: bool) {
         if value & 0xff != 0 {
-            let rect = Self::idx_to_rect(idx);
+            let rect = Self::idx_to_druid_rect(idx);
             let color = druid::Color::from_rgba32_u32(value);
             ctx.fill(rect, &color);
 
@@ -168,15 +168,15 @@ impl druid::Widget<AppState> for Palette {
                 ctx.set_active(true);
             }
 
-            Event::MouseMove(e) => match Self::point_to_xy(e.pos) {
-                Some(xy) => data.pos_color = self.values[Self::xy_to_idx(xy.0, xy.1)],
+            Event::MouseMove(e) => match Self::druid_point_to_p(e.pos) {
+                Some(p) => data.pos_color = self.values[Self::xy_to_idx(p.x, p.y)],
                 None => data.pos_color = data.brush_color,
             },
 
             Event::MouseUp(e) if ctx.is_active() => {
-                match Self::point_to_xy(e.pos) {
-                    Some(xy) => {
-                        self.current_idx = Self::xy_to_idx(xy.0, xy.1);
+                match Self::druid_point_to_p(e.pos) {
+                    Some(p) => {
+                        self.current_idx = Self::xy_to_idx(p.x, p.y);
                         data.brush_color = self.values[self.current_idx];
                         ctx.request_paint();
                     }
@@ -208,7 +208,7 @@ impl druid::Widget<AppState> for Palette {
         _data: &AppState,
         _env: &Env,
     ) -> Size {
-        let rect = Self::idx_to_rect(self.values.len() - 1);
+        let rect = Self::idx_to_druid_rect(self.values.len() - 1);
         let size = Size::new(rect.x1 + 1.0, rect.y1 + 1.0);
         bc.constrain(size)
     }
