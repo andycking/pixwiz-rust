@@ -64,6 +64,14 @@ impl Point {
     pub fn empty() -> Self {
         Self { x: 0, y: 0 }
     }
+
+    pub fn min(a: Self, b: Self) -> Self {
+        Self::new(std::cmp::min(a.x, b.x), std::cmp::min(a.y, b.y))
+    }
+
+    pub fn max(a: Self, b: Self) -> Self {
+        Self::new(std::cmp::max(a.x, b.x), std::cmp::max(a.y, b.y))
+    }
 }
 
 impl From<(usize, usize)> for Point {
