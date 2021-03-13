@@ -148,10 +148,10 @@ fn build_status_label() -> impl druid::Widget<AppState> {
             g,
             b,
             a,
-            data.selection.0 .0,
-            data.selection.0 .1,
-            data.selection.1 .0,
-            data.selection.1 .1,
+            data.selection.x0,
+            data.selection.y0,
+            data.selection.x1,
+            data.selection.y1,
             data.current_pos.x,
             data.current_pos.y
         )

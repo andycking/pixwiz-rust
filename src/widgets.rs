@@ -1,4 +1,3 @@
-use std::cmp;
 use std::collections::VecDeque;
 use std::sync::Arc;
 
@@ -37,7 +36,7 @@ impl druid::Widget<AppState> for ToolButton {
             Event::MouseUp(_e) if ctx.is_active() => {
                 if ctx.is_hot() {
                     if self.tool_type == ToolType::Marquee {
-                        data.selection = ((0, 0), (0, 0));
+                        data.selection = Rect::empty();
                         ctx.request_paint();
                     }
                     data.tool_type = self.tool_type;
@@ -311,8 +310,8 @@ impl Canvas {
         if data.has_selection() {
             let s = data.selection;
 
-            let tl = Self::p_to_druid_point(Point::from(s.0));
-            let br = Self::p_to_druid_point(Point::from(s.1));
+            let tl = Self::p_to_druid_point(Point::new(s.x0, s.y0));
+            let br = Self::p_to_druid_point(Point::new(s.x1, s.y1));
 
             let rect = druid::Rect::new(tl.x, tl.y, br.x + 16.0, br.y + 16.0);
 
@@ -340,11 +339,7 @@ impl Canvas {
     }
 
     fn selection_fill(data: &mut AppState, p: Point<usize>) -> bool {
-        if p.x < data.selection.0 .0
-            || p.x > data.selection.1 .0
-            || p.y < data.selection.0 .1
-            || p.y > data.selection.1 .1
-        {
+        if !data.selection.contains(p) {
             return false;
         }
 
@@ -410,17 +405,10 @@ impl Canvas {
             ToolType::Fill => Self::fill(data, p),
 
             ToolType::Marquee => {
-                let tl = (
-                    cmp::min(data.start_pos.x, data.current_pos.x),
-                    cmp::min(data.start_pos.y, data.current_pos.y),
-                );
+                let tl = Point::min(data.start_pos, data.current_pos);
+                let br = Point::max(data.start_pos, data.current_pos);
 
-                let br = (
-                    cmp::max(data.start_pos.x, data.current_pos.x),
-                    cmp::max(data.start_pos.y, data.current_pos.y),
-                );
-
-                let s = (tl, br);
+                let s = Rect::from((tl, br));
 
                 if s != data.selection {
                     data.selection = s;

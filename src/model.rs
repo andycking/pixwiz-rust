@@ -83,7 +83,7 @@ impl<T: Default + Ord> From<(T, T)> for Point<T> {
     }
 }
 
-#[derive(Clone, Copy, druid::Data)]
+#[derive(Clone, Copy, druid::Data, PartialEq)]
 pub struct Rect<T> {
     pub x0: T,
     pub y0: T,
@@ -91,7 +91,7 @@ pub struct Rect<T> {
     pub y1: T,
 }
 
-impl<T: Default> Rect<T> {
+impl<T: Default + Ord> Rect<T> {
     pub fn new(x0: T, y0: T, x1: T, y1: T) -> Self {
         Self {
             x0: x0,
@@ -108,6 +108,10 @@ impl<T: Default> Rect<T> {
             x1: Default::default(),
             y1: Default::default(),
         }
+    }
+
+    pub fn contains(&self, p: Point<T>) -> bool {
+        p.x >= self.x0 && p.x <= self.x1 && p.y >= self.y0 && p.y <= self.y1
     }
 }
 
@@ -129,7 +133,7 @@ pub struct AppState {
     pub pos_color: u32,
     pub start_pos: Point<usize>,
     pub current_pos: Point<usize>,
-    pub selection: ((usize, usize), (usize, usize)),
+    pub selection: Rect<usize>,
     pub tool_type: ToolType,
     pub pixels: PixelState,
 }
@@ -141,13 +145,13 @@ impl AppState {
             pos_color: 0x0ff,
             start_pos: Point::empty(),
             current_pos: Point::empty(),
-            selection: ((0, 0), (0, 0)),
+            selection: Rect::empty(),
             tool_type: ToolType::Paint,
             pixels: PixelState::new(),
         }
     }
 
     pub fn has_selection(&self) -> bool {
-        self.selection != ((0, 0), (0, 0))
+        self.selection != Rect::empty()
     }
 }
