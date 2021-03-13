@@ -256,7 +256,10 @@ impl Canvas {
 
     fn p_to_druid_point(p: Point<usize>) -> druid::Point {
         assert!(p.x > 0 && p.y > 0);
-        druid::Point::new(1.0 + ((p.x - 1) as f64 * 16.0), 1.0 + ((p.y - 1) as f64 * 16.0))
+        druid::Point::new(
+            1.0 + ((p.x - 1) as f64 * 16.0),
+            1.0 + ((p.y - 1) as f64 * 16.0),
+        )
     }
 
     fn idx_to_druid_point(idx: usize) -> druid::Point {
