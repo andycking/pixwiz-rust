@@ -235,7 +235,7 @@ impl Canvas {
         }
     }
 
-    fn druid_point_to_point(pos: druid::Point) -> Option<Point<usize>> {
+    fn druid_point_to_p(pos: druid::Point) -> Option<Point<usize>> {
         if pos.x < 1.0 || pos.y < 1.0 {
             return None;
         }
@@ -444,11 +444,11 @@ impl druid::Widget<AppState> for Canvas {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, _env: &Env) {
         match event {
             Event::MouseDown(e) => {
-                match Self::druid_point_to_point(e.pos) {
-                    Some(xy) => {
-                        data.start_pos = xy;
+                match Self::druid_point_to_p(e.pos) {
+                    Some(p) => {
+                        data.start_pos = p;
 
-                        if self.tool(data, xy.x, xy.y) {
+                        if self.tool(data, p.x, p.y) {
                             ctx.request_paint();
                         }
                     }
@@ -457,14 +457,14 @@ impl druid::Widget<AppState> for Canvas {
                 ctx.set_active(true);
             }
 
-            Event::MouseMove(e) => match Self::druid_point_to_point(e.pos) {
-                Some(xy) => {
+            Event::MouseMove(e) => match Self::druid_point_to_p(e.pos) {
+                Some(p) => {
                     if ctx.is_active() {
-                        self.tool(data, xy.x, xy.y);
+                        self.tool(data, p.x, p.y);
                     }
 
-                    let idx = Self::xy_to_idx(xy.x, xy.y);
-                    data.current_pos = xy;
+                    let idx = Self::xy_to_idx(p.x, p.y);
+                    data.current_pos = p;
                     data.pos_color = data.pixels[idx];
                 }
                 None => {
