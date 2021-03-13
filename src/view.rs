@@ -152,8 +152,8 @@ fn build_status_label() -> impl druid::Widget<AppState> {
             data.selection.0 .1,
             data.selection.1 .0,
             data.selection.1 .1,
-            data.current_pos.0,
-            data.current_pos.1
+            data.current_pos.x,
+            data.current_pos.y
         )
     })
     .with_font(druid::FontDescriptor::new(druid::FontFamily::MONOSPACE))

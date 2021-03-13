@@ -5,6 +5,7 @@ use std::sync::Arc;
 use druid::widget::prelude::*;
 
 use crate::model::AppState;
+use crate::model::Point;
 use crate::model::ToolType;
 use crate::theme;
 
@@ -234,7 +235,7 @@ impl Canvas {
         }
     }
 
-    fn point_to_xy(pos: druid::Point) -> Option<(usize, usize)> {
+    fn druid_point_to_point(pos: druid::Point) -> Option<Point<usize>> {
         if pos.x < 1.0 || pos.y < 1.0 {
             return None;
         }
@@ -245,26 +246,26 @@ impl Canvas {
             return None;
         }
 
-        Some((x, y))
+        Some(Point::new(x, y))
     }
 
     fn xy_to_idx(x: usize, y: usize) -> usize {
         (y - 1) * 32 + (x - 1)
     }
 
-    fn xy_to_point(x: usize, y: usize) -> druid::Point {
+    fn xy_to_druid_point(x: usize, y: usize) -> druid::Point {
         assert!(x > 0 && y > 0);
         druid::Point::new(1.0 + ((x - 1) as f64 * 16.0), 1.0 + ((y - 1) as f64 * 16.0))
     }
 
-    fn idx_to_point(idx: usize) -> druid::Point {
+    fn idx_to_druid_point(idx: usize) -> druid::Point {
         let y = (idx / 32) as f64;
         let x = (idx % 32) as f64;
         druid::Point::new(1.0 + (x * 16.0), 1.0 + (y * 16.0))
     }
 
     fn idx_to_rect(idx: usize) -> druid::Rect {
-        let origin = Self::idx_to_point(idx);
+        let origin = Self::idx_to_druid_point(idx);
         druid::Rect::from_origin_size(origin, (16.0, 16.0))
     }
 
@@ -306,8 +307,8 @@ impl Canvas {
         if data.has_selection() {
             let s = data.selection;
 
-            let tl = Self::xy_to_point(s.0 .0, s.0 .1);
-            let br = Self::xy_to_point(s.1 .0, s.1 .1);
+            let tl = Self::xy_to_druid_point(s.0 .0, s.0 .1);
+            let br = Self::xy_to_druid_point(s.1 .0, s.1 .1);
 
             let rect = druid::Rect::new(tl.x, tl.y, br.x + 16.0, br.y + 16.0);
 
@@ -411,13 +412,13 @@ impl Canvas {
 
             ToolType::Marquee => {
                 let tl = (
-                    cmp::min(data.start_pos.0, data.current_pos.0),
-                    cmp::min(data.start_pos.1, data.current_pos.1),
+                    cmp::min(data.start_pos.x, data.current_pos.x),
+                    cmp::min(data.start_pos.y, data.current_pos.y),
                 );
 
                 let br = (
-                    cmp::max(data.start_pos.0, data.current_pos.0),
-                    cmp::max(data.start_pos.1, data.current_pos.1),
+                    cmp::max(data.start_pos.x, data.current_pos.x),
+                    cmp::max(data.start_pos.y, data.current_pos.y),
                 );
 
                 let s = (tl, br);
@@ -443,32 +444,32 @@ impl druid::Widget<AppState> for Canvas {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, _env: &Env) {
         match event {
             Event::MouseDown(e) => {
-                match Self::point_to_xy(e.pos) {
+                match Self::druid_point_to_point(e.pos) {
                     Some(xy) => {
-                        data.start_pos = (xy.0, xy.1);
+                        data.start_pos = xy;
 
-                        if self.tool(data, xy.0, xy.1) {
+                        if self.tool(data, xy.x, xy.y) {
                             ctx.request_paint();
                         }
                     }
-                    _ => data.start_pos = (0, 0),
+                    _ => data.start_pos = Point::new(0, 0),
                 }
                 ctx.set_active(true);
             }
 
-            Event::MouseMove(e) => match Self::point_to_xy(e.pos) {
+            Event::MouseMove(e) => match Self::druid_point_to_point(e.pos) {
                 Some(xy) => {
                     if ctx.is_active() {
-                        self.tool(data, xy.0, xy.1);
+                        self.tool(data, xy.x, xy.y);
                     }
 
-                    let idx = Self::xy_to_idx(xy.0, xy.1);
-                    data.current_pos = (xy.0, xy.1);
+                    let idx = Self::xy_to_idx(xy.x, xy.y);
+                    data.current_pos = xy;
                     data.pos_color = data.pixels[idx];
                 }
                 None => {
                     if !ctx.is_active() {
-                        data.current_pos = (0, 0);
+                        data.current_pos = Point::new(0, 0);
                         data.pos_color = data.brush_color;
                     }
                 }
