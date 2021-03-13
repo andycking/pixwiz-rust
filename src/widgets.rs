@@ -254,9 +254,9 @@ impl Canvas {
         (p.y - 1) * 32 + (p.x - 1)
     }
 
-    fn xy_to_druid_point(x: usize, y: usize) -> druid::Point {
-        assert!(x > 0 && y > 0);
-        druid::Point::new(1.0 + ((x - 1) as f64 * 16.0), 1.0 + ((y - 1) as f64 * 16.0))
+    fn p_to_druid_point(p: Point<usize>) -> druid::Point {
+        assert!(p.x > 0 && p.y > 0);
+        druid::Point::new(1.0 + ((p.x - 1) as f64 * 16.0), 1.0 + ((p.y - 1) as f64 * 16.0))
     }
 
     fn idx_to_druid_point(idx: usize) -> druid::Point {
@@ -308,8 +308,8 @@ impl Canvas {
         if data.has_selection() {
             let s = data.selection;
 
-            let tl = Self::xy_to_druid_point(s.0 .0, s.0 .1);
-            let br = Self::xy_to_druid_point(s.1 .0, s.1 .1);
+            let tl = Self::p_to_druid_point(Point::from(s.0));
+            let br = Self::p_to_druid_point(Point::from(s.1));
 
             let rect = druid::Rect::new(tl.x, tl.y, br.x + 16.0, br.y + 16.0);
 
