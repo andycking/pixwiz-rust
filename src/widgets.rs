@@ -6,6 +6,7 @@ use druid::widget::prelude::*;
 
 use crate::model::AppState;
 use crate::model::Point;
+use crate::model::Rect;
 use crate::model::ToolType;
 use crate::theme;
 
@@ -328,36 +329,32 @@ impl Canvas {
     }
 
     fn fill(data: &mut AppState, x: usize, y: usize) -> bool {
+        let p = Point::new(x, y);
         if data.has_selection() {
-            Self::selection_fill(data, x, y)
+            Self::selection_fill(data, p)
         } else {
-            Self::flood_fill(data, x, y)
+            Self::flood_fill(data, p)
         }
     }
 
-    fn selection_fill(data: &mut AppState, x: usize, y: usize) -> bool {
-        if x < data.selection.0 .0
-            || x > data.selection.1 .0
-            || y < data.selection.0 .1
-            || y > data.selection.1 .1
+    fn selection_fill(data: &mut AppState, p: Point<usize>) -> bool {
+        if p.x < data.selection.0 .0
+            || p.x > data.selection.1 .0
+            || p.y < data.selection.0 .1
+            || p.y > data.selection.1 .1
         {
             return false;
         }
 
-        Self::flood_fill_work(data, x, y, data.selection)
+        Self::flood_fill_work(data, p, Rect::from(data.selection))
     }
 
-    fn flood_fill(data: &mut AppState, x: usize, y: usize) -> bool {
-        Self::flood_fill_work(data, x, y, ((1, 1), (32, 32)))
+    fn flood_fill(data: &mut AppState, p: Point<usize>) -> bool {
+        Self::flood_fill_work(data, p, Rect::new(1, 1, 32, 32))
     }
 
-    fn flood_fill_work(
-        data: &mut AppState,
-        x: usize,
-        y: usize,
-        bounds: ((usize, usize), (usize, usize)),
-    ) -> bool {
-        let start_idx = Self::xy_to_idx(x, y);
+    fn flood_fill_work(data: &mut AppState, start_pos: Point<usize>, bounds: Rect<usize>) -> bool {
+        let start_idx = Self::xy_to_idx(start_pos.x, start_pos.y);
         let start_color = data.pixels[start_idx];
         if start_color == data.brush_color {
             return false;
@@ -365,26 +362,26 @@ impl Canvas {
 
         let mut dirty = false;
 
-        let mut q: VecDeque<(usize, usize)> = VecDeque::new();
-        q.push_back((x, y));
+        let mut q: VecDeque<Point<usize>> = VecDeque::new();
+        q.push_back(start_pos);
         while !q.is_empty() {
             let node = q.pop_front().unwrap();
 
-            let idx = Self::xy_to_idx(node.0, node.1);
+            let idx = Self::xy_to_idx(node.x, node.y);
             if data.pixels[idx] == start_color {
                 data.pixels[idx] = data.brush_color;
 
-                if node.0 > bounds.0 .0 {
-                    q.push_back((node.0 - 1, node.1));
+                if node.x > bounds.x0 {
+                    q.push_back(Point::new(node.x - 1, node.y));
                 }
-                if node.0 < bounds.1 .0 {
-                    q.push_back((node.0 + 1, node.1));
+                if node.x < bounds.x1 {
+                    q.push_back(Point::new(node.x + 1, node.y));
                 }
-                if node.1 > bounds.0 .1 {
-                    q.push_back((node.0, node.1 - 1));
+                if node.y > bounds.y0 {
+                    q.push_back(Point::new(node.x, node.y - 1));
                 }
-                if node.1 < bounds.1 .1 {
-                    q.push_back((node.0, node.1 + 1));
+                if node.y < bounds.y1 {
+                    q.push_back(Point::new(node.x, node.y + 1));
                 }
 
                 dirty = true;
