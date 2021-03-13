@@ -307,7 +307,7 @@ impl Canvas {
     }
 
     fn paint_selection(&self, ctx: &mut PaintCtx, data: &AppState) {
-        if !data.selection.is_empty() {
+        if !data.selection.is_zero() {
             let s = data.selection;
 
             let tl = Self::p_to_druid_point(Point::new(s.x0, s.y0));
@@ -331,7 +331,7 @@ impl Canvas {
     }
 
     fn fill(data: &mut AppState, p: Point<usize>) -> bool {
-        if data.selection.is_empty() {
+        if data.selection.is_zero() {
             Self::flood_fill(data, p)
         } else {
             Self::selection_fill(data, p)

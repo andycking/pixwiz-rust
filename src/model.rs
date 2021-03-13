@@ -114,6 +114,11 @@ impl<T: Default + Ord> Rect<T> {
         self.x0 == self.x1 && self.y0 == self.y1
     }
 
+    pub fn is_zero(&self) -> bool {
+        let zero: T = Default::default();
+        self.x0 == zero && self.y0 == zero && self.x1 == zero && self.y1 == zero
+    }
+
     pub fn contains(&self, p: Point<T>) -> bool {
         p.x >= self.x0 && p.x <= self.x1 && p.y >= self.y0 && p.y <= self.y1
     }
