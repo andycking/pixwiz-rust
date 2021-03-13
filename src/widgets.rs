@@ -134,8 +134,8 @@ impl Palette {
         Some(Point::new(x, y))
     }
 
-    fn xy_to_idx(x: usize, y: usize) -> usize {
-        (y - 1) * 8 + (x - 1)
+    fn p_to_idx(p: Point<usize>) -> usize {
+        (p.y - 1) * 8 + (p.x - 1)
     }
 
     fn idx_to_druid_point(idx: usize) -> druid::Point {
@@ -170,14 +170,14 @@ impl druid::Widget<AppState> for Palette {
             }
 
             Event::MouseMove(e) => match Self::druid_point_to_p(e.pos) {
-                Some(p) => data.pos_color = self.values[Self::xy_to_idx(p.x, p.y)],
+                Some(p) => data.pos_color = self.values[Self::p_to_idx(p)],
                 None => data.pos_color = data.brush_color,
             },
 
             Event::MouseUp(e) if ctx.is_active() => {
                 match Self::druid_point_to_p(e.pos) {
                     Some(p) => {
-                        self.current_idx = Self::xy_to_idx(p.x, p.y);
+                        self.current_idx = Self::p_to_idx(p);
                         data.brush_color = self.values[self.current_idx];
                         ctx.request_paint();
                     }
@@ -250,8 +250,8 @@ impl Canvas {
         Some(Point::new(x, y))
     }
 
-    fn xy_to_idx(x: usize, y: usize) -> usize {
-        (y - 1) * 32 + (x - 1)
+    fn p_to_idx(p: Point<usize>) -> usize {
+        (p.y - 1) * 32 + (p.x - 1)
     }
 
     fn xy_to_druid_point(x: usize, y: usize) -> druid::Point {
@@ -328,8 +328,7 @@ impl Canvas {
         }
     }
 
-    fn fill(data: &mut AppState, x: usize, y: usize) -> bool {
-        let p = Point::new(x, y);
+    fn fill(data: &mut AppState, p: Point<usize>) -> bool {
         if data.has_selection() {
             Self::selection_fill(data, p)
         } else {
@@ -354,7 +353,7 @@ impl Canvas {
     }
 
     fn flood_fill_work(data: &mut AppState, start_pos: Point<usize>, bounds: Rect<usize>) -> bool {
-        let start_idx = Self::xy_to_idx(start_pos.x, start_pos.y);
+        let start_idx = Self::p_to_idx(start_pos);
         let start_color = data.pixels[start_idx];
         if start_color == data.brush_color {
             return false;
@@ -367,7 +366,7 @@ impl Canvas {
         while !q.is_empty() {
             let node = q.pop_front().unwrap();
 
-            let idx = Self::xy_to_idx(node.x, node.y);
+            let idx = Self::p_to_idx(node);
             if data.pixels[idx] == start_color {
                 data.pixels[idx] = data.brush_color;
 
@@ -391,8 +390,8 @@ impl Canvas {
         dirty
     }
 
-    fn tool(&mut self, data: &mut AppState, x: usize, y: usize) -> bool {
-        let idx = Self::xy_to_idx(x, y);
+    fn tool(&mut self, data: &mut AppState, p: Point<usize>) -> bool {
+        let idx = Self::p_to_idx(p);
 
         match data.tool_type {
             ToolType::Dropper => {
@@ -405,7 +404,7 @@ impl Canvas {
                 true
             }
 
-            ToolType::Fill => Self::fill(data, x, y),
+            ToolType::Fill => Self::fill(data, p),
 
             ToolType::Marquee => {
                 let tl = (
@@ -445,7 +444,7 @@ impl druid::Widget<AppState> for Canvas {
                     Some(p) => {
                         data.start_pos = p;
 
-                        if self.tool(data, p.x, p.y) {
+                        if self.tool(data, p) {
                             ctx.request_paint();
                         }
                     }
@@ -457,10 +456,10 @@ impl druid::Widget<AppState> for Canvas {
             Event::MouseMove(e) => match Self::druid_point_to_p(e.pos) {
                 Some(p) => {
                     if ctx.is_active() {
-                        self.tool(data, p.x, p.y);
+                        self.tool(data, p);
                     }
 
-                    let idx = Self::xy_to_idx(p.x, p.y);
+                    let idx = Self::p_to_idx(p);
                     data.current_pos = p;
                     data.pos_color = data.pixels[idx];
                 }
