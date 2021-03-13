@@ -235,7 +235,7 @@ impl Canvas {
         }
     }
 
-    fn druid_point_to_point(pos: druid::Point) -> Option<Point> {
+    fn druid_point_to_point(pos: druid::Point) -> Option<Point<usize>> {
         if pos.x < 1.0 || pos.y < 1.0 {
             return None;
         }

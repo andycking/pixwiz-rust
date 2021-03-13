@@ -51,18 +51,21 @@ impl fmt::Display for ToolType {
 }
 
 #[derive(Clone, Copy, druid::Data)]
-pub struct Point {
-    pub x: usize,
-    pub y: usize,
+pub struct Point<T> {
+    pub x: T,
+    pub y: T,
 }
 
-impl Point {
-    pub fn new(x: usize, y: usize) -> Self {
+impl<T: Default + Ord> Point<T> {
+    pub fn new(x: T, y: T) -> Self {
         Self { x: x, y: y }
     }
 
     pub fn empty() -> Self {
-        Self { x: 0, y: 0 }
+        Self {
+            x: Default::default(),
+            y: Default::default(),
+        }
     }
 
     pub fn min(a: Self, b: Self) -> Self {
@@ -74,13 +77,13 @@ impl Point {
     }
 }
 
-impl From<(usize, usize)> for Point {
+impl From<(usize, usize)> for Point<usize> {
     fn from(item: (usize, usize)) -> Self {
         Self::new(item.0, item.1)
     }
 }
 
-impl From<(f64, f64)> for Point {
+impl From<(f64, f64)> for Point<usize> {
     fn from(item: (f64, f64)) -> Self {
         Self::new(item.0 as usize, item.1 as usize)
     }
@@ -90,8 +93,8 @@ impl From<(f64, f64)> for Point {
 pub struct AppState {
     pub brush_color: u32,
     pub pos_color: u32,
-    pub start_pos: Point,
-    pub current_pos: Point,
+    pub start_pos: Point<usize>,
+    pub current_pos: Point<usize>,
     pub selection: ((usize, usize), (usize, usize)),
     pub tool_type: ToolType,
     pub pixels: PixelState,
