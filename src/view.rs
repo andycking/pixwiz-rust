@@ -169,3 +169,20 @@ fn build_status_bar() -> impl druid::Widget<AppState> {
         .with_child(build_status_label())
         .background(theme::STATUS_BAR_FILL)
 }
+
+pub fn build_menu_bar<T: Data>() -> druid::MenuDesc<T> {
+    druid::MenuDesc::new(druid::LocalizedString::new(""))
+        .append(druid::platform_menus::mac::application::default())
+        .append(druid::platform_menus::mac::file::default())
+        .append(build_edit_menu())
+}
+
+fn build_edit_menu<T: Data>() -> druid::MenuDesc<T> {
+    druid::MenuDesc::new(druid::LocalizedString::new("common-menu-edit-menu"))
+        .append(druid::platform_menus::common::undo())
+        .append(druid::platform_menus::common::redo())
+        .append_separator()
+        .append(druid::platform_menus::common::cut().disabled())
+        .append(druid::platform_menus::common::copy())
+        .append(druid::platform_menus::common::paste())
+}
