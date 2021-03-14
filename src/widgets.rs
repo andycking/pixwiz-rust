@@ -102,6 +102,10 @@ pub struct Palette {
 }
 
 impl Palette {
+    const COLS: usize = 8;
+    const ROWS: usize = 32;
+    const PIXELS: f64 = 16.0;
+
     /// Create a new palette with the given raw byte values.
     pub fn new(bytes: &[u8]) -> Self {
         Self {
@@ -133,9 +137,9 @@ impl Palette {
             return None;
         }
 
-        let x = pos.x as usize / (10 + 1) + 1;
-        let y = pos.y as usize / (10 + 1) + 1;
-        if x > 8 || y > 32 {
+        let x = pos.x as usize / ((Self::PIXELS as usize) + 1) + 1;
+        let y = pos.y as usize / ((Self::PIXELS as usize) + 1) + 1;
+        if x > Self::COLS || y > Self::ROWS {
             return None;
         }
 
@@ -144,20 +148,23 @@ impl Palette {
 
     /// Convert coordinates to an index within the palette storage.
     fn palette_coords_to_idx(p: druid::Point) -> usize {
-        ((p.y - 1.0) * 8.0 + (p.x - 1.0)) as usize
+        ((p.y - 1.0) * (Self::COLS as f64) + (p.x - 1.0)) as usize
     }
 
     /// Convert an index within the palette storage to screen coordinates.
     fn idx_to_screen_coords(idx: usize) -> druid::Point {
-        let y = (idx / 8) as f64;
-        let x = (idx % 8) as f64;
-        druid::Point::new(1.0 + (x * (10.0 + 1.0)), 1.0 + (y * (10.0 + 1.0)))
+        let y = (idx / Self::COLS) as f64;
+        let x = (idx % Self::COLS) as f64;
+        druid::Point::new(
+            1.0 + (x * (Self::PIXELS + 1.0)),
+            1.0 + (y * (Self::PIXELS + 1.0)),
+        )
     }
 
     /// Convert an index within the palette storage to a rectanble in screen coordinates.
     fn idx_to_screen_rect(idx: usize) -> druid::Rect {
         let origin = Self::idx_to_screen_coords(idx);
-        druid::Rect::from_origin_size(origin, (10.0, 10.0))
+        druid::Rect::from_origin_size(origin, (Self::PIXELS, Self::PIXELS))
     }
 
     /// Paint an index into palette storage into the given render context.
@@ -243,6 +250,10 @@ pub struct Canvas {
 }
 
 impl Canvas {
+    const COLS: usize = 32;
+    const ROWS: usize = 32;
+    const PIXELS: f64 = 16.0;
+
     /// Create an empty canvas.
     pub fn new() -> Self {
         Self {
@@ -257,9 +268,9 @@ impl Canvas {
             return None;
         }
 
-        let x = pos.x as usize / 16 + 1;
-        let y = pos.y as usize / 16 + 1;
-        if x > 32 || y > 32 {
+        let x = pos.x as usize / (Self::PIXELS as usize) + 1;
+        let y = pos.y as usize / (Self::PIXELS as usize) + 1;
+        if x > Self::COLS || y > Self::ROWS {
             return None;
         }
 
@@ -269,25 +280,28 @@ impl Canvas {
     /// Translate from canvas coordinates to screen coordinates.
     fn canvas_coords_to_screen_coords(p: druid::Point) -> druid::Point {
         assert!(p.x > 0.0 && p.y > 0.0);
-        druid::Point::new(1.0 + ((p.x - 1.0) * 16.0), 1.0 + ((p.y - 1.0) * 16.0))
+        druid::Point::new(
+            1.0 + ((p.x - 1.0) * Self::PIXELS),
+            1.0 + ((p.y - 1.0) * Self::PIXELS),
+        )
     }
 
     /// Convert coordinates to an index within the canvas storage.
     fn canvas_coords_to_idx(p: druid::Point) -> usize {
-        ((p.y - 1.0) * 32.0 + (p.x - 1.0)) as usize
+        ((p.y - 1.0) * (Self::COLS as f64) + (p.x - 1.0)) as usize
     }
 
     /// Convert an index within the canvas storage to screen coordinates.
     fn idx_to_screen_coords(idx: usize) -> druid::Point {
-        let y = (idx / 32) as f64;
-        let x = (idx % 32) as f64;
-        druid::Point::new(1.0 + (x * 16.0), 1.0 + (y * 16.0))
+        let y = (idx / Self::COLS) as f64;
+        let x = (idx % Self::COLS) as f64;
+        druid::Point::new(1.0 + (x * Self::PIXELS), 1.0 + (y * Self::PIXELS))
     }
 
     /// Convert an index within the canvas storage to a rectanble in screen coordinates.
     fn idx_to_screen_rect(idx: usize) -> druid::Rect {
         let origin = Self::idx_to_screen_coords(idx);
-        druid::Rect::from_origin_size(origin, (16.0, 16.0))
+        druid::Rect::from_origin_size(origin, (Self::PIXELS, Self::PIXELS))
     }
 
     /// Paint an index into canvas storage into the given render context.
