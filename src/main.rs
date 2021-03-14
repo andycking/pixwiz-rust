@@ -1,5 +1,6 @@
 use druid::PlatformError;
 
+mod delegate;
 mod model;
 mod theme;
 mod view;
@@ -19,6 +20,7 @@ fn main() -> Result<(), PlatformError> {
     let data = AppState::new();
 
     druid::AppLauncher::with_window(main_window)
+        .delegate(delegate::Delegate)
         .use_env_tracing()
         .launch(data)
 }
