@@ -1,5 +1,5 @@
 [package]
-name = "PixWiz"
+name = "pixwiz"
 version = "0.1.0"
 authors = ["Andy C King <andycking@fastmail.com>"]
 edition = "2018"
