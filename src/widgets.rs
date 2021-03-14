@@ -9,6 +9,8 @@ use crate::model::Rect;
 use crate::model::ToolType;
 use crate::theme;
 
+/// A tool button that displays an icon. Could also have been implemented as a Painter or
+/// Image, but without the styling for the selected state.
 #[derive(Clone, druid::Data)]
 pub struct ToolButton {
     tool_type: ToolType,
@@ -16,7 +18,7 @@ pub struct ToolButton {
 }
 
 impl ToolButton {
-    /// Create a new tool button of the given type and with the given raw bytes.
+    /// Create a new tool button of the given type and with the given raw bytes for the icon.
     pub fn new(tool_type: ToolType, bytes: &[u8]) -> Self {
         let image_buf = druid::ImageBuf::from_data(bytes).unwrap();
 
@@ -93,6 +95,9 @@ impl druid::Widget<AppState> for ToolButton {
     }
 }
 
+/// A palette that displays available colors. Each value is stored as a u32 representation
+/// of RGBA, with the alpha value in the least significant position. This matches what Color
+/// does internally.
 pub struct Palette {
     current_idx: usize,
     values: [u32; 256],
@@ -232,6 +237,8 @@ impl druid::Widget<AppState> for Palette {
     }
 }
 
+/// A canvas that allows for the display and modification of pixels. The size is currently
+/// fixed at 32x32.
 pub struct Canvas {
     ants_dark: druid::piet::StrokeStyle,
     ants_light: druid::piet::StrokeStyle,

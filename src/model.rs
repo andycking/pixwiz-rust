@@ -2,6 +2,9 @@ use std::fmt;
 use std::ops::{Index, IndexMut};
 use std::sync::Arc;
 
+/// Pixel storage. Each value is stored as a u32 representation of RGBA, with the alpha value
+/// in the least significant position. This matches what Color does internally. We hold the
+/// values in an ARC, to avoid copying them.
 #[derive(Clone, druid::Data)]
 pub struct PixelState {
     storage: Arc<[u32; 1024]>,
@@ -32,6 +35,7 @@ impl IndexMut<usize> for PixelState {
     }
 }
 
+/// Supported tool types.
 #[derive(Clone, Copy, druid::Data, Debug, PartialEq)]
 pub enum ToolType {
     Cropper,
@@ -127,6 +131,7 @@ impl<T: Default + Ord> From<(Point<T>, Point<T>)> for Rect<T> {
     }
 }
 
+/// Application state.
 #[derive(Clone, druid::Data)]
 pub struct AppState {
     pub brush_color: u32,
