@@ -4,8 +4,6 @@ use std::sync::Arc;
 use druid::widget::prelude::*;
 
 use crate::model::AppState;
-use crate::model::Point;
-use crate::model::Rect;
 use crate::model::ToolType;
 use crate::theme;
 
@@ -130,7 +128,7 @@ impl Palette {
     }
 
     /// Translate from screen coordinates (typically the mouse position) to palette coordinates.
-    fn screen_coords_to_palette_coords(pos: druid::Point) -> Option<Point<usize>> {
+    fn screen_coords_to_palette_coords(pos: druid::Point) -> Option<druid::Point> {
         if pos.x < 1.0 || pos.y < 1.0 {
             return None;
         }
@@ -141,12 +139,12 @@ impl Palette {
             return None;
         }
 
-        Some(Point::new(x, y))
+        Some(druid::Point::new(x as f64, y as f64))
     }
 
     /// Convert coordinates to an index within the palette storage.
-    fn palette_coords_to_idx(p: Point<usize>) -> usize {
-        (p.y - 1) * 8 + (p.x - 1)
+    fn palette_coords_to_idx(p: druid::Point) -> usize {
+        ((p.y - 1.0) * 8.0 + (p.x - 1.0)) as usize
     }
 
     /// Convert an index within the palette storage to screen coordinates.
@@ -254,7 +252,7 @@ impl Canvas {
     }
 
     /// Translate from screen coordinates (typically the mouse position) to canvas coordinates.
-    fn screen_coords_to_canvas_coords(pos: druid::Point) -> Option<Point<usize>> {
+    fn screen_coords_to_canvas_coords(pos: druid::Point) -> Option<druid::Point> {
         if pos.x < 1.0 || pos.y < 1.0 {
             return None;
         }
@@ -265,21 +263,18 @@ impl Canvas {
             return None;
         }
 
-        Some(Point::new(x, y))
+        Some(druid::Point::new(x as f64, y as f64))
     }
 
     /// Translate from canvas coordinates to screen coordinates.
-    fn canvas_coords_to_screen_coords(p: Point<usize>) -> druid::Point {
-        assert!(p.x > 0 && p.y > 0);
-        druid::Point::new(
-            1.0 + ((p.x - 1) as f64 * 16.0),
-            1.0 + ((p.y - 1) as f64 * 16.0),
-        )
+    fn canvas_coords_to_screen_coords(p: druid::Point) -> druid::Point {
+        assert!(p.x > 0.0 && p.y > 0.0);
+        druid::Point::new(1.0 + ((p.x - 1.0) * 16.0), 1.0 + ((p.y - 1.0) * 16.0))
     }
 
     /// Convert coordinates to an index within the canvas storage.
-    fn canvas_coords_to_idx(p: Point<usize>) -> usize {
-        (p.y - 1) * 32 + (p.x - 1)
+    fn canvas_coords_to_idx(p: druid::Point) -> usize {
+        ((p.y - 1.0) * 32.0 + (p.x - 1.0)) as usize
     }
 
     /// Convert an index within the canvas storage to screen coordinates.
@@ -338,8 +333,14 @@ impl Canvas {
     fn paint_selection(&self, ctx: &mut PaintCtx, data: &AppState) {
         match data.selection {
             Some(s) => {
-                let tl = Self::canvas_coords_to_screen_coords(Point::new(s.x0, s.y0));
-                let br = Self::canvas_coords_to_screen_coords(Point::new(s.x1, s.y1));
+                let tl = Self::canvas_coords_to_screen_coords(druid::Point::new(
+                    s.x0 as f64,
+                    s.y0 as f64,
+                ));
+                let br = Self::canvas_coords_to_screen_coords(druid::Point::new(
+                    s.x1 as f64,
+                    s.y1 as f64,
+                ));
 
                 let rect = druid::Rect::new(tl.x, tl.y, br.x + 16.0, br.y + 16.0);
 
@@ -363,7 +364,7 @@ impl Canvas {
 
     /// Fill the canvas starting at the given point. Will pick a fill mode depending on
     /// whether there is a selection (marquee).
-    fn fill(data: &mut AppState, p: Point<usize>) -> bool {
+    fn fill(data: &mut AppState, p: druid::Point) -> bool {
         match data.selection {
             Some(selection) => Self::selection_fill(data, p, selection),
             _ => Self::flood_fill(data, p),
@@ -372,7 +373,7 @@ impl Canvas {
 
     /// Fill the canvas starting at the given point out to the edge of the current
     /// selection, while respecting color boundaries.
-    fn selection_fill(data: &mut AppState, p: Point<usize>, selection: Rect<usize>) -> bool {
+    fn selection_fill(data: &mut AppState, p: druid::Point, selection: druid::Rect) -> bool {
         if !selection.contains(p) {
             return false;
         }
@@ -382,13 +383,13 @@ impl Canvas {
 
     /// Flood fill the canvas starting at the given point out to the edge of the
     /// canvas, while respecting color boundaries.
-    fn flood_fill(data: &mut AppState, p: Point<usize>) -> bool {
-        Self::flood_fill_work(data, p, Rect::new(1, 1, 32, 32))
+    fn flood_fill(data: &mut AppState, p: druid::Point) -> bool {
+        Self::flood_fill_work(data, p, druid::Rect::new(1.0, 1.0, 32.0, 32.0))
     }
 
     /// Flood fill the canvas starting at the given point out to the given boundary,
     /// while respecting color boundaries. We should really change this to a span fill.
-    fn flood_fill_work(data: &mut AppState, start_pos: Point<usize>, bounds: Rect<usize>) -> bool {
+    fn flood_fill_work(data: &mut AppState, start_pos: druid::Point, bounds: druid::Rect) -> bool {
         let start_idx = Self::canvas_coords_to_idx(start_pos);
         let start_color = data.pixels[start_idx];
         if start_color == data.brush_color {
@@ -397,7 +398,7 @@ impl Canvas {
 
         let mut dirty = false;
 
-        let mut q: VecDeque<Point<usize>> = VecDeque::new();
+        let mut q: VecDeque<druid::Point> = VecDeque::new();
         q.push_back(start_pos);
         while !q.is_empty() {
             let node = q.pop_front().unwrap();
@@ -406,17 +407,17 @@ impl Canvas {
             if data.pixels[idx] == start_color {
                 data.pixels[idx] = data.brush_color;
 
-                if node.x > bounds.x0 {
-                    q.push_back(Point::new(node.x - 1, node.y));
+                if node.x > bounds.x0 as f64 {
+                    q.push_back(druid::Point::new(node.x - 1.0, node.y));
                 }
-                if node.x < bounds.x1 {
-                    q.push_back(Point::new(node.x + 1, node.y));
+                if node.x < bounds.x1 as f64 {
+                    q.push_back(druid::Point::new(node.x + 1.0, node.y));
                 }
-                if node.y > bounds.y0 {
-                    q.push_back(Point::new(node.x, node.y - 1));
+                if node.y > bounds.y0 as f64 {
+                    q.push_back(druid::Point::new(node.x, node.y - 1.0));
                 }
-                if node.y < bounds.y1 {
-                    q.push_back(Point::new(node.x, node.y + 1));
+                if node.y < bounds.y1 as f64 {
+                    q.push_back(druid::Point::new(node.x, node.y + 1.0));
                 }
 
                 dirty = true;
@@ -428,7 +429,7 @@ impl Canvas {
 
     /// Execute a tool at the given point on the canvas. The point is in
     /// canvas coordinates.
-    fn tool(&mut self, data: &mut AppState, p: Point<usize>) -> bool {
+    fn tool(&mut self, data: &mut AppState, p: druid::Point) -> bool {
         let idx = Self::canvas_coords_to_idx(p);
 
         match data.tool_type {
@@ -445,12 +446,14 @@ impl Canvas {
             ToolType::Fill => Self::fill(data, p),
 
             ToolType::Marquee => {
-                let tl = Point::min(data.start_pos, data.current_pos);
-                let br = Point::max(data.start_pos, data.current_pos);
+                let x0 = data.start_pos.x.min(data.current_pos.x);
+                let y0 = data.start_pos.y.min(data.current_pos.y);
+                let x1 = data.start_pos.x.max(data.current_pos.x);
+                let y1 = data.start_pos.y.max(data.current_pos.y);
 
-                let new_selection = Rect::from((tl, br));
+                let new_selection = druid::Rect::new(x0, y0, x1, y1);
 
-                let old_selection = data.selection.unwrap_or(Rect::zero());
+                let old_selection = data.selection.unwrap_or(druid::Rect::ZERO);
 
                 if old_selection != new_selection {
                     data.selection = Some(new_selection);
@@ -481,7 +484,7 @@ impl druid::Widget<AppState> for Canvas {
                             ctx.request_paint();
                         }
                     }
-                    _ => data.start_pos = Point::zero(),
+                    _ => data.start_pos = druid::Point::ZERO,
                 }
                 ctx.set_active(true);
             }
@@ -498,7 +501,7 @@ impl druid::Widget<AppState> for Canvas {
                 }
                 None => {
                     if !ctx.is_active() {
-                        data.current_pos = Point::zero();
+                        data.current_pos = druid::Point::ZERO;
                         data.pos_color = data.brush_color;
                     }
                 }
