@@ -171,6 +171,7 @@ fn build_status_bar() -> impl druid::Widget<AppState> {
         .main_axis_alignment(druid::widget::MainAxisAlignment::End)
         .must_fill_main_axis(true)
         .with_child(build_status_label())
+        .with_default_spacer()
         .background(theme::STATUS_BAR_FILL)
 }
 
