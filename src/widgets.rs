@@ -306,32 +306,18 @@ impl Canvas {
 
     /// Paint an index into canvas storage into the given render context.
     fn paint_idx(ctx: &mut PaintCtx, idx: usize, value: u32) {
+        let rect = Self::idx_to_screen_rect(idx);
         if value & 0xff != 0 {
-            let rect = Self::idx_to_screen_rect(idx);
             let color = druid::Color::from_rgba32_u32(value);
             ctx.fill(rect, &color);
-        }
-    }
-
-    /// Paint a checkerboard pattern for the background of the canvas into the given
-    /// render context.
-    fn paint_checkerboard(&self, ctx: &mut PaintCtx, _data: &AppState) {
-        let rect = ctx.size().to_rect();
-        ctx.stroke(rect, &theme::CANVAS_STROKE, 1.0);
-
-        let dark = theme::CANVAS_FILL_DARK.as_rgba_u32();
-        let light = theme::CANVAS_FILL_LIGHT.as_rgba_u32();
-
-        let mut i = 0;
-        for x in 0..32 {
-            for y in 0..32 {
-                let v = match (x + y) % 2 {
-                    0 => dark,
-                    _ => light,
-                };
-                Self::paint_idx(ctx, i, v);
-                i += 1;
-            }
+        } else {
+            let y = idx / Self::COLS;
+            let x = idx % Self::ROWS;
+            let color = match (x + y) % 2 {
+                0 => theme::CANVAS_FILL_DARK,
+                _ => theme::CANVAS_FILL_LIGHT,
+            };
+            ctx.fill(rect, &color);
         }
     }
 
@@ -556,7 +542,6 @@ impl druid::Widget<AppState> for Canvas {
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, _env: &Env) {
-        self.paint_checkerboard(ctx, data);
         self.paint_pixels(ctx, data);
         self.paint_selection(ctx, data);
     }
