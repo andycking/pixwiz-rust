@@ -137,7 +137,7 @@ impl Canvas {
 
     /// Fill the canvas starting at the given point. Will pick a fill mode depending on
     /// whether there is a selection (marquee).
-    fn fill(data: &mut AppState, p: druid::Point) -> bool {
+    fn fill(data: &mut AppState, p: druid::Point) {
         match data.selection {
             Some(selection) => Self::selection_fill(data, p, selection),
             _ => Self::flood_fill(data, p),
@@ -146,30 +146,26 @@ impl Canvas {
 
     /// Fill the canvas starting at the given point out to the edge of the current
     /// selection, while respecting color boundaries.
-    fn selection_fill(data: &mut AppState, p: druid::Point, selection: druid::Rect) -> bool {
-        if !selection.contains(p) {
-            return false;
+    fn selection_fill(data: &mut AppState, p: druid::Point, selection: druid::Rect) {
+        if selection.contains(p) {
+            Self::flood_fill_work(data, p, selection)
         }
-
-        Self::flood_fill_work(data, p, selection)
     }
 
     /// Flood fill the canvas starting at the given point out to the edge of the
     /// canvas, while respecting color boundaries.
-    fn flood_fill(data: &mut AppState, p: druid::Point) -> bool {
+    fn flood_fill(data: &mut AppState, p: druid::Point) {
         Self::flood_fill_work(data, p, druid::Rect::new(1.0, 1.0, 32.0, 32.0))
     }
 
     /// Flood fill the canvas starting at the given point out to the given boundary,
     /// while respecting color boundaries. We should really change this to a span fill.
-    fn flood_fill_work(data: &mut AppState, start_pos: druid::Point, bounds: druid::Rect) -> bool {
+    fn flood_fill_work(data: &mut AppState, start_pos: druid::Point, bounds: druid::Rect) {
         let start_idx = Self::canvas_coords_to_idx(start_pos);
         let start_color = data.pixels[start_idx];
         if start_color == data.brush_color {
-            return false;
+            return;
         }
-
-        let mut repaint = false;
 
         let mut q: VecDeque<druid::Point> = VecDeque::new();
         q.push_back(start_pos);
@@ -192,28 +188,22 @@ impl Canvas {
                 if node.y < bounds.y1 as f64 {
                     q.push_back(druid::Point::new(node.x, node.y + 1.0));
                 }
-
-                repaint = true;
             }
         }
-
-        repaint
     }
 
     /// Execute a tool at the given point on the canvas. The point is in
     /// canvas coordinates.
-    fn tool(&mut self, data: &mut AppState, p: druid::Point) -> bool {
+    fn tool(&mut self, data: &mut AppState, p: druid::Point) {
         let idx = Self::canvas_coords_to_idx(p);
 
         match data.tool_type {
             ToolType::Dropper => {
                 data.brush_color = data.pixels[idx];
-                false
             }
 
             ToolType::Eraser => {
                 data.pixels.write(idx, 0);
-                true
             }
 
             ToolType::Fill => Self::fill(data, p),
@@ -231,16 +221,13 @@ impl Canvas {
                 if old_selection != new_selection {
                     data.selection = Some(new_selection);
                 }
-
-                old_selection != new_selection
             }
 
             ToolType::Paint => {
                 data.pixels.write(idx, data.brush_color);
-                true
             }
 
-            _ => false,
+            _ => {}
         }
     }
 }
@@ -252,10 +239,7 @@ impl druid::Widget<AppState> for Canvas {
                 match Self::screen_coords_to_canvas_coords(e.pos) {
                     Some(p) => {
                         data.start_pos = p;
-
-                        if self.tool(data, p) {
-                            ctx.request_paint();
-                        }
+                        self.tool(data, p);
                     }
                     _ => data.start_pos = druid::Point::ZERO,
                 }
@@ -265,9 +249,7 @@ impl druid::Widget<AppState> for Canvas {
             Event::MouseMove(e) => match Self::screen_coords_to_canvas_coords(e.pos) {
                 Some(p) => {
                     if ctx.is_active() {
-                        if self.tool(data, p) {
-                            ctx.request_paint();
-                        }
+                        self.tool(data, p);
                     }
 
                     let idx = Self::canvas_coords_to_idx(p);
@@ -299,7 +281,10 @@ impl druid::Widget<AppState> for Canvas {
     ) {
     }
 
-    fn update(&mut self, _ctx: &mut UpdateCtx, _old_data: &AppState, _data: &AppState, _env: &Env) {
+    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &AppState, data: &AppState, _env: &Env) {
+        if !old_data.same(data) {
+            ctx.request_paint();
+        }
     }
 
     fn layout(
