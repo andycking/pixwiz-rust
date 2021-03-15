@@ -31,6 +31,11 @@ impl PixelState {
         *Arc::make_mut(&mut self.storage).index_mut(idx) = value;
         self.dirty = true;
     }
+
+    pub fn zero(&mut self) {
+        self.storage = Arc::new([0; 1024]);
+        self.dirty = false;
+    }
 }
 
 impl Index<usize> for PixelState {
