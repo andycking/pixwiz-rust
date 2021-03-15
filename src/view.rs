@@ -188,7 +188,7 @@ fn build_file_menu<T: Data>() -> druid::MenuDesc<T> {
         .append(druid::platform_menus::mac::file::open_file())
         .append_separator()
         .append(druid::platform_menus::mac::file::close())
-        .append(druid::platform_menus::mac::file::save())
+        .append(druid::platform_menus::mac::file::save().disabled())
         .append(druid::platform_menus::mac::file::save_as())
 }
 
