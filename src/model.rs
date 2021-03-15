@@ -38,6 +38,8 @@ impl PixelState {
     }
 }
 
+/// Implement the index trait. This is a convenient way for callers to access the pixel
+/// storage directly. Note that it's immutable.
 impl Index<usize> for PixelState {
     type Output = u32;
     fn index(&self, idx: usize) -> &Self::Output {
