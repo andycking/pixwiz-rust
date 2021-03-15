@@ -169,7 +169,7 @@ impl Canvas {
             return false;
         }
 
-        let mut dirty = false;
+        let mut repaint = false;
 
         let mut q: VecDeque<druid::Point> = VecDeque::new();
         q.push_back(start_pos);
@@ -178,7 +178,7 @@ impl Canvas {
 
             let idx = Self::canvas_coords_to_idx(node);
             if data.pixels[idx] == start_color {
-                data.pixels[idx] = data.brush_color;
+                data.pixels.write(idx, data.brush_color);
 
                 if node.x > bounds.x0 as f64 {
                     q.push_back(druid::Point::new(node.x - 1.0, node.y));
@@ -193,11 +193,11 @@ impl Canvas {
                     q.push_back(druid::Point::new(node.x, node.y + 1.0));
                 }
 
-                dirty = true;
+                repaint = true;
             }
         }
 
-        dirty
+        repaint
     }
 
     /// Execute a tool at the given point on the canvas. The point is in
@@ -212,7 +212,7 @@ impl Canvas {
             }
 
             ToolType::Eraser => {
-                data.pixels[idx] = 0;
+                data.pixels.write(idx, 0);
                 true
             }
 
@@ -236,7 +236,7 @@ impl Canvas {
             }
 
             ToolType::Paint => {
-                data.pixels[idx] = data.brush_color;
+                data.pixels.write(idx, data.brush_color);
                 true
             }
 

@@ -7,12 +7,14 @@ use std::sync::Arc;
 /// values in an ARC, to avoid copying them.
 #[derive(Clone, druid::Data)]
 pub struct PixelState {
+    dirty: bool,
     storage: Arc<[u32; 1024]>,
 }
 
 impl PixelState {
     pub fn new() -> Self {
         Self {
+            dirty: false,
             storage: Arc::new([0; 1024]),
         }
     }
@@ -20,18 +22,21 @@ impl PixelState {
     pub fn len(&self) -> usize {
         self.storage.len()
     }
+
+    pub fn is_dirty(&self) -> bool {
+        self.dirty
+    }
+
+    pub fn write(&mut self, idx: usize, value: u32) {
+        *Arc::make_mut(&mut self.storage).index_mut(idx) = value;
+        self.dirty = true;
+    }
 }
 
 impl Index<usize> for PixelState {
     type Output = u32;
     fn index(&self, idx: usize) -> &Self::Output {
         &self.storage[idx]
-    }
-}
-
-impl IndexMut<usize> for PixelState {
-    fn index_mut(&mut self, idx: usize) -> &mut Self::Output {
-        Arc::make_mut(&mut self.storage).index_mut(idx)
     }
 }
 
