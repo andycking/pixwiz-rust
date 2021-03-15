@@ -178,8 +178,18 @@ fn build_status_bar() -> impl druid::Widget<AppState> {
 pub fn build_menu_bar<T: Data>() -> druid::MenuDesc<T> {
     druid::MenuDesc::new(druid::LocalizedString::new(""))
         .append(druid::platform_menus::mac::application::default())
-        .append(druid::platform_menus::mac::file::default())
+        .append(build_file_menu())
         .append(build_edit_menu())
+}
+
+fn build_file_menu<T: Data>() -> druid::MenuDesc<T> {
+    druid::MenuDesc::new(druid::LocalizedString::new("common-menu-file-menu"))
+        .append(druid::platform_menus::mac::file::new_file())
+        .append(druid::platform_menus::mac::file::open_file())
+        .append_separator()
+        .append(druid::platform_menus::mac::file::close())
+        .append(druid::platform_menus::mac::file::save())
+        .append(druid::platform_menus::mac::file::save_as())
 }
 
 fn build_edit_menu<T: Data>() -> druid::MenuDesc<T> {
