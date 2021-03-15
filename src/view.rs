@@ -43,7 +43,6 @@ fn build_tools() -> impl druid::Widget<AppState> {
     let dropper_bytes = include_bytes!("./assets/dropper.png");
 
     Flex::column()
-        .with_spacer(8.0)
         .with_child(build_tools_row(
             ToolButton::new(ToolType::Marquee, marquee_bytes),
             ToolButton::new(ToolType::Lasso, lasso_bytes),
@@ -82,8 +81,6 @@ fn build_left_pane() -> impl druid::Widget<AppState> {
         .with_child(build_tools())
         .with_default_spacer()
         .with_child(build_color_well())
-        .with_default_spacer()
-        .with_child(build_palette())
 }
 
 fn build_canvas() -> impl druid::Widget<AppState> {
@@ -120,8 +117,15 @@ fn build_preview() -> impl druid::Widget<AppState> {
 
 fn build_right_pane() -> impl druid::Widget<AppState> {
     Flex::column()
-        .with_default_spacer()
         .with_child(build_preview())
+        .with_default_spacer()
+}
+
+fn build_center_pane() -> impl druid::Widget<AppState> {
+    Flex::column()
+        .with_child(build_canvas())
+        .with_default_spacer()
+        .with_child(build_palette())
         .with_default_spacer()
 }
 
@@ -131,7 +135,7 @@ fn build_main_pane() -> impl druid::Widget<AppState> {
         .with_default_spacer()
         .with_child(build_left_pane())
         .with_default_spacer()
-        .with_child(build_canvas())
+        .with_child(build_center_pane())
         .with_default_spacer()
         .with_child(build_right_pane())
         .with_default_spacer()

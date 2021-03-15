@@ -102,9 +102,9 @@ pub struct Palette {
 }
 
 impl Palette {
-    const COLS: usize = 8;
-    const ROWS: usize = 32;
-    const PIXELS: f64 = 16.0;
+    const COLS: usize = 32;
+    const ROWS: usize = 8;
+    const PIXELS: f64 = 15.0;
 
     /// Create a new palette with the given raw byte values.
     pub fn new(bytes: &[u8]) -> Self {
@@ -506,7 +506,9 @@ impl druid::Widget<AppState> for Canvas {
             Event::MouseMove(e) => match Self::screen_coords_to_canvas_coords(e.pos) {
                 Some(p) => {
                     if ctx.is_active() {
-                        self.tool(data, p);
+                        if self.tool(data, p) {
+                            ctx.request_paint();
+                        }
                     }
 
                     let idx = Self::canvas_coords_to_idx(p);
