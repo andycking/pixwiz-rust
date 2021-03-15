@@ -76,6 +76,7 @@ pub struct AppState {
     pub selection: Option<druid::Rect>,
     pub tool_type: ToolType,
     pub pixels: PixelState,
+    pub path: Option<String>,
 }
 
 impl AppState {
@@ -88,6 +89,7 @@ impl AppState {
             selection: None,
             tool_type: ToolType::Paint,
             pixels: PixelState::new(),
+            path: None,
         }
     }
 }

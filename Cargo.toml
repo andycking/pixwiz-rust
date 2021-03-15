@@ -8,3 +8,5 @@ edition = "2018"
 version = "0.7.0"
 features = ["png"]
 git = "https://github.com/linebender/druid"
+
+[dependencies.png]

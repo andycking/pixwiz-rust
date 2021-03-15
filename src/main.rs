@@ -2,6 +2,7 @@ use druid::PlatformError;
 
 mod canvas;
 mod delegate;
+mod file;
 mod model;
 mod palette;
 mod theme;

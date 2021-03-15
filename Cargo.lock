@@ -1093,6 +1093,7 @@ name = "pixwiz"
 version = "0.1.0"
 dependencies = [
  "druid",
+ "png",
 ]
 
 [[package]]
