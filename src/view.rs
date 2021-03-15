@@ -2,12 +2,12 @@ use druid::widget::prelude::*;
 use druid::widget::Flex;
 use druid::WidgetExt;
 
+use crate::canvas::Canvas;
 use crate::model::AppState;
 use crate::model::ToolType;
+use crate::palette::Palette;
 use crate::theme;
-use crate::widgets::Canvas;
-use crate::widgets::Palette;
-use crate::widgets::ToolButton;
+use crate::tool_button::ToolButton;
 
 pub fn build_ui() -> impl druid::Widget<AppState> {
     Flex::column()

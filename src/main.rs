@@ -1,10 +1,12 @@
 use druid::PlatformError;
 
+mod canvas;
 mod delegate;
 mod model;
+mod palette;
 mod theme;
+mod tool_button;
 mod view;
-mod widgets;
 
 use model::AppState;
 
