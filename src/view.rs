@@ -197,7 +197,7 @@ fn build_edit_menu<T: Data>() -> druid::MenuDesc<T> {
         .append(druid::platform_menus::common::undo())
         .append(druid::platform_menus::common::redo())
         .append_separator()
-        .append(druid::platform_menus::common::cut().disabled())
+        .append(druid::platform_menus::common::cut())
         .append(druid::platform_menus::common::copy())
         .append(druid::platform_menus::common::paste())
 }
