@@ -1,15 +1,12 @@
 use druid::PlatformError;
 
-mod canvas;
-mod delegate;
-mod file;
+mod controller;
 mod model;
-mod palette;
-mod theme;
-mod tool_button;
+mod storage;
 mod view;
 
-use model::AppState;
+use controller::delegate::Delegate;
+use model::state::AppState;
 
 fn main() -> Result<(), PlatformError> {
     let ui = view::build_ui();
@@ -22,7 +19,7 @@ fn main() -> Result<(), PlatformError> {
     let data = AppState::new();
 
     druid::AppLauncher::with_window(main_window)
-        .delegate(delegate::Delegate)
+        .delegate(Delegate)
         .use_env_tracing()
         .launch(data)
 }

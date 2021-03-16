@@ -1,7 +1,6 @@
-use crate::file;
-use crate::model::AppState;
-use crate::model::ImageData;
-use crate::model::PixelState;
+use crate::model::state::AppState;
+use crate::model::state::PixelState;
+use crate::storage;
 
 pub struct Delegate;
 
@@ -45,7 +44,7 @@ fn new_file(_cmd: &druid::Command, data: &mut AppState) {
         // Ask the user if they'd like to save the current image first.
     }
 
-    data.pixels = PixelState::new();
+    data.pixels = PixelState::empty();
 }
 
 fn open_file(cmd: &druid::Command, data: &mut AppState) {
@@ -53,7 +52,7 @@ fn open_file(cmd: &druid::Command, data: &mut AppState) {
     let file_info = cmd.get(druid::commands::OPEN_FILE).unwrap();
     let path = file_info.path().to_str().unwrap();
 
-    match file::read_png(path) {
+    match storage::png::read(path) {
         Ok(image_data) => {
             data.pixels = PixelState::from(&image_data);
             data.path = Some(String::from(path));
@@ -63,10 +62,10 @@ fn open_file(cmd: &druid::Command, data: &mut AppState) {
 }
 
 fn save_file(_cmd: &druid::Command, data: &mut AppState) {
-    let image_data = ImageData::from(&data.pixels);
+    let image_data = storage::image_data::ImageData::from(&data.pixels);
 
     match &data.path {
-        Some(path) => match file::write_png(path, &image_data) {
+        Some(path) => match storage::png::write(path, &image_data) {
             Ok(()) => {}
             Err(_e) => {}
         },
@@ -79,9 +78,9 @@ fn save_file_as(cmd: &druid::Command, data: &mut AppState) {
     let file_info = cmd.get(druid::commands::SAVE_FILE_AS).unwrap();
     let path = file_info.path().to_str().unwrap();
 
-    let image_data = ImageData::from(&data.pixels);
+    let image_data = storage::image_data::ImageData::from(&data.pixels);
 
-    match file::write_png(path, &image_data) {
+    match storage::png::write(path, &image_data) {
         Ok(()) => {
             data.path = Some(String::from(path));
         }

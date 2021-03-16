@@ -7,9 +7,9 @@ use std::path::Path;
 
 use png;
 
-use crate::model::ImageData;
+use crate::storage::image_data::ImageData;
 
-pub fn write_png(path_str: &str, data: &ImageData) -> Result<()> {
+pub fn write(path_str: &str, data: &ImageData) -> Result<()> {
     let path = Path::new(path_str);
     let file = File::create(path)?;
     let ref mut buf_writer = BufWriter::new(file);
@@ -25,7 +25,7 @@ pub fn write_png(path_str: &str, data: &ImageData) -> Result<()> {
     }
 }
 
-pub fn read_png(path_str: &str) -> Result<ImageData> {
+pub fn read(path_str: &str) -> Result<ImageData> {
     let path = Path::new(path_str);
     let file = File::open(path)?;
 

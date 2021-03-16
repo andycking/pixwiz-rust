@@ -1,7 +1,7 @@
 use druid::widget::prelude::*;
 
-use crate::model::AppState;
-use crate::theme;
+use crate::model::state::AppState;
+use crate::view::theme;
 
 /// A palette that displays available colors. Each value is stored as a u32 representation
 /// of RGBA, with the alpha value in the least significant position. This matches what Color
