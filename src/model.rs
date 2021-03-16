@@ -7,18 +7,28 @@ use std::sync::Arc;
 #[derive(Clone, druid::Data)]
 pub struct PixelState {
     dirty: bool,
-    storage: Arc<[u32; 1024]>,
+    width: usize,
+    height: usize,
+    storage: Arc<Vec<u32>>,
 }
 
 impl PixelState {
+    const DEFAULT_WIDTH: usize = 32;
+    const DEFAULT_HEIGHT: usize = 32;
+
     pub fn new() -> Self {
         Self {
             dirty: false,
-            storage: Arc::new([0; 1024]),
+            width: Self::DEFAULT_WIDTH,
+            height: Self::DEFAULT_HEIGHT,
+            storage: Arc::new(vec![0; Self::DEFAULT_WIDTH * Self::DEFAULT_HEIGHT]),
         }
     }
 
     pub fn len(&self) -> usize {
+        // We always want len and capacity to be the same. The entire vector must have been
+        // initialized so that later on we don't access an invalid pixel.
+        assert!(self.storage.len() == self.storage.capacity());
         self.storage.len()
     }
 
@@ -29,11 +39,6 @@ impl PixelState {
     pub fn write(&mut self, idx: usize, value: u32) {
         *Arc::make_mut(&mut self.storage).index_mut(idx) = value;
         self.dirty = true;
-    }
-
-    pub fn zero(&mut self) {
-        self.storage = Arc::new([0; 1024]);
-        self.dirty = false;
     }
 }
 

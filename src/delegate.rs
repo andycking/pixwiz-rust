@@ -1,5 +1,6 @@
 use crate::file;
 use crate::model::AppState;
+use crate::model::PixelState;
 
 pub struct Delegate;
 
@@ -38,7 +39,7 @@ fn new_file(_cmd: &druid::Command, data: &mut AppState) {
         // Ask the user if they'd like to save.
     }
 
-    data.pixels.zero();
+    data.pixels = PixelState::new();
 }
 
 fn save_file(_cmd: &druid::Command, data: &mut AppState) {
