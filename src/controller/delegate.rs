@@ -40,14 +40,14 @@ impl druid::AppDelegate<AppState> for Delegate {
 }
 
 fn new_file(_cmd: &druid::Command, data: &mut AppState) {
-    if data.pixels.dirty {
-        // Ask the user if they'd like to save the current image first.
-    }
+    check_for_save(data);
 
     data.pixels = PixelState::empty();
 }
 
 fn open_file(cmd: &druid::Command, data: &mut AppState) {
+    check_for_save(data);
+
     // If the file dialog passes us an invalid path then all bets are off. Just let it panic.
     let file_info = cmd.get(druid::commands::OPEN_FILE).unwrap();
     let path = file_info.path().to_str().unwrap();
@@ -86,4 +86,8 @@ fn save_file_as(cmd: &druid::Command, data: &mut AppState) {
         }
         Err(_e) => {}
     }
+}
+
+fn check_for_save(data: &mut AppState) {
+    if data.pixels.dirty {}
 }
