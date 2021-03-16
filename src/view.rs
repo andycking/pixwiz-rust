@@ -182,13 +182,35 @@ pub fn build_menu_bar<T: Data>() -> druid::MenuDesc<T> {
 }
 
 fn build_file_menu<T: Data>() -> druid::MenuDesc<T> {
+    fn open_file<T: Data>() -> druid::MenuItem<T> {
+        let file_dialog_options =
+            druid::FileDialogOptions::default().allowed_types(vec![druid::FileSpec::PNG]);
+
+        druid::MenuItem::new(
+            druid::LocalizedString::new("common-menu-file-open"),
+            druid::commands::SHOW_OPEN_PANEL.with(file_dialog_options),
+        )
+        .hotkey(druid::SysMods::Cmd, "o")
+    }
+
+    fn save_as<T: Data>() -> druid::MenuItem<T> {
+        let file_dialog_options =
+            druid::FileDialogOptions::default().allowed_types(vec![druid::FileSpec::PNG]);
+
+        druid::MenuItem::new(
+            druid::LocalizedString::new("common-menu-file-save-as"),
+            druid::commands::SHOW_SAVE_PANEL.with(file_dialog_options),
+        )
+        .hotkey(druid::SysMods::CmdShift, "S")
+    }
+
     druid::MenuDesc::new(druid::LocalizedString::new("common-menu-file-menu"))
         .append(druid::platform_menus::mac::file::new_file())
-        .append(druid::platform_menus::mac::file::open_file())
+        .append(open_file())
         .append_separator()
         .append(druid::platform_menus::mac::file::close())
         .append(druid::platform_menus::mac::file::save().disabled())
-        .append(druid::platform_menus::mac::file::save_as())
+        .append(save_as())
 }
 
 fn build_edit_menu<T: Data>() -> druid::MenuDesc<T> {
