@@ -7,34 +7,40 @@ use std::path::Path;
 
 use png;
 
-use crate::model::AppState;
+use crate::model::ImageData;
 
-pub fn write_png(path_str: &str, data: &AppState) -> Result<()> {
+pub fn write_png(path_str: &str, data: &ImageData) -> Result<()> {
     let path = Path::new(path_str);
     let file = File::create(path)?;
     let ref mut buf_writer = BufWriter::new(file);
 
-    let mut encoder = png::Encoder::new(buf_writer, 32, 32);
+    let mut encoder = png::Encoder::new(buf_writer, data.width as u32, data.height as u32);
     encoder.set_color(png::ColorType::RGBA);
     encoder.set_depth(png::BitDepth::Eight);
-    let mut writer = encoder.write_header().unwrap();
+    let mut writer = encoder.write_header()?;
 
-    let mut bytes: [u8; 4096] = [0; 4096];
-    for i in 0..data.pixels.len() {
-        let j = i * 4;
-        let chunk = data.pixels[i].to_be_bytes();
-        bytes[j + 0] = chunk[0];
-        bytes[j + 1] = chunk[1];
-        bytes[j + 2] = chunk[2];
-        bytes[j + 3] = chunk[3];
-    }
-
-    match writer.write_image_data(&bytes) {
+    match writer.write_image_data(&data.bytes) {
         Ok(()) => Ok(()),
         Err(e) => Err(Error::new(ErrorKind::InvalidInput, e)),
     }
 }
 
-pub fn _read_png(_path: &str, _data: &mut AppState) -> Result<()> {
-    Ok(())
+pub fn read_png(path_str: &str) -> Result<ImageData> {
+    let path = Path::new(path_str);
+    let file = File::open(path)?;
+
+    let decoder = png::Decoder::new(file);
+    let (info, mut reader) = decoder.read_info()?;
+
+    let mut bytes = vec![0; info.buffer_size()];
+
+    reader.next_frame(&mut bytes)?;
+
+    Ok(ImageData::new(
+        info.width as usize,
+        info.height as usize,
+        8,
+        None,
+        bytes,
+    ))
 }
