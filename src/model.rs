@@ -1,4 +1,3 @@
-use std::fmt;
 use std::ops::{Index, IndexMut};
 use std::sync::Arc;
 
@@ -58,12 +57,6 @@ pub enum ToolType {
     Marquee,
     Move,
     Paint,
-}
-
-impl fmt::Display for ToolType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
 }
 
 /// Application state.
