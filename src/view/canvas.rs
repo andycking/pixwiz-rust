@@ -9,10 +9,8 @@ use crate::view::theme;
 /// A canvas that allows for the display and modification of pixels. The size is currently
 /// fixed at 32x32.
 pub struct Canvas {
-    ants_dark: druid::piet::StrokeStyle,
-    ants_light: druid::piet::StrokeStyle,
-    grid_dark: druid::piet::StrokeStyle,
-    grid_light: druid::piet::StrokeStyle,
+    long_dash: [druid::piet::StrokeStyle; 2],
+    short_dash: [druid::piet::StrokeStyle; 2],
 }
 
 impl Canvas {
@@ -23,10 +21,14 @@ impl Canvas {
     /// Create an empty canvas.
     pub fn new() -> Self {
         Self {
-            ants_dark: druid::piet::StrokeStyle::new().dash(vec![4.0], 0.0),
-            ants_light: druid::piet::StrokeStyle::new().dash(vec![4.0], 4.0),
-            grid_dark: druid::piet::StrokeStyle::new().dash(vec![1.0], 0.0),
-            grid_light: druid::piet::StrokeStyle::new().dash(vec![1.0], 1.0),
+            long_dash: [
+                druid::piet::StrokeStyle::new().dash(vec![4.0], 0.0),
+                druid::piet::StrokeStyle::new().dash(vec![4.0], 4.0),
+            ],
+            short_dash: [
+                druid::piet::StrokeStyle::new().dash(vec![1.0], 0.0),
+                druid::piet::StrokeStyle::new().dash(vec![1.0], 1.0),
+            ],
         }
     }
 
@@ -111,12 +113,17 @@ impl Canvas {
         let a = Self::canvas_coords_to_screen_coords(druid::Point::new(x0 as f64, y0 as f64));
         let b = Self::canvas_coords_to_screen_coords(druid::Point::new(x1 as f64, y1 as f64));
         let line = druid::kurbo::Line::new(a, b);
-        ctx.stroke_styled(line, &theme::CANVAS_STROKE_GRID_DARK, 1.0, &self.grid_dark);
+        ctx.stroke_styled(
+            line,
+            &theme::CANVAS_STROKE_GRID_DARK,
+            1.0,
+            &self.short_dash[0],
+        );
         ctx.stroke_styled(
             line,
             &theme::CANVAS_STROKE_GRID_LIGHT,
             1.0,
-            &self.grid_light,
+            &self.short_dash[1],
         );
     }
 
@@ -148,13 +155,13 @@ impl Canvas {
                     rect,
                     &theme::CANVAS_STROKE_SELECTED_DARK,
                     2.0,
-                    &self.ants_dark,
+                    &self.long_dash[0],
                 );
                 ctx.stroke_styled(
                     rect,
                     &theme::CANVAS_STROKE_SELECTED_LIGHT,
                     2.0,
-                    &self.ants_light,
+                    &self.long_dash[1],
                 );
             }
 
