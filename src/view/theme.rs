@@ -22,3 +22,5 @@ pub const CANVAS_FILL_LIGHT: Color = Color::rgb8(96, 96, 96);
 pub const CANVAS_STROKE: Color = MAIN_STROKE;
 pub const CANVAS_STROKE_SELECTED_DARK: Color = Color::BLACK;
 pub const CANVAS_STROKE_SELECTED_LIGHT: Color = Color::WHITE;
+pub const CANVAS_STROKE_GRID_DARK: Color = Color::BLACK;
+pub const CANVAS_STROKE_GRID_LIGHT: Color = MAIN_STROKE;

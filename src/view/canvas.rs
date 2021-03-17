@@ -11,6 +11,8 @@ use crate::view::theme;
 pub struct Canvas {
     ants_dark: druid::piet::StrokeStyle,
     ants_light: druid::piet::StrokeStyle,
+    grid_dark: druid::piet::StrokeStyle,
+    grid_light: druid::piet::StrokeStyle,
 }
 
 impl Canvas {
@@ -23,6 +25,8 @@ impl Canvas {
         Self {
             ants_dark: druid::piet::StrokeStyle::new().dash(vec![4.0], 0.0),
             ants_light: druid::piet::StrokeStyle::new().dash(vec![4.0], 4.0),
+            grid_dark: druid::piet::StrokeStyle::new().dash(vec![1.0], 0.0),
+            grid_light: druid::piet::StrokeStyle::new().dash(vec![1.0], 1.0),
         }
     }
 
@@ -99,6 +103,29 @@ impl Canvas {
     fn paint_pixels(&self, ctx: &mut PaintCtx, data: &AppState) {
         for i in 0..data.pixels.len() {
             Self::paint_idx(ctx, i, data.pixels[i]);
+        }
+    }
+
+    /// Paint a grid line onto the given render context.
+    fn paint_grid_line(&self, ctx: &mut PaintCtx, x0: usize, y0: usize, x1: usize, y1: usize) {
+        let a = Self::canvas_coords_to_screen_coords(druid::Point::new(x0 as f64, y0 as f64));
+        let b = Self::canvas_coords_to_screen_coords(druid::Point::new(x1 as f64, y1 as f64));
+        let line = druid::kurbo::Line::new(a, b);
+        ctx.stroke_styled(line, &theme::CANVAS_STROKE_GRID_DARK, 1.0, &self.grid_dark);
+        ctx.stroke_styled(
+            line,
+            &theme::CANVAS_STROKE_GRID_LIGHT,
+            1.0,
+            &self.grid_light,
+        );
+    }
+
+    /// Paint the grid onto the given render context.
+    fn paint_grid(&self, ctx: &mut PaintCtx, _data: &AppState) {
+        for i in 1..4 {
+            let offset = 1 + i * 8;
+            self.paint_grid_line(ctx, offset, 1, offset, Self::ROWS + 1);
+            self.paint_grid_line(ctx, 1, offset, Self::COLS + 1, offset);
         }
     }
 
@@ -304,6 +331,7 @@ impl druid::Widget<AppState> for Canvas {
     fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, _env: &Env) {
         self.paint_border(ctx, data);
         self.paint_pixels(ctx, data);
+        self.paint_grid(ctx, data);
         self.paint_selection(ctx, data);
     }
 }
