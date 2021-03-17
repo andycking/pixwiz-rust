@@ -29,8 +29,10 @@ impl ToolButton {
 impl druid::Widget<AppState> for ToolButton {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, _env: &Env) {
         match event {
-            Event::MouseDown(_e) => {
-                ctx.set_active(true);
+            Event::MouseDown(e) => {
+                if !e.focus {
+                    ctx.set_active(true);
+                }
             }
 
             Event::MouseUp(_e) if ctx.is_active() => {

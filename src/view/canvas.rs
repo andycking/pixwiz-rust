@@ -236,14 +236,16 @@ impl druid::Widget<AppState> for Canvas {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, _env: &Env) {
         match event {
             Event::MouseDown(e) => {
-                match Self::screen_coords_to_canvas_coords(e.pos) {
-                    Some(p) => {
-                        data.start_pos = p;
-                        self.tool(data, p);
+                if !e.focus {
+                    match Self::screen_coords_to_canvas_coords(e.pos) {
+                        Some(p) => {
+                            data.start_pos = p;
+                            self.tool(data, p);
+                        }
+                        _ => data.start_pos = druid::Point::ZERO,
                     }
-                    _ => data.start_pos = druid::Point::ZERO,
+                    ctx.set_active(true);
                 }
-                ctx.set_active(true);
             }
 
             Event::MouseMove(e) => match Self::screen_coords_to_canvas_coords(e.pos) {

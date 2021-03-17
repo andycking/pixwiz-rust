@@ -94,8 +94,10 @@ impl Palette {
 impl druid::Widget<AppState> for Palette {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, _env: &Env) {
         match event {
-            Event::MouseDown(_e) => {
-                ctx.set_active(true);
+            Event::MouseDown(e) => {
+                if !e.focus {
+                    ctx.set_active(true);
+                }
             }
 
             Event::MouseMove(e) => match Self::screen_coords_to_palette_coords(e.pos) {
