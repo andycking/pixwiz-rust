@@ -151,7 +151,8 @@ fn build_status_label() -> impl druid::Widget<AppState> {
         let (r, g, b, a) = color.as_rgba8();
         let selection = data.selection.unwrap_or(druid::Rect::ZERO);
         format!(
-            "r:{:3} g:{:3} b:{:3} a:{:3}  {:02}:{:02}-{:02}:{:02}  {:02}:{:02}",
+            "{:>10}  r:{:3} g:{:3} b:{:3} a:{:3}  {:02}:{:02}-{:02}:{:02}  {:02}:{:02}",
+            data.tool_type.to_string().to_lowercase(),
             r,
             g,
             b,
