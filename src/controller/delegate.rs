@@ -1,13 +1,14 @@
 use crate::model::state::AppState;
 use crate::model::state::PixelState;
 use crate::storage;
+use crate::view;
 
 pub struct Delegate;
 
 impl druid::AppDelegate<AppState> for Delegate {
     fn command(
         &mut self,
-        _ctx: &mut druid::DelegateCtx,
+        ctx: &mut druid::DelegateCtx,
         _target: druid::Target,
         cmd: &druid::Command,
         data: &mut AppState,
@@ -15,22 +16,22 @@ impl druid::AppDelegate<AppState> for Delegate {
     ) -> druid::Handled {
         match cmd {
             _ if cmd.is(druid::commands::NEW_FILE) => {
-                new_file(cmd, data);
+                new_file(ctx, cmd, data);
                 druid::Handled::Yes
             }
 
             _ if cmd.is(druid::commands::OPEN_FILE) => {
-                open_file(cmd, data);
+                open_file(ctx, cmd, data);
                 druid::Handled::Yes
             }
 
             _ if cmd.is(druid::commands::SAVE_FILE) => {
-                save_file(cmd, data);
+                save_file(ctx, cmd, data);
                 druid::Handled::Yes
             }
 
             _ if cmd.is(druid::commands::SAVE_FILE_AS) => {
-                save_file_as(cmd, data);
+                save_file_as(ctx, cmd, data);
                 druid::Handled::Yes
             }
 
@@ -39,13 +40,13 @@ impl druid::AppDelegate<AppState> for Delegate {
     }
 }
 
-fn new_file(_cmd: &druid::Command, data: &mut AppState) {
+fn new_file(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     check_for_save(data);
 
     data.pixels = PixelState::empty();
 }
 
-fn open_file(cmd: &druid::Command, data: &mut AppState) {
+fn open_file(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
     check_for_save(data);
 
     let file_info = cmd.get_unchecked(druid::commands::OPEN_FILE);
@@ -62,7 +63,7 @@ fn open_file(cmd: &druid::Command, data: &mut AppState) {
     }
 }
 
-fn save_file(_cmd: &druid::Command, data: &mut AppState) {
+fn save_file(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     let image_data = storage::image_data::ImageData::from(&data.pixels);
 
     match &data.path {
@@ -74,7 +75,7 @@ fn save_file(_cmd: &druid::Command, data: &mut AppState) {
     }
 }
 
-fn save_file_as(cmd: &druid::Command, data: &mut AppState) {
+fn save_file_as(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
     let file_info = cmd.get_unchecked(druid::commands::SAVE_FILE_AS);
 
     // If the file dialog passes us an invalid path then all bets are off. Just let it panic.
@@ -85,6 +86,7 @@ fn save_file_as(cmd: &druid::Command, data: &mut AppState) {
     match storage::png::write(path, &image_data) {
         Ok(()) => {
             data.path = Some(String::from(path));
+            enable_save(ctx, cmd);
         }
         Err(_e) => {}
     }
@@ -92,4 +94,15 @@ fn save_file_as(cmd: &druid::Command, data: &mut AppState) {
 
 fn check_for_save(data: &mut AppState) {
     if data.pixels.dirty {}
+}
+
+fn enable_save(ctx: &mut druid::DelegateCtx, cmd: &druid::Command) {
+    match cmd.target() {
+        druid::Target::Window(id) => {
+            let menu_bar: druid::MenuDesc<AppState> = view::build_menu_bar(false);
+            ctx.set_menu(menu_bar, id);
+        }
+
+        _ => {}
+    }
 }

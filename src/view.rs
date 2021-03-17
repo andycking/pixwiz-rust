@@ -178,14 +178,14 @@ fn build_status_bar() -> impl druid::Widget<AppState> {
         .background(theme::STATUS_BAR_FILL)
 }
 
-pub fn build_menu_bar<T: Data>() -> druid::MenuDesc<T> {
+pub fn build_menu_bar<T: Data>(disable_save: bool) -> druid::MenuDesc<T> {
     druid::MenuDesc::new(druid::LocalizedString::new(""))
         .append(druid::platform_menus::mac::application::default())
-        .append(build_file_menu())
+        .append(build_file_menu(disable_save))
         .append(build_edit_menu())
 }
 
-fn build_file_menu<T: Data>() -> druid::MenuDesc<T> {
+fn build_file_menu<T: Data>(disable_save: bool) -> druid::MenuDesc<T> {
     fn open_file<T: Data>() -> druid::MenuItem<T> {
         let file_dialog_options =
             druid::FileDialogOptions::default().allowed_types(vec![druid::FileSpec::PNG]);
@@ -213,7 +213,7 @@ fn build_file_menu<T: Data>() -> druid::MenuDesc<T> {
         .append(open_file())
         .append_separator()
         .append(druid::platform_menus::mac::file::close())
-        .append(druid::platform_menus::mac::file::save().disabled())
+        .append(druid::platform_menus::mac::file::save().disabled_if(|| disable_save))
         .append(save_as())
 }
 
