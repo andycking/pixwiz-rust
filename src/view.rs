@@ -10,6 +10,7 @@ mod tool_button;
 use crate::model::state::AppState;
 use crate::model::types::ToolType;
 use crate::view::canvas::Canvas;
+use crate::view::canvas::CanvasController;
 use crate::view::palette::Palette;
 use crate::view::tool_button::ToolButton;
 
@@ -88,7 +89,7 @@ fn build_left_pane() -> impl druid::Widget<AppState> {
 }
 
 fn build_canvas() -> impl druid::Widget<AppState> {
-    Canvas::new()
+    Canvas::new().controller(CanvasController)
 }
 
 fn build_palette() -> impl druid::Widget<AppState> {

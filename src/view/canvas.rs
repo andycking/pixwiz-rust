@@ -267,6 +267,23 @@ impl Canvas {
 impl druid::Widget<AppState> for Canvas {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, _env: &Env) {
         match event {
+            Event::KeyUp(e) => {
+                if e.code == druid::Code::Delete || e.code == druid::Code::Backspace {
+                    match data.selection {
+                        Some(selection) => {
+                            for row in selection.x0 as usize..selection.x1 as usize {
+                                for col in selection.y0 as usize..selection.y1 as usize {
+                                    let p = druid::Point::new(row as f64, col as f64);
+                                    let idx = Self::canvas_coords_to_idx(p);
+                                    data.pixels.write(idx, 0);
+                                }
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+            }
+
             Event::MouseDown(e) => {
                 if !e.focus {
                     match Self::screen_coords_to_canvas_coords(e.pos) {
@@ -338,5 +355,23 @@ impl druid::Widget<AppState> for Canvas {
         self.paint_pixels(ctx, data);
         self.paint_grid(ctx, data);
         self.paint_selection(ctx, data);
+    }
+}
+
+pub struct CanvasController;
+
+impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for CanvasController {
+    fn event(
+        &mut self,
+        child: &mut W,
+        ctx: &mut EventCtx<'_, '_>,
+        event: &Event,
+        data: &mut AppState,
+        env: &Env,
+    ) {
+        if let Event::WindowConnected = event {
+            ctx.request_focus();
+        }
+        child.event(ctx, event, data, env);
     }
 }
