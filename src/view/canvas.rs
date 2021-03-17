@@ -282,13 +282,13 @@ impl druid::Widget<AppState> for Canvas {
 
             Event::MouseMove(e) => match Self::screen_coords_to_canvas_coords(e.pos) {
                 Some(p) => {
-                    if ctx.is_active() {
-                        self.tool(data, p);
-                    }
-
                     let idx = Self::canvas_coords_to_idx(p);
                     data.current_pos = p;
                     data.pos_color = data.pixels[idx];
+
+                    if ctx.is_active() {
+                        self.tool(data, p);
+                    }
                 }
                 None => {
                     if !ctx.is_active() {
