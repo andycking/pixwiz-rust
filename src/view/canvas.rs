@@ -48,11 +48,15 @@ impl Canvas {
     }
 
     /// Translate from canvas coordinates to screen coordinates.
-    fn canvas_coords_to_screen_coords(p: druid::Point) -> druid::Point {
-        assert!(p.x > 0.0 && p.y > 0.0);
+    fn canvas_coords_to_screen_coords(x: usize, y: usize) -> druid::Point {
+        Self::canvas_coords_to_screen_coords_f64(x as f64, y as f64)
+    }
+
+    fn canvas_coords_to_screen_coords_f64(x: f64, y: f64) -> druid::Point {
+        assert!(x > 0.0 && y > 0.0);
         druid::Point::new(
-            1.0 + ((p.x - 1.0) * Self::PIXELS),
-            1.0 + ((p.y - 1.0) * Self::PIXELS),
+            1.0 + ((x - 1.0) * Self::PIXELS),
+            1.0 + ((y - 1.0) * Self::PIXELS),
         )
     }
 
@@ -110,8 +114,8 @@ impl Canvas {
 
     /// Paint a grid line onto the given render context.
     fn paint_grid_line(&self, ctx: &mut PaintCtx, x0: usize, y0: usize, x1: usize, y1: usize) {
-        let a = Self::canvas_coords_to_screen_coords(druid::Point::new(x0 as f64, y0 as f64));
-        let b = Self::canvas_coords_to_screen_coords(druid::Point::new(x1 as f64, y1 as f64));
+        let a = Self::canvas_coords_to_screen_coords(x0, y0);
+        let b = Self::canvas_coords_to_screen_coords(x1, y1);
         let line = druid::kurbo::Line::new(a, b);
         ctx.stroke_styled(
             line,
@@ -140,14 +144,8 @@ impl Canvas {
     fn paint_selection(&self, ctx: &mut PaintCtx, data: &AppState) {
         match data.selection {
             Some(s) => {
-                let tl = Self::canvas_coords_to_screen_coords(druid::Point::new(
-                    s.x0 as f64,
-                    s.y0 as f64,
-                ));
-                let br = Self::canvas_coords_to_screen_coords(druid::Point::new(
-                    s.x1 as f64,
-                    s.y1 as f64,
-                ));
+                let tl = Self::canvas_coords_to_screen_coords_f64(s.x0, s.y0);
+                let br = Self::canvas_coords_to_screen_coords_f64(s.x1, s.y1);
 
                 let rect = druid::Rect::new(tl.x, tl.y, br.x + 16.0, br.y + 16.0);
 
