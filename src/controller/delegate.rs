@@ -48,8 +48,9 @@ fn new_file(_cmd: &druid::Command, data: &mut AppState) {
 fn open_file(cmd: &druid::Command, data: &mut AppState) {
     check_for_save(data);
 
+    let file_info = cmd.get_unchecked(druid::commands::OPEN_FILE);
+
     // If the file dialog passes us an invalid path then all bets are off. Just let it panic.
-    let file_info = cmd.get(druid::commands::OPEN_FILE).unwrap();
     let path = file_info.path().to_str().unwrap();
 
     match storage::png::read(path) {
@@ -74,8 +75,9 @@ fn save_file(_cmd: &druid::Command, data: &mut AppState) {
 }
 
 fn save_file_as(cmd: &druid::Command, data: &mut AppState) {
+    let file_info = cmd.get_unchecked(druid::commands::SAVE_FILE_AS);
+
     // If the file dialog passes us an invalid path then all bets are off. Just let it panic.
-    let file_info = cmd.get(druid::commands::SAVE_FILE_AS).unwrap();
     let path = file_info.path().to_str().unwrap();
 
     let image_data = storage::image_data::ImageData::from(&data.pixels);
