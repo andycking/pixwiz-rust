@@ -46,7 +46,7 @@ fn new_file(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut App
     data.pixels = PixelState::empty();
 }
 
-fn open_file(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+fn open_file(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
     check_for_save(data);
 
     let file_info = cmd.get_unchecked(druid::commands::OPEN_FILE);
@@ -58,6 +58,7 @@ fn open_file(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut App
         Ok(image_data) => {
             data.pixels = PixelState::from(&image_data);
             data.path = Some(String::from(path));
+            enable_save(ctx, cmd);
         }
         Err(_e) => {}
     }
