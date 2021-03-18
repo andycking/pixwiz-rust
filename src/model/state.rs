@@ -51,6 +51,18 @@ impl PixelState {
         self.storage.len()
     }
 
+    /// Convert coordinates to an index within storage.
+    pub fn xy_to_idx(&self, x: usize, y: usize) -> usize {
+        (y - 1) * self.height + (x - 1)
+    }
+
+    /// Convert point coordinates to an index within storage.
+    pub fn point_to_idx(&self, p: druid::Point) -> usize {
+        self.xy_to_idx(p.x as usize, p.y as usize)
+    }
+
+    /// Write a value to an index in storage. This is a function and not an IndexMut
+    /// so that we can control the dirty flag.
     pub fn write(&mut self, idx: usize, value: u32) {
         *Arc::make_mut(&mut self.storage).index_mut(idx) = value;
         self.dirty = true;
