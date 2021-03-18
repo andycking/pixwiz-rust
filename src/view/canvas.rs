@@ -266,12 +266,13 @@ impl druid::Widget<AppState> for Canvas {
                 if e.code == druid::Code::Delete || e.code == druid::Code::Backspace {
                     match data.selection {
                         Some(selection) => {
-                            for row in selection.x0 as usize..selection.x1 as usize {
-                                for col in selection.y0 as usize..selection.y1 as usize {
-                                    let idx = data.pixels.xy_to_idx(row, col);
-                                    data.pixels.write(idx, 0);
-                                }
-                            }
+                            data.pixels.write_block(
+                                selection.x0 as usize,
+                                selection.y0 as usize,
+                                selection.x1 as usize,
+                                selection.y1 as usize,
+                                0,
+                            );
                         }
                         _ => {}
                     }

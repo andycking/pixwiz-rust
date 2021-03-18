@@ -65,10 +65,26 @@ impl PixelState {
     }
 
     /// Write a value to an index in storage. This is a function and not an IndexMut
-    /// so that we can control the dirty flag.
+    /// because we want to control the dirty flag.
     #[inline]
     pub fn write(&mut self, idx: usize, value: u32) {
         *Arc::make_mut(&mut self.storage).index_mut(idx) = value;
+        self.dirty = true;
+    }
+
+    /// Write a value to a block of storage. Probably a little bit faster than making
+    /// multiple calls to write(). Probably. What even is a profiler?
+    pub fn write_block(&mut self, x0: usize, y0: usize, x1: usize, y1: usize, value: u32) {
+        let pixels = Arc::make_mut(&mut self.storage);
+
+        for row in x0..x1 + 1 {
+            for col in y0..y1 + 1 {
+                // Why can't we use our own function? Because then we'd have a mutable
+                // borrow followed by an immutable borrow. So just do our own inlining.
+                let idx = (col - 1) * self.height + (row - 1);
+                pixels[idx] = value;
+            }
+        }
         self.dirty = true;
     }
 }
