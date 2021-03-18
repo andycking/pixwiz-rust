@@ -262,22 +262,21 @@ impl Canvas {
 impl druid::Widget<AppState> for Canvas {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, _env: &Env) {
         match event {
-            Event::KeyUp(e) => {
-                if e.code == druid::Code::Delete || e.code == druid::Code::Backspace {
-                    match data.selection {
-                        Some(selection) => {
-                            data.pixels.write_block(
-                                selection.x0 as usize,
-                                selection.y0 as usize,
-                                selection.x1 as usize,
-                                selection.y1 as usize,
-                                0,
-                            );
-                        }
-                        _ => {}
+            Event::KeyUp(e) => match e.code {
+                druid::Code::Delete | druid::Code::Backspace => match data.selection {
+                    Some(selection) => {
+                        data.pixels.write_block(
+                            selection.x0 as usize,
+                            selection.y0 as usize,
+                            selection.x1 as usize,
+                            selection.y1 as usize,
+                            0,
+                        );
                     }
-                }
-            }
+                    _ => {}
+                },
+                _ => {}
+            },
 
             Event::MouseDown(e) => {
                 if !e.focus {
