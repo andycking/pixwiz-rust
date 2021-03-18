@@ -1,3 +1,4 @@
+use crate::model::commands;
 use crate::model::state::AppState;
 use crate::model::state::PixelState;
 use crate::storage;
@@ -15,6 +16,7 @@ impl druid::AppDelegate<AppState> for Delegate {
         _env: &druid::Env,
     ) -> druid::Handled {
         match cmd {
+            // File menu.
             _ if cmd.is(druid::commands::NEW_FILE) => {
                 new_file(ctx, cmd, data);
                 druid::Handled::Yes
@@ -32,6 +34,18 @@ impl druid::AppDelegate<AppState> for Delegate {
 
             _ if cmd.is(druid::commands::SAVE_FILE_AS) => {
                 save_file_as(ctx, cmd, data);
+                druid::Handled::Yes
+            }
+
+            // Image menu.
+            _ if cmd.is(commands::CONVERT_TO_GRAYSCALE) => {
+                convert_to_grayscale(ctx, cmd, data);
+                druid::Handled::Yes
+            }
+
+            // View menu.
+            _ if cmd.is(commands::SHOW_GRID) => {
+                show_grid(ctx, cmd, data);
                 druid::Handled::Yes
             }
 
@@ -107,3 +121,7 @@ fn enable_save(ctx: &mut druid::DelegateCtx, cmd: &druid::Command) {
         _ => {}
     }
 }
+
+fn convert_to_grayscale(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {}
+
+fn show_grid(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {}

@@ -7,6 +7,7 @@ mod palette;
 mod theme;
 mod tool_button;
 
+use crate::model::commands;
 use crate::model::state::AppState;
 use crate::model::types::ToolType;
 use crate::view::canvas::Canvas;
@@ -185,6 +186,8 @@ pub fn build_menu_bar<T: Data>(disable_save: bool) -> druid::MenuDesc<T> {
         .append(druid::platform_menus::mac::application::default())
         .append(build_file_menu(disable_save))
         .append(build_edit_menu())
+        .append(build_image_menu())
+        .append(build_view_menu())
 }
 
 fn build_file_menu<T: Data>(disable_save: bool) -> druid::MenuDesc<T> {
@@ -227,4 +230,29 @@ fn build_edit_menu<T: Data>() -> druid::MenuDesc<T> {
         .append(druid::platform_menus::common::cut())
         .append(druid::platform_menus::common::copy())
         .append(druid::platform_menus::common::paste())
+}
+
+fn build_image_menu<T: Data>() -> druid::MenuDesc<T> {
+    fn convert_to_grayscale<T: Data>() -> druid::MenuItem<T> {
+        druid::MenuItem::new(
+            druid::LocalizedString::new("menu-image-grayscale")
+                .with_placeholder("Convert to Grayscale"),
+            commands::CONVERT_TO_GRAYSCALE,
+        )
+    }
+
+    druid::MenuDesc::new(druid::LocalizedString::new("menu-image-menu").with_placeholder("Image"))
+        .append(convert_to_grayscale())
+}
+
+fn build_view_menu<T: Data>() -> druid::MenuDesc<T> {
+    fn toggle_grid<T: Data>() -> druid::MenuItem<T> {
+        druid::MenuItem::new(
+            druid::LocalizedString::new("menu-view-show-grid").with_placeholder("Show Grid"),
+            commands::SHOW_GRID,
+        )
+    }
+
+    druid::MenuDesc::new(druid::LocalizedString::new("menu-view-menu").with_placeholder("View"))
+        .append(toggle_grid().selected())
 }
