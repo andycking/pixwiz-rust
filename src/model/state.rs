@@ -73,7 +73,8 @@ impl PixelState {
     }
 
     /// Write a value to a block of storage. Probably a little bit faster than making
-    /// multiple calls to write(). Probably. What even is a profiler?
+    /// multiple calls to write(). Probably. What even is a profiler? This is used by the
+    /// eraser tool.
     pub fn write_block(&mut self, x0: usize, y0: usize, x1: usize, y1: usize, value: u32) {
         let pixels = Arc::make_mut(&mut self.storage);
 
@@ -89,7 +90,7 @@ impl PixelState {
     }
 }
 
-/// Implement the index trait. This is a convenient way for callers to access the pixel
+/// Implement the index trait. This is a convenient way for callers to read the pixel
 /// storage directly. Note that it's immutable.
 impl Index<usize> for PixelState {
     type Output = u32;
