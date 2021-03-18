@@ -60,11 +60,6 @@ impl Canvas {
         )
     }
 
-    /// Convert coordinates to an index within the canvas storage.
-    fn canvas_coords_to_idx(p: druid::Point) -> usize {
-        ((p.y - 1.0) * (Self::COLS as f64) + (p.x - 1.0)) as usize
-    }
-
     /// Convert an index within the canvas storage to screen coordinates.
     fn idx_to_screen_coords(idx: usize) -> druid::Point {
         let y = (idx / Self::COLS) as f64;
@@ -193,7 +188,7 @@ impl Canvas {
     /// Flood fill the canvas starting at the given point out to the given boundary,
     /// while respecting color boundaries. We should really change this to a span fill.
     fn flood_fill_work(data: &mut AppState, start_pos: druid::Point, bounds: druid::Rect) {
-        let start_idx = Self::canvas_coords_to_idx(start_pos);
+        let start_idx = data.pixels.point_to_idx(start_pos);
         let start_color = data.pixels[start_idx];
         if start_color == data.brush_color {
             return;
@@ -204,7 +199,7 @@ impl Canvas {
         while !q.is_empty() {
             let node = q.pop_front().unwrap();
 
-            let idx = Self::canvas_coords_to_idx(node);
+            let idx = data.pixels.point_to_idx(node);
             if data.pixels[idx] == start_color {
                 data.pixels.write(idx, data.brush_color);
 
@@ -227,7 +222,7 @@ impl Canvas {
     /// Execute a tool at the given point on the canvas. The point is in
     /// canvas coordinates.
     fn tool(&mut self, data: &mut AppState, p: druid::Point) {
-        let idx = Self::canvas_coords_to_idx(p);
+        let idx = data.pixels.point_to_idx(p);
 
         match data.tool_type {
             ToolType::Dropper => {
@@ -273,8 +268,7 @@ impl druid::Widget<AppState> for Canvas {
                         Some(selection) => {
                             for row in selection.x0 as usize..selection.x1 as usize {
                                 for col in selection.y0 as usize..selection.y1 as usize {
-                                    let p = druid::Point::new(row as f64, col as f64);
-                                    let idx = Self::canvas_coords_to_idx(p);
+                                    let idx = data.pixels.xy_to_idx(row, col);
                                     data.pixels.write(idx, 0);
                                 }
                             }
@@ -299,7 +293,7 @@ impl druid::Widget<AppState> for Canvas {
 
             Event::MouseMove(e) => match Self::screen_coords_to_canvas_coords(e.pos) {
                 Some(p) => {
-                    let idx = Self::canvas_coords_to_idx(p);
+                    let idx = data.pixels.point_to_idx(p);
                     data.current_pos = p;
                     data.pos_color = data.pixels[idx];
 
