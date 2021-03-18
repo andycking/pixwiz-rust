@@ -44,6 +44,7 @@ impl PixelState {
         }
     }
 
+    #[inline]
     pub fn len(&self) -> usize {
         // We always want len and capacity to be the same. The entire vector must have been
         // initialized so that later on we don't access an invalid pixel.
@@ -52,17 +53,20 @@ impl PixelState {
     }
 
     /// Convert coordinates to an index within storage.
+    #[inline]
     pub fn xy_to_idx(&self, x: usize, y: usize) -> usize {
         (y - 1) * self.height + (x - 1)
     }
 
     /// Convert point coordinates to an index within storage.
+    #[inline]
     pub fn point_to_idx(&self, p: druid::Point) -> usize {
         self.xy_to_idx(p.x as usize, p.y as usize)
     }
 
     /// Write a value to an index in storage. This is a function and not an IndexMut
     /// so that we can control the dirty flag.
+    #[inline]
     pub fn write(&mut self, idx: usize, value: u32) {
         *Arc::make_mut(&mut self.storage).index_mut(idx) = value;
         self.dirty = true;
@@ -73,6 +77,8 @@ impl PixelState {
 /// storage directly. Note that it's immutable.
 impl Index<usize> for PixelState {
     type Output = u32;
+
+    #[inline]
     fn index(&self, idx: usize) -> &Self::Output {
         &self.storage[idx]
     }
