@@ -122,6 +122,11 @@ fn enable_save(ctx: &mut druid::DelegateCtx, cmd: &druid::Command) {
     }
 }
 
-fn convert_to_grayscale(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut AppState) {}
+fn convert_to_grayscale(
+    _ctx: &mut druid::DelegateCtx,
+    _cmd: &druid::Command,
+    _data: &mut AppState,
+) {
+}
 
 fn show_grid(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut AppState) {}
