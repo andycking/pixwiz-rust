@@ -103,7 +103,7 @@ impl Canvas {
     /// on top of the checkboard. Pixel transparency is via alpha value.
     fn paint_pixels(&self, ctx: &mut PaintCtx, data: &AppState) {
         for i in 0..data.pixels.len() {
-            Self::paint_idx(ctx, i, data.pixels[i]);
+            Self::paint_idx(ctx, i, data.pixels.read(i));
         }
     }
 
@@ -189,7 +189,7 @@ impl Canvas {
     /// while respecting color boundaries. We should really change this to a span fill.
     fn flood_fill_work(data: &mut AppState, start_pos: druid::Point, bounds: druid::Rect) {
         let start_idx = data.pixels.point_to_idx(start_pos);
-        let start_color = data.pixels[start_idx];
+        let start_color = data.pixels.read(start_idx);
         if start_color == data.brush_color {
             return;
         }
@@ -200,7 +200,7 @@ impl Canvas {
             let node = q.pop_front().unwrap();
 
             let idx = data.pixels.point_to_idx(node);
-            if data.pixels[idx] == start_color {
+            if data.pixels.read(idx) == start_color {
                 data.pixels.write(idx, data.brush_color);
 
                 if node.x > bounds.x0 as f64 {
@@ -226,7 +226,7 @@ impl Canvas {
 
         match data.tool_type {
             ToolType::Dropper => {
-                data.brush_color = data.pixels[idx];
+                data.brush_color = data.pixels.read(idx);
             }
 
             ToolType::Eraser => {
@@ -295,7 +295,7 @@ impl druid::Widget<AppState> for Canvas {
                 Some(p) => {
                     let idx = data.pixels.point_to_idx(p);
                     data.current_pos = p;
-                    data.pos_color = data.pixels[idx];
+                    data.pos_color = data.pixels.read(idx);
 
                     if ctx.is_active() {
                         self.tool(data, p);

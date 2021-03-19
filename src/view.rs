@@ -104,7 +104,7 @@ fn build_preview() -> impl druid::Widget<AppState> {
             for x in 0..32 {
                 let rect = druid::Rect::new(x as f64, y as f64, (x as f64) + 1.0, (y as f64) + 1.0);
 
-                let mut value = data.pixels[i];
+                let mut value = data.pixels.read(i);
                 value = match value & 0xff {
                     0 => theme::PREVIEW_FILL.as_rgba_u32(),
                     _ => value,

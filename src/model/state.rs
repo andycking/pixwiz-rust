@@ -12,7 +12,7 @@ pub struct PixelState {
     pub width: usize,
     pub height: usize,
     pub depth: u8,
-    storage: Arc<Vec<u32>>,
+    pub storage: Arc<Vec<u8>>,
 }
 
 impl PixelState {
@@ -20,13 +20,14 @@ impl PixelState {
     const DEFAULT_HEIGHT: usize = 32;
     const DEFAULT_DEPTH: u8 = 8;
 
-    pub fn new(dirty: bool, width: usize, height: usize, depth: u8, vec: Vec<u32>) -> Self {
+    pub fn new(width: usize, height: usize, depth: u8, vec: Vec<u8>) -> Self {
         assert!(width == 32);
         assert!(height == 32);
         assert!(depth == 8);
+        assert!(vec.len() == width * height * 4);
 
         Self {
-            dirty: dirty,
+            dirty: false,
             width: width,
             height: height,
             depth: depth,
@@ -35,12 +36,14 @@ impl PixelState {
     }
 
     pub fn empty() -> Self {
+        let size = Self::DEFAULT_WIDTH * Self::DEFAULT_HEIGHT * 4;
+
         Self {
             dirty: false,
             width: Self::DEFAULT_WIDTH,
             height: Self::DEFAULT_HEIGHT,
             depth: Self::DEFAULT_DEPTH,
-            storage: Arc::new(vec![0; Self::DEFAULT_WIDTH * Self::DEFAULT_HEIGHT]),
+            storage: Arc::new(vec![0; size]),
         }
     }
 
@@ -49,7 +52,7 @@ impl PixelState {
         // We always want len and capacity to be the same. The entire vector must have been
         // initialized so that later on we don't access an invalid pixel.
         assert!(self.storage.len() == self.storage.capacity());
-        self.storage.len()
+        self.storage.len() / 4
     }
 
     /// Convert coordinates to an index within storage.
@@ -64,11 +67,45 @@ impl PixelState {
         self.xy_to_idx(p.x as usize, p.y as usize)
     }
 
+    #[inline]
+    fn u32_to_rgba(v: u32) -> (u8, u8, u8, u8) {
+        (
+            ((v >> 24) & 0xff) as u8,
+            ((v >> 16) & 0xff) as u8,
+            ((v >> 8) & 0xff) as u8,
+            (v & 0xff) as u8,
+        )
+    }
+
+    #[inline]
+    fn rgba_to_u32(v: (u8, u8, u8, u8)) -> u32 {
+        ((v.0 as u32) << 24) | ((v.1 as u32) << 16) | ((v.2 as u32) << 8) | (v.3 as u32)
+    }
+
+    #[inline]
+    pub fn read(&self, idx: usize) -> u32 {
+        let byte_idx = idx * 4;
+        Self::rgba_to_u32((
+            self.storage[byte_idx + 0],
+            self.storage[byte_idx + 1],
+            self.storage[byte_idx + 2],
+            self.storage[byte_idx + 3],
+        ))
+    }
+
     /// Write a value to an index in storage. This is a function and not an IndexMut
     /// because we want to control the dirty flag.
     #[inline]
     pub fn write(&mut self, idx: usize, value: u32) {
-        *Arc::make_mut(&mut self.storage).index_mut(idx) = value;
+        let byte_idx = idx * 4;
+        let (r, g, b, a) = Self::u32_to_rgba(value);
+
+        let pixels = Arc::make_mut(&mut self.storage);
+        pixels[byte_idx + 0] = r;
+        pixels[byte_idx + 1] = g;
+        pixels[byte_idx + 2] = b;
+        pixels[byte_idx + 3] = a;
+
         self.dirty = true;
     }
 
@@ -83,21 +120,16 @@ impl PixelState {
                 // Why can't we use our own function? Because then we'd have a mutable
                 // borrow followed by an immutable borrow. So just do our own inlining.
                 let idx = (col - 1) * self.height + (row - 1);
-                pixels[idx] = value;
+                let byte_idx = idx * 4;
+
+                let (r, g, b, a) = Self::u32_to_rgba(value);
+                pixels[byte_idx + 0] = r;
+                pixels[byte_idx + 1] = g;
+                pixels[byte_idx + 2] = b;
+                pixels[byte_idx + 3] = a;
             }
         }
         self.dirty = true;
-    }
-}
-
-/// Implement the index trait. This is a convenient way for callers to read the pixel
-/// storage directly. Note that it's immutable.
-impl Index<usize> for PixelState {
-    type Output = u32;
-
-    #[inline]
-    fn index(&self, idx: usize) -> &Self::Output {
-        &self.storage[idx]
     }
 }
 

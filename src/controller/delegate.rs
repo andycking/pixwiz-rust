@@ -69,8 +69,8 @@ fn open_file(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppS
     let path = file_info.path().to_str().unwrap();
 
     match storage::png::read(path) {
-        Ok(image_data) => {
-            data.pixels = PixelState::from(&image_data);
+        Ok(pixels) => {
+            data.pixels = pixels;
             data.path = Some(String::from(path));
             enable_save(ctx, cmd);
         }
@@ -79,10 +79,8 @@ fn open_file(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppS
 }
 
 fn save_file(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    let image_data = storage::image_data::ImageData::from(&data.pixels);
-
     match &data.path {
-        Some(path) => match storage::png::write(path, &image_data) {
+        Some(path) => match storage::png::write(path, &data.pixels) {
             Ok(()) => {}
             Err(_e) => {}
         },
@@ -96,9 +94,7 @@ fn save_file_as(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut A
     // If the file dialog passes us an invalid path then all bets are off. Just let it panic.
     let path = file_info.path().to_str().unwrap();
 
-    let image_data = storage::image_data::ImageData::from(&data.pixels);
-
-    match storage::png::write(path, &image_data) {
+    match storage::png::write(path, &data.pixels) {
         Ok(()) => {
             data.path = Some(String::from(path));
             enable_save(ctx, cmd);
