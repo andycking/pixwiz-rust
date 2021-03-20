@@ -19,6 +19,8 @@ pub fn grayscale(
             let g = bytes[byte_idx + 1];
             let b = bytes[byte_idx + 2];
 
+            // TODO: Find nearest color in the current palette. I guess that means passing
+            // in the palette too.
             let avg = ((r as u32 + g as u32 + b as u32) / 3) as u8;
 
             bytes[byte_idx + 0] = avg;
