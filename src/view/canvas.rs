@@ -74,20 +74,20 @@ impl Canvas {
     }
 
     /// Paint an index into canvas storage into the given render context.
-    fn paint_idx(ctx: &mut PaintCtx, idx: usize, value: u32) {
+    fn paint_idx(ctx: &mut PaintCtx, idx: usize, color: &druid::Color) {
         let rect = Self::idx_to_screen_rect(idx);
-        if value & 0xff != 0 {
-            let color = druid::Color::from_rgba32_u32(value);
-            ctx.fill(rect, &color);
-        } else {
+
+        let (_, _, _, a) = color.as_rgba8();
+        if a != 255 {
             let y = idx / Self::COLS;
             let x = idx % Self::ROWS;
-            let color = match (x + y) % 2 {
-                0 => theme::CANVAS_FILL_DARK,
-                _ => theme::CANVAS_FILL_LIGHT,
+            match (x + y) % 2 {
+                0 => ctx.fill(rect, &theme::CANVAS_FILL_DARK),
+                _ => ctx.fill(rect, &theme::CANVAS_FILL_LIGHT),
             };
-            ctx.fill(rect, &color);
         }
+
+        ctx.fill(rect, color);
     }
 
     /// Paint border. The canvas does this internally instead of via border() because the
@@ -103,7 +103,7 @@ impl Canvas {
     /// on top of the checkboard. Pixel transparency is via alpha value.
     fn paint_pixels(&self, ctx: &mut PaintCtx, data: &AppState) {
         for i in 0..data.pixels.len() {
-            Self::paint_idx(ctx, i, data.pixels.read(i));
+            Self::paint_idx(ctx, i, &data.pixels.read(i));
         }
     }
 
@@ -201,7 +201,7 @@ impl Canvas {
 
             let idx = data.pixels.point_to_idx(node);
             if data.pixels.read(idx) == start_color {
-                data.pixels.write(idx, data.brush_color);
+                data.pixels.write(idx, &data.brush_color);
 
                 if node.x > bounds.x0 as f64 {
                     q.push_back(druid::Point::new(node.x - 1.0, node.y));
@@ -230,7 +230,7 @@ impl Canvas {
             }
 
             ToolType::Eraser => {
-                data.pixels.write(idx, 0);
+                data.pixels.write(idx, &druid::Color::rgba8(0, 0, 0, 0));
             }
 
             ToolType::Fill => Self::fill(data, p),
@@ -251,7 +251,7 @@ impl Canvas {
             }
 
             ToolType::Paint => {
-                data.pixels.write(idx, data.brush_color);
+                data.pixels.write(idx, &data.brush_color);
             }
 
             _ => {}
@@ -270,7 +270,7 @@ impl druid::Widget<AppState> for Canvas {
                             selection.y0 as usize,
                             selection.x1 as usize,
                             selection.y1 as usize,
-                            0,
+                            &druid::Color::rgba8(0, 0, 0, 0),
                         );
                     }
                     _ => {}
@@ -304,7 +304,7 @@ impl druid::Widget<AppState> for Canvas {
                 None => {
                     if !ctx.is_active() {
                         data.current_pos = druid::Point::ZERO;
-                        data.pos_color = data.brush_color;
+                        data.pos_color = data.brush_color.clone();
                     }
                 }
             },

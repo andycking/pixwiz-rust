@@ -101,15 +101,19 @@ impl druid::Widget<AppState> for Palette {
             }
 
             Event::MouseMove(e) => match Self::screen_coords_to_palette_coords(e.pos) {
-                Some(p) => data.pos_color = self.values[Self::palette_coords_to_idx(p)],
-                None => data.pos_color = data.brush_color,
+                Some(p) => {
+                    data.pos_color =
+                        druid::Color::from_rgba32_u32(self.values[Self::palette_coords_to_idx(p)])
+                }
+                None => data.pos_color = data.brush_color.clone(),
             },
 
             Event::MouseUp(e) if ctx.is_active() => {
                 match Self::screen_coords_to_palette_coords(e.pos) {
                     Some(p) => {
                         self.current_idx = Self::palette_coords_to_idx(p);
-                        data.brush_color = self.values[self.current_idx];
+                        data.brush_color =
+                            druid::Color::from_rgba32_u32(self.values[self.current_idx]);
                         ctx.request_paint();
                     }
                     None => {}

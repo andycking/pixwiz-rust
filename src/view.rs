@@ -74,8 +74,8 @@ fn build_tools() -> impl druid::Widget<AppState> {
 fn build_color_well() -> impl druid::Widget<AppState> {
     druid::widget::Painter::new(|ctx, data: &AppState, _env| {
         let rect = ctx.size().to_rect();
-        let color = druid::Color::from_rgba32_u32(data.brush_color);
-        ctx.fill(rect, &color);
+        let color = &data.brush_color;
+        ctx.fill(rect, color);
     })
     .fix_size(88.0, 30.0)
     .border(theme::COLOR_WELL_STROKE, 1.0)
@@ -104,13 +104,12 @@ fn build_preview() -> impl druid::Widget<AppState> {
             for x in 0..32 {
                 let rect = druid::Rect::new(x as f64, y as f64, (x as f64) + 1.0, (y as f64) + 1.0);
 
-                let mut value = data.pixels.read(i);
-                value = match value & 0xff {
-                    0 => theme::PREVIEW_FILL.as_rgba_u32(),
-                    _ => value,
+                let color = data.pixels.read(i);
+                let (_, _, _, a) = color.as_rgba8();
+                if a != 255 {
+                    ctx.fill(rect, &theme::PREVIEW_FILL);
                 };
 
-                let color = druid::Color::from_rgba32_u32(value);
                 ctx.fill(rect, &color);
 
                 i += 1;
@@ -149,8 +148,7 @@ fn build_main_pane() -> impl druid::Widget<AppState> {
 
 fn build_status_label() -> impl druid::Widget<AppState> {
     druid::widget::Label::new(|data: &AppState, _env: &_| {
-        let color = druid::Color::from_rgba32_u32(data.pos_color);
-        let (r, g, b, a) = color.as_rgba8();
+        let (r, g, b, a) = data.pos_color.as_rgba8();
         let selection = data.selection.unwrap_or(druid::Rect::ZERO);
         format!(
             "{:>10}  r:{:3} g:{:3} b:{:3} a:{:3}  {:02}:{:02}-{:02}:{:02}  {:02}:{:02}",

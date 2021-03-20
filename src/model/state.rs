@@ -1,6 +1,5 @@
 use crate::model::types::ToolType;
 
-use std::ops::{Index, IndexMut};
 use std::sync::Arc;
 
 /// Pixel storage. Each value is stored as a u32 representation of RGBA, with the alpha value
@@ -68,37 +67,22 @@ impl PixelState {
     }
 
     #[inline]
-    fn u32_to_rgba(v: u32) -> (u8, u8, u8, u8) {
-        (
-            ((v >> 24) & 0xff) as u8,
-            ((v >> 16) & 0xff) as u8,
-            ((v >> 8) & 0xff) as u8,
-            (v & 0xff) as u8,
-        )
-    }
-
-    #[inline]
-    fn rgba_to_u32(v: (u8, u8, u8, u8)) -> u32 {
-        ((v.0 as u32) << 24) | ((v.1 as u32) << 16) | ((v.2 as u32) << 8) | (v.3 as u32)
-    }
-
-    #[inline]
-    pub fn read(&self, idx: usize) -> u32 {
+    pub fn read(&self, idx: usize) -> druid::Color {
         let byte_idx = idx * 4;
-        Self::rgba_to_u32((
+        druid::Color::rgba8(
             self.storage[byte_idx + 0],
             self.storage[byte_idx + 1],
             self.storage[byte_idx + 2],
             self.storage[byte_idx + 3],
-        ))
+        )
     }
 
     /// Write a value to an index in storage. This is a function and not an IndexMut
     /// because we want to control the dirty flag.
     #[inline]
-    pub fn write(&mut self, idx: usize, value: u32) {
+    pub fn write(&mut self, idx: usize, color: &druid::Color) {
         let byte_idx = idx * 4;
-        let (r, g, b, a) = Self::u32_to_rgba(value);
+        let (r, g, b, a) = color.as_rgba8();
 
         let pixels = Arc::make_mut(&mut self.storage);
         pixels[byte_idx + 0] = r;
@@ -112,7 +96,14 @@ impl PixelState {
     /// Write a value to a block of storage. Probably a little bit faster than making
     /// multiple calls to write(). Probably. What even is a profiler? This is used by the
     /// eraser tool.
-    pub fn write_block(&mut self, x0: usize, y0: usize, x1: usize, y1: usize, value: u32) {
+    pub fn write_block(
+        &mut self,
+        x0: usize,
+        y0: usize,
+        x1: usize,
+        y1: usize,
+        color: &druid::Color,
+    ) {
         let pixels = Arc::make_mut(&mut self.storage);
 
         for row in x0..x1 + 1 {
@@ -122,7 +113,7 @@ impl PixelState {
                 let idx = (col - 1) * self.height + (row - 1);
                 let byte_idx = idx * 4;
 
-                let (r, g, b, a) = Self::u32_to_rgba(value);
+                let (r, g, b, a) = color.as_rgba8();
                 pixels[byte_idx + 0] = r;
                 pixels[byte_idx + 1] = g;
                 pixels[byte_idx + 2] = b;
@@ -136,8 +127,8 @@ impl PixelState {
 /// Application state.
 #[derive(Clone, druid::Data)]
 pub struct AppState {
-    pub brush_color: u32,
-    pub pos_color: u32,
+    pub brush_color: druid::Color,
+    pub pos_color: druid::Color,
     pub start_pos: druid::Point,
     pub current_pos: druid::Point,
     pub selection: Option<druid::Rect>,
@@ -149,8 +140,8 @@ pub struct AppState {
 impl AppState {
     pub fn new() -> Self {
         Self {
-            brush_color: 0x0ff,
-            pos_color: 0x0ff,
+            brush_color: druid::Color::BLACK,
+            pos_color: druid::Color::rgba8(0, 0, 0, 0),
             start_pos: druid::Point::ZERO,
             current_pos: druid::Point::ZERO,
             selection: None,
