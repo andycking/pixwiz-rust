@@ -19,7 +19,7 @@ pub fn write(path_str: &str, pixels: &PixelState) -> Result<()> {
     encoder.set_depth(png::BitDepth::Eight);
     let mut writer = encoder.write_header()?;
 
-    match writer.write_image_data(&pixels.storage) {
+    match writer.write_image_data(&pixels.bytes) {
         Ok(()) => Ok(()),
         Err(e) => Err(Error::new(ErrorKind::InvalidInput, e)),
     }

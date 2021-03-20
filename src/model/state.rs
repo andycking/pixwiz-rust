@@ -2,16 +2,15 @@ use crate::model::types::ToolType;
 
 use std::sync::Arc;
 
-/// Pixel storage. Each value is stored as a u32 representation of RGBA, with the alpha value
-/// in the least significant position. This matches what Color does internally. We hold the
-/// values in an ARC, to avoid copying them.
+/// Pixel storage. Each value is stored as four contiguous bytes representing RGBA,
+/// respectively. We hold the values in an ARC, to avoid copying them.
 #[derive(Clone, druid::Data)]
 pub struct PixelState {
     pub dirty: bool,
     pub width: usize,
     pub height: usize,
     pub depth: u8,
-    pub storage: Arc<Vec<u8>>,
+    pub bytes: Arc<Vec<u8>>,
 }
 
 impl PixelState {
@@ -19,21 +18,23 @@ impl PixelState {
     const DEFAULT_HEIGHT: usize = 32;
     const DEFAULT_DEPTH: u8 = 8;
 
-    pub fn new(width: usize, height: usize, depth: u8, vec: Vec<u8>) -> Self {
+    /// Create new pixel state with given bytes.
+    pub fn new(width: usize, height: usize, depth: u8, bytes: Vec<u8>) -> Self {
         assert!(width == 32);
         assert!(height == 32);
         assert!(depth == 8);
-        assert!(vec.len() == width * height * 4);
+        assert!(bytes.len() == width * height * 4);
 
         Self {
             dirty: false,
             width: width,
             height: height,
             depth: depth,
-            storage: Arc::new(vec),
+            bytes: Arc::new(bytes),
         }
     }
 
+    /// Create an empty (transparent) pixel state of the default size.
     pub fn empty() -> Self {
         let size = Self::DEFAULT_WIDTH * Self::DEFAULT_HEIGHT * 4;
 
@@ -42,16 +43,17 @@ impl PixelState {
             width: Self::DEFAULT_WIDTH,
             height: Self::DEFAULT_HEIGHT,
             depth: Self::DEFAULT_DEPTH,
-            storage: Arc::new(vec![0; size]),
+            bytes: Arc::new(vec![0; size]),
         }
     }
 
+    /// Get the length of the pixel state in bytes.
     #[inline]
     pub fn len(&self) -> usize {
         // We always want len and capacity to be the same. The entire vector must have been
         // initialized so that later on we don't access an invalid pixel.
-        assert!(self.storage.len() == self.storage.capacity());
-        self.storage.len() / 4
+        assert!(self.bytes.len() == self.bytes.capacity());
+        self.bytes.len() / 4
     }
 
     /// Convert coordinates to an index within storage.
@@ -66,14 +68,15 @@ impl PixelState {
         self.xy_to_idx(p.x as usize, p.y as usize)
     }
 
+    /// Read a value from an index in storage.
     #[inline]
     pub fn read(&self, idx: usize) -> druid::Color {
         let byte_idx = idx * 4;
         druid::Color::rgba8(
-            self.storage[byte_idx + 0],
-            self.storage[byte_idx + 1],
-            self.storage[byte_idx + 2],
-            self.storage[byte_idx + 3],
+            self.bytes[byte_idx + 0],
+            self.bytes[byte_idx + 1],
+            self.bytes[byte_idx + 2],
+            self.bytes[byte_idx + 3],
         )
     }
 
@@ -84,7 +87,7 @@ impl PixelState {
         let byte_idx = idx * 4;
         let (r, g, b, a) = color.as_rgba8();
 
-        let pixels = Arc::make_mut(&mut self.storage);
+        let pixels = Arc::make_mut(&mut self.bytes);
         pixels[byte_idx + 0] = r;
         pixels[byte_idx + 1] = g;
         pixels[byte_idx + 2] = b;
@@ -104,7 +107,7 @@ impl PixelState {
         y1: usize,
         color: &druid::Color,
     ) {
-        let pixels = Arc::make_mut(&mut self.storage);
+        let bytes = Arc::make_mut(&mut self.bytes);
 
         for row in x0..x1 + 1 {
             for col in y0..y1 + 1 {
@@ -114,10 +117,10 @@ impl PixelState {
                 let byte_idx = idx * 4;
 
                 let (r, g, b, a) = color.as_rgba8();
-                pixels[byte_idx + 0] = r;
-                pixels[byte_idx + 1] = g;
-                pixels[byte_idx + 2] = b;
-                pixels[byte_idx + 3] = a;
+                bytes[byte_idx + 0] = r;
+                bytes[byte_idx + 1] = g;
+                bytes[byte_idx + 2] = b;
+                bytes[byte_idx + 3] = a;
             }
         }
         self.dirty = true;
@@ -138,6 +141,7 @@ pub struct AppState {
 }
 
 impl AppState {
+    /// Create default application state.
     pub fn new() -> Self {
         Self {
             brush_color: druid::Color::BLACK,
