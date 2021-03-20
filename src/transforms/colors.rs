@@ -1,4 +1,4 @@
-pub fn erase(
+pub fn grayscale(
     _width: usize,
     height: usize,
     bytes_per_pixel: usize,
@@ -14,10 +14,16 @@ pub fn erase(
         for row in y0..y1 + 1 {
             let idx = (row - 1) * height + (col - 1);
             let byte_idx = idx * bytes_per_pixel;
-            bytes[byte_idx + 0] = 0;
-            bytes[byte_idx + 1] = 0;
-            bytes[byte_idx + 2] = 0;
-            bytes[byte_idx + 3] = 0;
+
+            let r = bytes[byte_idx + 0];
+            let g = bytes[byte_idx + 1];
+            let b = bytes[byte_idx + 2];
+
+            let avg = ((r as u32 + g as u32 + b as u32) / 3) as u8;
+
+            bytes[byte_idx + 0] = avg;
+            bytes[byte_idx + 1] = avg;
+            bytes[byte_idx + 2] = avg;
         }
     }
 }

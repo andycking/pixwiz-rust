@@ -39,7 +39,8 @@ pub fn read(path_str: &str) -> Result<PixelState> {
     Ok(PixelState::new(
         info.width as usize,
         info.height as usize,
-        8,
+        8, // But why you lying tho?
+        4, // Ditto.
         bytes,
     ))
 }

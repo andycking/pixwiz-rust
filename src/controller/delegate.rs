@@ -120,7 +120,8 @@ fn enable_save(ctx: &mut druid::DelegateCtx, cmd: &druid::Command) {
 }
 
 fn convert_to_grayscale(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    data.pixels.apply(data.selection, transforms::simple::erase);
+    data.pixels
+        .apply(data.selection, transforms::colors::grayscale);
 }
 
 fn show_grid(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut AppState) {}
