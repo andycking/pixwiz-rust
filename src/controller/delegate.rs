@@ -2,6 +2,7 @@ use crate::model::commands;
 use crate::model::state::AppState;
 use crate::model::state::PixelState;
 use crate::storage;
+use crate::transforms;
 use crate::view;
 
 pub struct Delegate;
@@ -118,11 +119,8 @@ fn enable_save(ctx: &mut druid::DelegateCtx, cmd: &druid::Command) {
     }
 }
 
-fn convert_to_grayscale(
-    _ctx: &mut druid::DelegateCtx,
-    _cmd: &druid::Command,
-    _data: &mut AppState,
-) {
+fn convert_to_grayscale(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+    data.pixels.apply(data.selection, transforms::simple::erase);
 }
 
 fn show_grid(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut AppState) {}

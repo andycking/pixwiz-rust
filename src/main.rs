@@ -3,6 +3,7 @@ use druid::PlatformError;
 mod controller;
 mod model;
 mod storage;
+mod transforms;
 mod view;
 
 use controller::delegate::Delegate;

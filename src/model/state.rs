@@ -59,7 +59,15 @@ impl PixelState {
     /// Convert coordinates to an index within storage.
     #[inline]
     pub fn xy_to_idx(&self, x: usize, y: usize) -> usize {
-        (y - 1) * self.height + (x - 1)
+        Self::xy_to_idx_helper(self.height, x, y)
+    }
+
+    pub fn xy_to_idx_helper(height: usize, x: usize, y: usize) -> usize {
+        (y - 1) * height + (x - 1)
+    }
+
+    pub fn byte_idx(idx: usize) -> usize {
+        idx * 4
     }
 
     /// Convert point coordinates to an index within storage.
@@ -71,7 +79,7 @@ impl PixelState {
     /// Read a value from an index in storage.
     #[inline]
     pub fn read(&self, idx: usize) -> druid::Color {
-        let byte_idx = idx * 4;
+        let byte_idx = Self::byte_idx(idx);
         druid::Color::rgba8(
             self.bytes[byte_idx + 0],
             self.bytes[byte_idx + 1],
@@ -84,7 +92,7 @@ impl PixelState {
     /// because we want to control the dirty flag.
     #[inline]
     pub fn write(&mut self, idx: usize, color: &druid::Color) {
-        let byte_idx = idx * 4;
+        let byte_idx = Self::byte_idx(idx);
         let (r, g, b, a) = color.as_rgba8();
 
         let pixels = Arc::make_mut(&mut self.bytes);
@@ -96,33 +104,21 @@ impl PixelState {
         self.dirty = true;
     }
 
-    /// Write a value to a block of storage. Probably a little bit faster than making
-    /// multiple calls to write(). Probably. What even is a profiler? This is used by the
-    /// eraser tool.
-    pub fn write_block(
-        &mut self,
-        x0: usize,
-        y0: usize,
-        x1: usize,
-        y1: usize,
-        color: &druid::Color,
-    ) {
+    /// Apply a transformation to the pixels, or some selection thereof.
+    pub fn apply<F>(&mut self, selection: Option<druid::Rect>, f: F)
+    where
+        F: Fn(usize, usize, &mut Vec<u8>, &druid::Rect),
+    {
+        let bounds = selection.unwrap_or(druid::Rect::new(
+            0.0,
+            0.0,
+            self.width as f64,
+            self.height as f64,
+        ));
+
         let bytes = Arc::make_mut(&mut self.bytes);
+        f(self.width, self.height, bytes, &bounds);
 
-        for row in x0..x1 + 1 {
-            for col in y0..y1 + 1 {
-                // Why can't we use our own function? Because then we'd have a mutable
-                // borrow followed by an immutable borrow. So just do our own inlining.
-                let idx = (col - 1) * self.height + (row - 1);
-                let byte_idx = idx * 4;
-
-                let (r, g, b, a) = color.as_rgba8();
-                bytes[byte_idx + 0] = r;
-                bytes[byte_idx + 1] = g;
-                bytes[byte_idx + 2] = b;
-                bytes[byte_idx + 3] = a;
-            }
-        }
         self.dirty = true;
     }
 }

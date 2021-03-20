@@ -4,6 +4,7 @@ use druid::widget::prelude::*;
 
 use crate::model::state::AppState;
 use crate::model::types::ToolType;
+use crate::transforms;
 use crate::view::theme;
 
 /// A canvas that allows for the display and modification of pixels. The size is currently
@@ -263,18 +264,9 @@ impl druid::Widget<AppState> for Canvas {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, _env: &Env) {
         match event {
             Event::KeyUp(e) => match e.code {
-                druid::Code::Delete | druid::Code::Backspace => match data.selection {
-                    Some(selection) => {
-                        data.pixels.write_block(
-                            selection.x0 as usize,
-                            selection.y0 as usize,
-                            selection.x1 as usize,
-                            selection.y1 as usize,
-                            &druid::Color::rgba8(0, 0, 0, 0),
-                        );
-                    }
-                    _ => {}
-                },
+                druid::Code::Delete | druid::Code::Backspace => {
+                    data.pixels.apply(data.selection, transforms::simple::erase);
+                }
                 _ => {}
             },
 
