@@ -102,8 +102,9 @@ impl druid::Widget<AppState> for Palette {
 
             Event::MouseMove(e) => match Self::screen_coords_to_palette_coords(e.pos) {
                 Some(p) => {
-                    data.pos_color =
-                        druid::Color::from_rgba32_u32(self.values[Self::palette_coords_to_idx(p)])
+                    let idx = Self::palette_coords_to_idx(p);
+                    let val = self.values[idx];
+                    data.pos_color = druid::Color::from_rgba32_u32(val);
                 }
                 None => data.pos_color = data.brush_color.clone(),
             },
@@ -112,8 +113,8 @@ impl druid::Widget<AppState> for Palette {
                 match Self::screen_coords_to_palette_coords(e.pos) {
                     Some(p) => {
                         self.current_idx = Self::palette_coords_to_idx(p);
-                        data.brush_color =
-                            druid::Color::from_rgba32_u32(self.values[self.current_idx]);
+                        let val = self.values[self.current_idx];
+                        data.brush_color = druid::Color::from_rgba32_u32(val);
                         ctx.request_paint();
                     }
                     None => {}
