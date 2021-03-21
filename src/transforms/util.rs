@@ -26,3 +26,17 @@ pub fn write(x: usize, y: usize, header: &PixelHeader, bytes: &mut Vec<u8>, rgba
     bytes[byte_idx + 2] = rgba.b;
     bytes[byte_idx + 3] = rgba.a;
 }
+
+pub fn as_gray(rgba: &Rgba) -> Rgba {
+    let avg = ((rgba.r as u32 + rgba.g as u32 + rgba.b as u32) / 3) as u8;
+    Rgba::new(avg, avg, avg, rgba.a)
+}
+
+pub fn as_bw(rgba: &Rgba) -> Rgba {
+    let avg = ((rgba.r as u32 + rgba.g as u32 + rgba.b as u32) / 3) as u8;
+    let bw = match avg < 128 {
+        true => 0,
+        _ => 255,
+    };
+    Rgba::new(bw, bw, bw, rgba.a)
+}

@@ -43,6 +43,7 @@ impl Default for PixelHeader {
 
 /// Generic RGBA color type. Yes, I know we already use druid::Color, but that doesn't expose
 /// the components directly. Blah.
+#[derive(Clone, Default)]
 pub struct Rgba {
     pub r: u8,
     pub g: u8,

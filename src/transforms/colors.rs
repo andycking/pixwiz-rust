@@ -6,12 +6,7 @@ pub fn grayscale(header: &PixelHeader, bytes: &mut Vec<u8>, bounds: (usize, usiz
     for y in bounds.1..bounds.3 + 1 {
         for x in bounds.0..bounds.2 + 1 {
             let rgba = util::read(x, y, header, bytes);
-
-            // TODO: Find nearest color in the current palette. I guess that means passing
-            // in the palette too.
-            let avg = ((rgba.r as u32 + rgba.g as u32 + rgba.b as u32) / 3) as u8;
-
-            util::write(x, y, header, bytes, Rgba::new(avg, avg, avg, rgba.a));
+            util::write(x, y, header, bytes, util::as_gray(&rgba));
         }
     }
 }
