@@ -3,7 +3,7 @@ use crate::model::types::PixelHeader;
 /// Read RGBA from bytes. The underlying storage doesn't really matter: it can be a
 /// PixelState, or a copy thereof, or something else, as long as it's bytes.
 pub fn read(x: usize, y: usize, header: &PixelHeader, bytes: &Vec<u8>) -> (u8, u8, u8, u8) {
-    let idx = (y - 1) * header.height + (x - 1);
+    let idx = (y - 1) * header.width + (x - 1);
     let byte_idx = idx * header.bytes_per_pixel;
 
     let r = bytes[byte_idx + 0];
@@ -23,7 +23,7 @@ pub fn write(
     bytes: &mut Vec<u8>,
     rgba: (u8, u8, u8, u8),
 ) {
-    let idx = (y - 1) * header.height + (x - 1);
+    let idx = (y - 1) * header.width + (x - 1);
     let byte_idx = idx * header.bytes_per_pixel;
 
     bytes[byte_idx + 0] = rgba.0;

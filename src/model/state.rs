@@ -36,7 +36,7 @@ impl PixelState {
     /// Convert coordinates to an index within storage.
     #[inline]
     pub fn xy_to_idx(&self, x: usize, y: usize) -> usize {
-        (y - 1) * self.header.height + (x - 1)
+        (y - 1) * self.header.width + (x - 1)
     }
 
     /// Convert point coordinates to an index within storage.
