@@ -1,6 +1,5 @@
 use crate::model::commands;
 use crate::model::state::AppState;
-use crate::model::state::PixelState;
 use crate::storage;
 use crate::transforms;
 use crate::view;
@@ -58,7 +57,7 @@ impl druid::AppDelegate<AppState> for Delegate {
 fn new_file(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     check_for_save(data);
 
-    data.pixels = PixelState::empty();
+    data.pixels = Default::default();
 }
 
 fn open_file(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {

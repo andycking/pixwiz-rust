@@ -8,13 +8,18 @@ use std::path::Path;
 use png;
 
 use crate::model::state::PixelState;
+use crate::model::types::PixelHeader;
 
 pub fn write(path_str: &str, pixels: &PixelState) -> Result<()> {
     let path = Path::new(path_str);
     let file = File::create(path)?;
     let ref mut buf_writer = BufWriter::new(file);
 
-    let mut encoder = png::Encoder::new(buf_writer, pixels.width as u32, pixels.height as u32);
+    let mut encoder = png::Encoder::new(
+        buf_writer,
+        pixels.header.width as u32,
+        pixels.header.height as u32,
+    );
     encoder.set_color(png::ColorType::RGBA);
     encoder.set_depth(png::BitDepth::Eight);
     let mut writer = encoder.write_header()?;
@@ -36,11 +41,14 @@ pub fn read(path_str: &str) -> Result<PixelState> {
 
     reader.next_frame(&mut bytes)?;
 
-    Ok(PixelState::new(
+    let header = PixelHeader::new(
         info.width as usize,
         info.height as usize,
         8, // But why you lying tho?
         4, // Ditto.
-        bytes,
-    ))
+    );
+
+    let pixels = PixelState::new(header, bytes);
+
+    Ok(pixels)
 }
