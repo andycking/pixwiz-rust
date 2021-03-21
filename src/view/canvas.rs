@@ -267,6 +267,10 @@ impl druid::Widget<AppState> for Canvas {
                 druid::Code::Delete | druid::Code::Backspace => {
                     data.pixels.apply(data.selection, transforms::simple::erase);
                 }
+
+                druid::Code::Escape => {
+                    data.selection = None;
+                }
                 _ => {}
             },
 
