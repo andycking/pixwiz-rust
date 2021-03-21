@@ -14,3 +14,10 @@ pub fn grayscale(header: &PixelHeader, bytes: &mut Vec<u8>, bounds: (usize, usiz
         }
     }
 }
+
+pub fn _floyd_steinberg(
+    _header: &PixelHeader,
+    _bytes: &mut Vec<u8>,
+    _bounds: (usize, usize, usize, usize),
+) {
+}
