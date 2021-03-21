@@ -10,7 +10,7 @@ pub fn grayscale(header: &PixelHeader, bytes: &mut Vec<u8>, bounds: (usize, usiz
             // in the palette too.
             let avg = ((r as u32 + g as u32 + b as u32) / 3) as u8;
 
-            util::write(col, row, header, bytes, avg, avg, avg, a);
+            util::write(col, row, header, bytes, (avg, avg, avg, a));
         }
     }
 }
