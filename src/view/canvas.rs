@@ -163,63 +163,6 @@ impl Canvas {
         }
     }
 
-    /// Fill the canvas starting at the given point. Will pick a fill mode depending on
-    /// whether there is a selection (marquee).
-    fn fill(data: &mut AppState, p: druid::Point) {
-        match data.selection {
-            Some(selection) => Self::selection_fill(data, p, selection),
-            _ => Self::flood_fill(data, p),
-        }
-    }
-
-    /// Fill the canvas starting at the given point out to the edge of the current
-    /// selection, while respecting color boundaries.
-    fn selection_fill(data: &mut AppState, p: druid::Point, selection: druid::Rect) {
-        if selection.contains(p) {
-            Self::flood_fill_work(data, p, selection)
-        }
-    }
-
-    /// Flood fill the canvas starting at the given point out to the edge of the
-    /// canvas, while respecting color boundaries.
-    fn flood_fill(data: &mut AppState, p: druid::Point) {
-        Self::flood_fill_work(data, p, druid::Rect::new(1.0, 1.0, 32.0, 32.0))
-    }
-
-    /// Flood fill the canvas starting at the given point out to the given boundary,
-    /// while respecting color boundaries. We should really change this to a span fill.
-    fn flood_fill_work(data: &mut AppState, start_pos: druid::Point, bounds: druid::Rect) {
-        let start_idx = data.pixels.point_to_idx(start_pos);
-        let start_color = data.pixels.read(start_idx);
-        if start_color == data.brush_color {
-            return;
-        }
-
-        let mut q: VecDeque<druid::Point> = VecDeque::new();
-        q.push_back(start_pos);
-        while !q.is_empty() {
-            let node = q.pop_front().unwrap();
-
-            let idx = data.pixels.point_to_idx(node);
-            if data.pixels.read(idx) == start_color {
-                data.pixels.write(idx, &data.brush_color);
-
-                if node.x > bounds.x0 as f64 {
-                    q.push_back(druid::Point::new(node.x - 1.0, node.y));
-                }
-                if node.x < bounds.x1 as f64 {
-                    q.push_back(druid::Point::new(node.x + 1.0, node.y));
-                }
-                if node.y > bounds.y0 as f64 {
-                    q.push_back(druid::Point::new(node.x, node.y - 1.0));
-                }
-                if node.y < bounds.y1 as f64 {
-                    q.push_back(druid::Point::new(node.x, node.y + 1.0));
-                }
-            }
-        }
-    }
-
     /// Execute a tool at the given point on the canvas. The point is in
     /// canvas coordinates.
     fn tool(&mut self, data: &mut AppState, p: druid::Point) {
@@ -234,7 +177,9 @@ impl Canvas {
                 data.pixels.write(idx, &druid::Color::rgba8(0, 0, 0, 0));
             }
 
-            ToolType::Fill => Self::fill(data, p),
+            ToolType::Fill => {
+                transforms::apply(data, transforms::colors::fill);
+            }
 
             ToolType::Marquee => {
                 let x0 = data.start_pos.x.min(data.current_pos.x);

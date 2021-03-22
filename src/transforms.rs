@@ -22,7 +22,7 @@ where
         ),
     };
 
-    let env = PixelEnv::new(data.brush_color.clone(), data.start_pos, bounds);
+    let env = PixelEnv::new(data.brush_color.clone(), data.current_pos, bounds);
 
     let bytes = Arc::make_mut(&mut data.pixels.bytes);
 
