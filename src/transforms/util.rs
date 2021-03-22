@@ -28,6 +28,8 @@ pub fn write(x: usize, y: usize, header: &PixelHeader, bytes: &mut Vec<u8>, colo
     bytes[byte_idx + 3] = a;
 }
 
+/// Convert given color to black and white. This will desaturate the color first, and then
+/// pick black or white depending on which side of the threshold they land.
 pub fn black_and_white(color: druid::Color, threshold: f64) -> druid::Color {
     let gray = desaturate(color);
     let (r, _, _, a) = gray.as_rgba();
@@ -38,6 +40,7 @@ pub fn black_and_white(color: druid::Color, threshold: f64) -> druid::Color {
     druid::Color::rgba(bw, bw, bw, a)
 }
 
+/// Desaturate the given color (make it grayscale).
 pub fn desaturate(color: druid::Color) -> druid::Color {
     let (r, g, b, a) = color.as_rgba();
     let gray = r * 0.299 + g * 0.587 + b * 0.114;
