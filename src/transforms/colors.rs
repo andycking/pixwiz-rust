@@ -8,7 +8,7 @@ pub fn black_and_white(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>
     for y in env.bounds.y0 as usize..env.bounds.y1 as usize + 1 {
         for x in env.bounds.x0 as usize..env.bounds.x1 as usize + 1 {
             let color = util::read(x, y, header, bytes);
-            let bw = util::black_and_white(color, 0.5);
+            let bw = util::black_and_white(&color, 0.5);
             util::write(x, y, header, bytes, bw);
         }
     }
@@ -18,7 +18,7 @@ pub fn desaturate(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     for y in env.bounds.y0 as usize..env.bounds.y1 as usize + 1 {
         for x in env.bounds.x0 as usize..env.bounds.x1 as usize + 1 {
             let color = util::read(x, y, header, bytes);
-            let gray = util::desaturate(color);
+            let gray = util::desaturate(&color);
             util::write(x, y, header, bytes, gray);
         }
     }
@@ -61,4 +61,19 @@ pub fn fill(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     }
 }
 
-pub fn _floyd_steinberg(_header: &PixelHeader, _bytes: &mut Vec<u8>, _bounds: druid::Rect) {}
+pub fn dither_floyd_steinberg(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
+    fn calculate_error(oldpixel: &druid::Color, newpixel: &druid::Color) -> (f64, f64, f64) {
+        let (old_r, old_g, old_b, _) = oldpixel.as_rgba();
+        let (new_r, new_g, new_b, _) = newpixel.as_rgba();
+
+        (old_r - new_r, old_g - new_g, old_b - new_b)
+    }
+
+    for y in env.bounds.y0 as usize..env.bounds.y1 as usize + 1 {
+        for x in env.bounds.x0 as usize..env.bounds.x1 as usize + 1 {
+            let oldpixel = util::read(x, y, header, bytes);
+            let newpixel = util::black_and_white(&oldpixel, 0.5);
+            let _quant_error = calculate_error(&oldpixel, &newpixel);
+        }
+    }
+}
