@@ -28,18 +28,18 @@ pub fn write(x: usize, y: usize, header: &PixelHeader, bytes: &mut Vec<u8>, colo
     bytes[byte_idx + 3] = a;
 }
 
-pub fn as_gray(color: druid::Color) -> druid::Color {
-    let (r, g, b, a) = color.as_rgba();
-    let avg = (r + g + b) / 3.0;
-    druid::Color::rgba(avg, avg, avg, a)
-}
-
-pub fn as_bw(color: druid::Color) -> druid::Color {
-    let (r, g, b, a) = color.as_rgba();
-    let avg = (r + g + b) / 3.0;
-    let bw = match avg < 128.0 {
+pub fn black_and_white(color: druid::Color, threshold: f64) -> druid::Color {
+    let gray = desaturate(color);
+    let (r, _, _, a) = gray.as_rgba();
+    let bw = match r < threshold {
         true => 0.0,
-        _ => 255.0,
+        _ => 1.0,
     };
     druid::Color::rgba(bw, bw, bw, a)
+}
+
+pub fn desaturate(color: druid::Color) -> druid::Color {
+    let (r, g, b, a) = color.as_rgba();
+    let gray = r * 0.299 + g * 0.587 + b * 0.114;
+    druid::Color::rgba(gray, gray, gray, a)
 }

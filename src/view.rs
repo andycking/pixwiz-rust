@@ -234,16 +234,24 @@ fn build_edit_menu<T: Data>() -> druid::MenuDesc<T> {
 }
 
 fn build_image_menu<T: Data>() -> druid::MenuDesc<T> {
-    fn convert_to_grayscale<T: Data>() -> druid::MenuItem<T> {
+    fn black_and_white<T: Data>() -> druid::MenuItem<T> {
         druid::MenuItem::new(
-            druid::LocalizedString::new("menu-image-grayscale")
-                .with_placeholder("Convert to Grayscale"),
-            commands::CONVERT_TO_GRAYSCALE,
+            druid::LocalizedString::new("menu-image-black-and-white")
+                .with_placeholder("Black && White"),
+            commands::BLACK_AND_WHITE,
+        )
+    }
+
+    fn desaturate<T: Data>() -> druid::MenuItem<T> {
+        druid::MenuItem::new(
+            druid::LocalizedString::new("menu-image-desaturate").with_placeholder("Desaturate"),
+            commands::DESATURATE,
         )
     }
 
     druid::MenuDesc::new(druid::LocalizedString::new("menu-image-menu").with_placeholder("Image"))
-        .append(convert_to_grayscale())
+        .append(black_and_white())
+        .append(desaturate())
 }
 
 fn build_view_menu<T: Data>() -> druid::MenuDesc<T> {

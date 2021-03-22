@@ -38,8 +38,12 @@ impl druid::AppDelegate<AppState> for Delegate {
             }
 
             // Image menu.
-            _ if cmd.is(commands::CONVERT_TO_GRAYSCALE) => {
-                convert_to_grayscale(ctx, cmd, data);
+            _ if cmd.is(commands::BLACK_AND_WHITE) => {
+                black_and_white(ctx, cmd, data);
+                druid::Handled::Yes
+            }
+            _ if cmd.is(commands::DESATURATE) => {
+                desaturate(ctx, cmd, data);
                 druid::Handled::Yes
             }
 
@@ -118,9 +122,14 @@ fn enable_save(ctx: &mut druid::DelegateCtx, cmd: &druid::Command) {
     }
 }
 
-fn convert_to_grayscale(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+fn black_and_white(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     data.pixels
-        .apply(data.selection, transforms::colors::grayscale);
+        .apply(data.selection, transforms::colors::black_and_white);
+}
+
+fn desaturate(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+    data.pixels
+        .apply(data.selection, transforms::colors::desaturate);
 }
 
 fn show_grid(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut AppState) {}
