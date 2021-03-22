@@ -76,16 +76,16 @@ impl PixelState {
     /// Apply a transformation to the pixels, or some selection thereof.
     pub fn apply<F>(&mut self, selection: Option<druid::Rect>, f: F)
     where
-        F: Fn(&PixelHeader, &mut Vec<u8>, (usize, usize, usize, usize)),
+        F: Fn(&PixelHeader, &mut Vec<u8>, druid::Rect),
     {
         let bounds = match selection {
-            Some(rect) => (
-                rect.x0 as usize,
-                rect.y0 as usize,
-                rect.x1 as usize,
-                rect.y1 as usize,
+            Some(rect) => rect,
+            _ => druid::Rect::new(
+                1.0,
+                1.0,
+                self.header.width as f64,
+                self.header.height as f64,
             ),
-            _ => (1, 1, self.header.width, self.header.height),
         };
 
         let bytes = Arc::make_mut(&mut self.bytes);

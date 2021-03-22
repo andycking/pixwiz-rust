@@ -1,12 +1,11 @@
 use crate::model::types::PixelHeader;
-use crate::model::types::Rgba;
 use crate::transforms::util;
 
-pub fn grayscale(header: &PixelHeader, bytes: &mut Vec<u8>, bounds: (usize, usize, usize, usize)) {
-    for y in bounds.1..bounds.3 + 1 {
-        for x in bounds.0..bounds.2 + 1 {
+pub fn grayscale(header: &PixelHeader, bytes: &mut Vec<u8>, bounds: druid::Rect) {
+    for y in bounds.y0 as usize..bounds.y1 as usize + 1 {
+        for x in bounds.x0 as usize..bounds.x1 as usize + 1 {
             let rgba = util::read(x, y, header, bytes);
-            util::write(x, y, header, bytes, util::as_gray(&rgba));
+            util::write(x, y, header, bytes, util::as_gray(rgba));
         }
     }
 }

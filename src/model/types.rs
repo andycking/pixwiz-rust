@@ -41,33 +41,6 @@ impl Default for PixelHeader {
     }
 }
 
-/// Generic RGBA color type. Yes, I know we already use druid::Color, but that doesn't expose
-/// the components directly. Blah.
-#[derive(Clone, Default)]
-pub struct Rgba {
-    pub r: u8,
-    pub g: u8,
-    pub b: u8,
-    pub a: u8,
-}
-
-impl Rgba {
-    pub fn new(r: u8, g: u8, b: u8, a: u8) -> Self {
-        Self {
-            r: r,
-            g: g,
-            b: b,
-            a: a,
-        }
-    }
-}
-
-impl From<(u8, u8, u8, u8)> for Rgba {
-    fn from(v: (u8, u8, u8, u8)) -> Self {
-        Rgba::new(v.0, v.1, v.2, v.3)
-    }
-}
-
 /// Supported tool types.
 #[derive(Clone, Copy, druid::Data, Debug, PartialEq)]
 pub enum ToolType {
