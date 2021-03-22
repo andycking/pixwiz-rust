@@ -123,13 +123,11 @@ fn enable_save(ctx: &mut druid::DelegateCtx, cmd: &druid::Command) {
 }
 
 fn black_and_white(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    data.pixels
-        .apply(data.selection, transforms::colors::black_and_white);
+    transforms::apply(data, transforms::colors::black_and_white);
 }
 
 fn desaturate(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    data.pixels
-        .apply(data.selection, transforms::colors::desaturate);
+    transforms::apply(data, transforms::colors::desaturate);
 }
 
 fn show_grid(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut AppState) {}

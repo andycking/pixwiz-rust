@@ -265,7 +265,7 @@ impl druid::Widget<AppState> for Canvas {
         match event {
             Event::KeyUp(e) => match e.code {
                 druid::Code::Delete | druid::Code::Backspace => {
-                    data.pixels.apply(data.selection, transforms::simple::erase);
+                    transforms::apply(data, transforms::simple::erase);
                 }
 
                 druid::Code::Escape => {

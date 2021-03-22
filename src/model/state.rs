@@ -1,7 +1,7 @@
+use std::sync::Arc;
+
 use crate::model::types::PixelHeader;
 use crate::model::types::ToolType;
-
-use std::sync::Arc;
 
 /// Pixel storage. Each value is stored as four contiguous bytes representing RGBA,
 /// respectively. We hold the values in an ARC, to avoid copying them.
@@ -69,27 +69,6 @@ impl PixelState {
         pixels[byte_idx + 1] = g;
         pixels[byte_idx + 2] = b;
         pixels[byte_idx + 3] = a;
-
-        self.dirty = true;
-    }
-
-    /// Apply a transformation to the pixels, or some selection thereof.
-    pub fn apply<F>(&mut self, selection: Option<druid::Rect>, f: F)
-    where
-        F: Fn(&PixelHeader, &mut Vec<u8>, druid::Rect),
-    {
-        let bounds = match selection {
-            Some(rect) => rect,
-            _ => druid::Rect::new(
-                1.0,
-                1.0,
-                self.header.width as f64,
-                self.header.height as f64,
-            ),
-        };
-
-        let bytes = Arc::make_mut(&mut self.bytes);
-        f(&self.header, bytes, bounds);
 
         self.dirty = true;
     }
