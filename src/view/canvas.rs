@@ -1,8 +1,8 @@
 use druid::widget::prelude::*;
 
+use crate::model::commands;
 use crate::model::state::AppState;
 use crate::model::types::ToolType;
-use crate::transforms;
 use crate::view::theme;
 
 /// A canvas that allows for the display and modification of pixels. The size is currently
@@ -163,7 +163,7 @@ impl Canvas {
 
     /// Execute a tool at the given point on the canvas. The point is in
     /// canvas coordinates.
-    fn tool(&mut self, data: &mut AppState, p: druid::Point) {
+    fn tool(&mut self, ctx: &mut EventCtx, data: &mut AppState, p: druid::Point) {
         let idx = data.pixels.point_to_idx(p);
 
         match data.tool_type {
@@ -176,7 +176,7 @@ impl Canvas {
             }
 
             ToolType::Fill => {
-                transforms::apply(data, transforms::colors::fill);
+                ctx.submit_command(commands::IMAGE_FILL);
             }
 
             ToolType::Marquee => {
@@ -208,7 +208,7 @@ impl druid::Widget<AppState> for Canvas {
         match event {
             Event::KeyUp(e) => match e.code {
                 druid::Code::Delete | druid::Code::Backspace => {
-                    transforms::apply(data, transforms::simple::erase);
+                    ctx.submit_command(commands::IMAGE_ERASE);
                 }
 
                 druid::Code::Escape => {
@@ -222,7 +222,7 @@ impl druid::Widget<AppState> for Canvas {
                     match Self::screen_coords_to_canvas_coords(e.pos) {
                         Some(p) => {
                             data.start_pos = p;
-                            self.tool(data, p);
+                            self.tool(ctx, data, p);
                         }
                         _ => data.start_pos = druid::Point::ZERO,
                     }
@@ -237,7 +237,7 @@ impl druid::Widget<AppState> for Canvas {
                     data.pos_color = data.pixels.read(idx);
 
                     if ctx.is_active() {
-                        self.tool(data, p);
+                        self.tool(ctx, data, p);
                     }
                 }
                 None => {

@@ -16,7 +16,7 @@ impl druid::AppDelegate<AppState> for Delegate {
         _env: &druid::Env,
     ) -> druid::Handled {
         match cmd {
-            // File menu.
+            // File.
             _ if cmd.is(druid::commands::NEW_FILE) => {
                 new_file(ctx, cmd, data);
                 druid::Handled::Yes
@@ -37,7 +37,7 @@ impl druid::AppDelegate<AppState> for Delegate {
                 druid::Handled::Yes
             }
 
-            // Image menu.
+            // Image.
             _ if cmd.is(commands::IMAGE_BLACK_AND_WHITE) => {
                 black_and_white(ctx, cmd, data);
                 druid::Handled::Yes
@@ -50,8 +50,16 @@ impl druid::AppDelegate<AppState> for Delegate {
                 dither_floyd(ctx, cmd, data);
                 druid::Handled::Yes
             }
+            _ if cmd.is(commands::IMAGE_ERASE) => {
+                erase(ctx, cmd, data);
+                druid::Handled::Yes
+            }
+            _ if cmd.is(commands::IMAGE_FILL) => {
+                fill(ctx, cmd, data);
+                druid::Handled::Yes
+            }
 
-            // View menu.
+            // View.
             _ if cmd.is(commands::VIEW_SHOW_GRID) => {
                 show_grid(ctx, cmd, data);
                 druid::Handled::Yes
@@ -136,6 +144,14 @@ fn desaturate(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut A
 
 fn dither_floyd(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     transforms::apply(data, transforms::colors::dither_floyd);
+}
+
+fn erase(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+    transforms::apply(data, transforms::simple::erase);
+}
+
+fn fill(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+    transforms::apply(data, transforms::colors::fill);
 }
 
 fn show_grid(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut AppState) {}
