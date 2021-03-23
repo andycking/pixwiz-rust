@@ -12,7 +12,7 @@ pub fn apply<F>(data: &mut AppState, f: F)
 where
     F: Fn(&PixelHeader, &PixelEnv, &mut Vec<u8>),
 {
-    let bounds = match data.selection {
+    let mut bounds = match data.selection {
         Some(rect) => rect,
         _ => druid::Rect::new(
             1.0,
@@ -21,6 +21,8 @@ where
             data.pixels.header.height as f64,
         ),
     };
+    bounds.x1 += 1.0;
+    bounds.y1 += 1.0;
 
     let env = PixelEnv::new(data.brush_color.clone(), data.current_pos, bounds);
 

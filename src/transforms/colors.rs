@@ -5,8 +5,8 @@ use crate::model::types::PixelHeader;
 use crate::transforms::util;
 
 pub fn black_and_white(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
-    for y in env.bounds.y0 as usize..env.bounds.y1 as usize + 1 {
-        for x in env.bounds.x0 as usize..env.bounds.x1 as usize + 1 {
+    for y in env.bounds.y0 as usize..env.bounds.y1 as usize {
+        for x in env.bounds.x0 as usize..env.bounds.x1 as usize {
             let color = util::read(x, y, header, bytes);
             let bw = util::black_and_white(&color, 0.5);
             util::write(x, y, header, bytes, bw);
@@ -15,8 +15,8 @@ pub fn black_and_white(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>
 }
 
 pub fn desaturate(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
-    for y in env.bounds.y0 as usize..env.bounds.y1 as usize + 1 {
-        for x in env.bounds.x0 as usize..env.bounds.x1 as usize + 1 {
+    for y in env.bounds.y0 as usize..env.bounds.y1 as usize {
+        for x in env.bounds.x0 as usize..env.bounds.x1 as usize {
             let color = util::read(x, y, header, bytes);
             let gray = util::desaturate(&color);
             util::write(x, y, header, bytes, gray);
@@ -45,17 +45,21 @@ pub fn fill(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
         if util::read(x, y, header, bytes) == start_color {
             util::write(x, y, header, bytes, env.color.clone());
 
-            if node.x > env.bounds.x0 {
-                q.push_back(druid::Point::new(node.x - 1.0, node.y));
+            let left = node - (1.0, 0.0);
+            if env.bounds.contains(left) {
+                q.push_back(left);
             }
-            if node.x < env.bounds.x1 {
-                q.push_back(druid::Point::new(node.x + 1.0, node.y));
+            let right = node + (1.0, 0.0);
+            if env.bounds.contains(right) {
+                q.push_back(right);
             }
-            if node.y > env.bounds.y0 {
-                q.push_back(druid::Point::new(node.x, node.y - 1.0));
+            let up = node - (0.0, 1.0);
+            if env.bounds.contains(up) {
+                q.push_back(up);
             }
-            if node.y < env.bounds.y1 {
-                q.push_back(druid::Point::new(node.x, node.y + 1.0));
+            let down = node + (0.0, 1.0);
+            if env.bounds.contains(down) {
+                q.push_back(down);
             }
         }
     }
@@ -69,8 +73,8 @@ pub fn dither_floyd_steinberg(header: &PixelHeader, env: &PixelEnv, bytes: &mut 
         (old_r - new_r, old_g - new_g, old_b - new_b)
     }
 
-    for y in env.bounds.y0 as usize..env.bounds.y1 as usize + 1 {
-        for x in env.bounds.x0 as usize..env.bounds.x1 as usize + 1 {
+    for y in env.bounds.y0 as usize..env.bounds.y1 as usize {
+        for x in env.bounds.x0 as usize..env.bounds.x1 as usize {
             let oldpixel = util::read(x, y, header, bytes);
             let newpixel = util::black_and_white(&oldpixel, 0.5);
             let _quant_error = calculate_error(&oldpixel, &newpixel);
