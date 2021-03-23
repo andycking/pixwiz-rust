@@ -38,17 +38,21 @@ impl druid::AppDelegate<AppState> for Delegate {
             }
 
             // Image menu.
-            _ if cmd.is(commands::BLACK_AND_WHITE) => {
+            _ if cmd.is(commands::IMAGE_BLACK_AND_WHITE) => {
                 black_and_white(ctx, cmd, data);
                 druid::Handled::Yes
             }
-            _ if cmd.is(commands::DESATURATE) => {
+            _ if cmd.is(commands::IMAGE_DESATURATE) => {
                 desaturate(ctx, cmd, data);
+                druid::Handled::Yes
+            }
+            _ if cmd.is(commands::IMAGE_DITHER_FLOYD) => {
+                dither_floyd(ctx, cmd, data);
                 druid::Handled::Yes
             }
 
             // View menu.
-            _ if cmd.is(commands::SHOW_GRID) => {
+            _ if cmd.is(commands::VIEW_SHOW_GRID) => {
                 show_grid(ctx, cmd, data);
                 druid::Handled::Yes
             }
@@ -128,6 +132,10 @@ fn black_and_white(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &
 
 fn desaturate(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     transforms::apply(data, transforms::colors::desaturate);
+}
+
+fn dither_floyd(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+    transforms::apply(data, transforms::colors::dither_floyd);
 }
 
 fn show_grid(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut AppState) {}

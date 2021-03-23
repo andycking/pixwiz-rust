@@ -16,7 +16,7 @@ pub fn read(x: usize, y: usize, header: &PixelHeader, bytes: &Vec<u8>) -> druid:
 
 /// Write RGBA to bytes. The underlying storage doesn't really matter; it can be a
 /// PixelState, or a copy thereof, or something else, as long as it's bytes.
-pub fn write(x: usize, y: usize, header: &PixelHeader, bytes: &mut Vec<u8>, color: druid::Color) {
+pub fn write(x: usize, y: usize, header: &PixelHeader, bytes: &mut Vec<u8>, color: &druid::Color) {
     let idx = (y - 1) * header.width + (x - 1);
     let byte_idx = idx * header.bytes_per_pixel;
 

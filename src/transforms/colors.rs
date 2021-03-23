@@ -9,7 +9,7 @@ pub fn black_and_white(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>
         for x in env.bounds.x0 as usize..env.bounds.x1 as usize {
             let color = util::read(x, y, header, bytes);
             let bw = util::black_and_white(&color, 0.5);
-            util::write(x, y, header, bytes, bw);
+            util::write(x, y, header, bytes, &bw);
         }
     }
 }
@@ -19,7 +19,7 @@ pub fn desaturate(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
         for x in env.bounds.x0 as usize..env.bounds.x1 as usize {
             let color = util::read(x, y, header, bytes);
             let gray = util::desaturate(&color);
-            util::write(x, y, header, bytes, gray);
+            util::write(x, y, header, bytes, &gray);
         }
     }
 }
@@ -43,7 +43,7 @@ pub fn fill(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
         let x = node.x as usize;
         let y = node.y as usize;
         if util::read(x, y, header, bytes) == start_color {
-            util::write(x, y, header, bytes, env.color.clone());
+            util::write(x, y, header, bytes, &env.color);
 
             let left = node - (1.0, 0.0);
             if env.bounds.contains(left) {
@@ -65,7 +65,7 @@ pub fn fill(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     }
 }
 
-pub fn dither_floyd_steinberg(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
+pub fn dither_floyd(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     fn calculate_error(oldpixel: &druid::Color, newpixel: &druid::Color) -> (f64, f64, f64) {
         let (old_r, old_g, old_b, _) = oldpixel.as_rgba();
         let (new_r, new_g, new_b, _) = newpixel.as_rgba();
@@ -73,11 +73,47 @@ pub fn dither_floyd_steinberg(header: &PixelHeader, env: &PixelEnv, bytes: &mut 
         (old_r - new_r, old_g - new_g, old_b - new_b)
     }
 
+    fn apply_error(
+        color: &druid::Color,
+        quant_error: (f64, f64, f64),
+        weight: f64,
+    ) -> druid::Color {
+        let (mut r, mut g, mut b, a) = color.as_rgba();
+        r = r + (quant_error.0 * weight / 16.0);
+        g = g + (quant_error.1 * weight / 16.0);
+        b = b + (quant_error.2 * weight / 16.0);
+        druid::Color::rgba(r, g, b, a)
+    }
+
+    fn mod_pixel(
+        x: usize,
+        y: usize,
+        quant_error: (f64, f64, f64),
+        weight: f64,
+        header: &PixelHeader,
+        env: &PixelEnv,
+        bytes: &mut Vec<u8>,
+    ) {
+        let p = druid::Point::new(x as f64, y as f64);
+        if env.bounds.contains(p) {
+            let oldpixel = util::read(x, y, header, bytes);
+            let newpixel = apply_error(&oldpixel, quant_error, weight);
+            util::write(x, y, header, bytes, &newpixel);
+        }
+    }
+
     for y in env.bounds.y0 as usize..env.bounds.y1 as usize {
         for x in env.bounds.x0 as usize..env.bounds.x1 as usize {
             let oldpixel = util::read(x, y, header, bytes);
             let newpixel = util::black_and_white(&oldpixel, 0.5);
-            let _quant_error = calculate_error(&oldpixel, &newpixel);
+            util::write(x, y, header, bytes, &newpixel);
+
+            let quant_error = calculate_error(&oldpixel, &newpixel);
+
+            mod_pixel(x + 1, y + 0, quant_error, 7.0, header, env, bytes);
+            mod_pixel(x - 1, y + 1, quant_error, 3.0, header, env, bytes);
+            mod_pixel(x + 0, y + 1, quant_error, 5.0, header, env, bytes);
+            mod_pixel(x + 1, y + 1, quant_error, 1.0, header, env, bytes);
         }
     }
 }

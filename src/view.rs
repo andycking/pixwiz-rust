@@ -238,27 +238,36 @@ fn build_image_menu<T: Data>() -> druid::MenuDesc<T> {
         druid::MenuItem::new(
             druid::LocalizedString::new("menu-image-black-and-white")
                 .with_placeholder("Black && White"),
-            commands::BLACK_AND_WHITE,
+            commands::IMAGE_BLACK_AND_WHITE,
         )
     }
 
     fn desaturate<T: Data>() -> druid::MenuItem<T> {
         druid::MenuItem::new(
             druid::LocalizedString::new("menu-image-desaturate").with_placeholder("Desaturate"),
-            commands::DESATURATE,
+            commands::IMAGE_DESATURATE,
+        )
+    }
+
+    fn dither_floyd<T: Data>() -> druid::MenuItem<T> {
+        druid::MenuItem::new(
+            druid::LocalizedString::new("menu-image-dither-floyd")
+                .with_placeholder("Dither - Floyd"),
+            commands::IMAGE_DITHER_FLOYD,
         )
     }
 
     druid::MenuDesc::new(druid::LocalizedString::new("menu-image-menu").with_placeholder("Image"))
         .append(black_and_white())
         .append(desaturate())
+        .append(dither_floyd())
 }
 
 fn build_view_menu<T: Data>() -> druid::MenuDesc<T> {
     fn toggle_grid<T: Data>() -> druid::MenuItem<T> {
         druid::MenuItem::new(
             druid::LocalizedString::new("menu-view-show-grid").with_placeholder("Show Grid"),
-            commands::SHOW_GRID,
+            commands::VIEW_SHOW_GRID,
         )
     }
 
