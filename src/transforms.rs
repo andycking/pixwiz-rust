@@ -12,20 +12,8 @@ pub fn apply<F>(data: &mut AppState, f: F)
 where
     F: Fn(&PixelHeader, &PixelEnv, &mut Vec<u8>),
 {
-    let mut bounds = match data.selection {
-        Some(rect) => rect,
-        _ => druid::Rect::new(
-            1.0,
-            1.0,
-            data.pixels.header.width as f64,
-            data.pixels.header.height as f64,
-        ),
-    };
-    bounds.x1 += 1.0;
-    bounds.y1 += 1.0;
-
+    let bounds = data.get_bounds();
     let env = PixelEnv::new(data.brush_color.clone(), data.current_pos, bounds);
-
     let bytes = Arc::make_mut(&mut data.pixels.bytes);
 
     f(&data.pixels.header, &env, bytes);

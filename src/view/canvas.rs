@@ -197,7 +197,10 @@ impl Canvas {
             }
 
             ToolType::Paint => {
-                data.pixels.write(idx, &data.brush_color);
+                let bounds = data.get_bounds();
+                if bounds.contains(p) {
+                    data.pixels.write(idx, &data.brush_color);
+                }
             }
 
             _ => {}
