@@ -126,7 +126,11 @@ fn check_for_save(data: &mut AppState) {
 fn enable_save(ctx: &mut druid::DelegateCtx, cmd: &druid::Command) {
     match cmd.target() {
         druid::Target::Window(id) => {
-            let menu_bar: druid::MenuDesc<AppState> = view::build_menu_bar(false);
+            let mut menu_opts: view::MenuOpts = Default::default();
+            menu_opts
+                .disabled
+                .insert("common-menu-file-save".to_string(), false);
+            let menu_bar: druid::MenuDesc<AppState> = view::build_menu_bar(&menu_opts);
             ctx.set_menu(menu_bar, id);
         }
 
@@ -154,4 +158,17 @@ fn fill(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppStat
     transforms::apply(data, transforms::colors::fill);
 }
 
-fn show_grid(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut AppState) {}
+fn show_grid(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, _data: &mut AppState) {
+    match cmd.target() {
+        druid::Target::Window(id) => {
+            let mut menu_opts: view::MenuOpts = Default::default();
+            menu_opts
+                .selected
+                .insert("menu-view-show-grid".to_string(), false);
+            let menu_bar: druid::MenuDesc<AppState> = view::build_menu_bar(&menu_opts);
+            ctx.set_menu(menu_bar, id);
+        }
+
+        _ => {}
+    }
+}

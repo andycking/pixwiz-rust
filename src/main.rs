@@ -8,13 +8,17 @@ mod view;
 
 use controller::delegate::Delegate;
 use model::state::AppState;
+use view::MenuOpts;
 
 fn main() -> Result<(), PlatformError> {
     let ui = view::build_ui();
 
+    let menu_opts: MenuOpts = Default::default();
+    let menu_bar = view::build_menu_bar(&menu_opts);
+
     let main_window = druid::WindowDesc::new(ui)
         .title("Pix Wiz")
-        .menu(view::build_menu_bar(true))
+        .menu(menu_bar)
         .window_size((672.0, 712.0));
 
     let data = AppState::new();

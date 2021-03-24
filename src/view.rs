@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use druid::widget::prelude::*;
 use druid::widget::Flex;
 use druid::WidgetExt;
@@ -14,6 +16,26 @@ use crate::view::canvas::Canvas;
 use crate::view::canvas::CanvasController;
 use crate::view::palette::Palette;
 use crate::view::tool_button::ToolButton;
+
+pub struct MenuOpts {
+    pub disabled: HashMap<String, bool>,
+    pub selected: HashMap<String, bool>,
+}
+
+impl Default for MenuOpts {
+    fn default() -> Self {
+        let mut disabled: HashMap<String, bool> = HashMap::new();
+        disabled.insert("common-menu-file-save".to_string(), true);
+
+        let mut selected: HashMap<String, bool> = HashMap::new();
+        selected.insert("menu-view-show-grid".to_string(), true);
+
+        Self {
+            disabled: disabled,
+            selected: selected,
+        }
+    }
+}
 
 pub fn build_ui() -> impl druid::Widget<AppState> {
     Flex::column()
@@ -182,16 +204,16 @@ fn build_status_bar() -> impl druid::Widget<AppState> {
         .background(theme::STATUS_BAR_FILL)
 }
 
-pub fn build_menu_bar<T: Data>(disable_save: bool) -> druid::MenuDesc<T> {
+pub fn build_menu_bar<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
     druid::MenuDesc::new(druid::LocalizedString::new(""))
         .append(druid::platform_menus::mac::application::default())
-        .append(build_file_menu(disable_save))
+        .append(build_file_menu(menu_opts))
         .append(build_edit_menu())
         .append(build_image_menu())
-        .append(build_view_menu())
+        .append(build_view_menu(menu_opts))
 }
 
-fn build_file_menu<T: Data>(disable_save: bool) -> druid::MenuDesc<T> {
+fn build_file_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
     fn open_file<T: Data>() -> druid::MenuItem<T> {
         let file_dialog_options =
             druid::FileDialogOptions::default().allowed_types(vec![druid::FileSpec::PNG]);
@@ -214,12 +236,17 @@ fn build_file_menu<T: Data>(disable_save: bool) -> druid::MenuDesc<T> {
         .hotkey(druid::SysMods::CmdShift, "S")
     }
 
+    let mut save_disabled = false;
+    if menu_opts.disabled.contains_key("common-menu-file-save") {
+        save_disabled = menu_opts.disabled["common-menu-file-save"];
+    }
+
     druid::MenuDesc::new(druid::LocalizedString::new("common-menu-file-menu"))
         .append(druid::platform_menus::mac::file::new_file())
         .append(open_file())
         .append_separator()
         .append(druid::platform_menus::mac::file::close())
-        .append(druid::platform_menus::mac::file::save().disabled_if(|| disable_save))
+        .append(druid::platform_menus::mac::file::save().disabled_if(|| save_disabled))
         .append(save_as())
 }
 
@@ -263,7 +290,7 @@ fn build_image_menu<T: Data>() -> druid::MenuDesc<T> {
         .append(dither_floyd())
 }
 
-fn build_view_menu<T: Data>() -> druid::MenuDesc<T> {
+fn build_view_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
     fn toggle_grid<T: Data>() -> druid::MenuItem<T> {
         druid::MenuItem::new(
             druid::LocalizedString::new("menu-view-show-grid").with_placeholder("Show Grid"),
@@ -271,6 +298,11 @@ fn build_view_menu<T: Data>() -> druid::MenuDesc<T> {
         )
     }
 
+    let mut grid_selected = true;
+    if menu_opts.selected.contains_key("menu-view-show-grid") {
+        grid_selected = menu_opts.selected["menu-view-show-grid"];
+    }
+
     druid::MenuDesc::new(druid::LocalizedString::new("menu-view-menu").with_placeholder("View"))
-        .append(toggle_grid().selected())
+        .append(toggle_grid().selected_if(|| grid_selected))
 }
