@@ -20,6 +20,9 @@ use crate::view::tool_button::ToolButton;
 pub const COMMON_MENU_FILE_SAVE: &'static str = "common-menu-file-save";
 pub const MENU_VIEW_SHOW_GRID: &'static str = "menu-view-show-grid";
 
+/// Druid menus are immutable, so if you want to update a menu item at runtime, you have to
+/// reconstruct the menu bar from scratch. Use a map to make it easier to tell the menu
+/// builder which items to disable (gray out) or select (check mark).
 pub struct MenuOpts {
     pub disabled: HashMap<String, bool>,
     pub selected: HashMap<String, bool>,
@@ -37,9 +40,13 @@ impl MenuOpts {
 
 impl Default for MenuOpts {
     fn default() -> Self {
+        // We typically start with an untitled document (no path), so the save menu item
+        // is disabled by default. It will get enabled when the user performs a save-as,
+        // or opens an existing document.
         let mut disabled: HashMap<String, bool> = HashMap::new();
         disabled.insert(COMMON_MENU_FILE_SAVE.to_string(), true);
 
+        // We show the canvas grid by default.
         let mut selected: HashMap<String, bool> = HashMap::new();
         selected.insert("menu-view-show-grid".to_string(), true);
 
