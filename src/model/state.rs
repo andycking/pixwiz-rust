@@ -99,11 +99,11 @@ pub struct AppState {
     pub tool_type: ToolType,
     pub pixels: PixelState,
     pub path: Option<String>,
+    pub show_grid: bool,
 }
 
-impl AppState {
-    /// Create default application state.
-    pub fn new() -> Self {
+impl Default for AppState {
+    fn default() -> Self {
         Self {
             brush_color: druid::Color::BLACK,
             pos_color: druid::Color::rgba8(0, 0, 0, 0),
@@ -113,6 +113,7 @@ impl AppState {
             tool_type: ToolType::Paint,
             pixels: Default::default(),
             path: None,
+            show_grid: true,
         }
     }
 }

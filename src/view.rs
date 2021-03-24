@@ -22,6 +22,16 @@ pub struct MenuOpts {
     pub selected: HashMap<String, bool>,
 }
 
+impl MenuOpts {
+    pub fn disable(&mut self, key: String, value: bool) {
+        self.disabled.insert(key, value);
+    }
+
+    pub fn select(&mut self, key: String, value: bool) {
+        self.selected.insert(key, value);
+    }
+}
+
 impl Default for MenuOpts {
     fn default() -> Self {
         let mut disabled: HashMap<String, bool> = HashMap::new();

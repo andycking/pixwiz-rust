@@ -126,11 +126,13 @@ impl Canvas {
     }
 
     /// Paint the grid onto the given render context.
-    fn paint_grid(&self, ctx: &mut PaintCtx, _data: &AppState) {
-        for i in 1..4 {
-            let offset = 1 + i * 8;
-            self.paint_grid_line(ctx, offset, 1, offset, Self::ROWS + 1);
-            self.paint_grid_line(ctx, 1, offset, Self::COLS + 1, offset);
+    fn paint_grid(&self, ctx: &mut PaintCtx, data: &AppState) {
+        if data.show_grid {
+            for i in 1..4 {
+                let offset = 1 + i * 8;
+                self.paint_grid_line(ctx, offset, 1, offset, Self::ROWS + 1);
+                self.paint_grid_line(ctx, 1, offset, Self::COLS + 1, offset);
+            }
         }
     }
 

@@ -21,7 +21,7 @@ fn main() -> Result<(), PlatformError> {
         .menu(menu_bar)
         .window_size((672.0, 712.0));
 
-    let data = AppState::new();
+    let data: AppState = Default::default();
 
     druid::AppLauncher::with_window(main_window)
         .delegate(Delegate)
