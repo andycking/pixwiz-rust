@@ -17,6 +17,9 @@ use crate::view::canvas::CanvasController;
 use crate::view::palette::Palette;
 use crate::view::tool_button::ToolButton;
 
+pub const COMMON_MENU_FILE_SAVE: &'static str = "common-menu-file-save";
+pub const MENU_VIEW_SHOW_GRID: &'static str = "menu-view-show-grid";
+
 pub struct MenuOpts {
     pub disabled: HashMap<String, bool>,
     pub selected: HashMap<String, bool>,
@@ -35,7 +38,7 @@ impl MenuOpts {
 impl Default for MenuOpts {
     fn default() -> Self {
         let mut disabled: HashMap<String, bool> = HashMap::new();
-        disabled.insert("common-menu-file-save".to_string(), true);
+        disabled.insert(COMMON_MENU_FILE_SAVE.to_string(), true);
 
         let mut selected: HashMap<String, bool> = HashMap::new();
         selected.insert("menu-view-show-grid".to_string(), true);
@@ -247,8 +250,8 @@ fn build_file_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
     }
 
     let mut save_disabled = false;
-    if menu_opts.disabled.contains_key("common-menu-file-save") {
-        save_disabled = menu_opts.disabled["common-menu-file-save"];
+    if menu_opts.disabled.contains_key(COMMON_MENU_FILE_SAVE) {
+        save_disabled = menu_opts.disabled[COMMON_MENU_FILE_SAVE];
     }
 
     druid::MenuDesc::new(druid::LocalizedString::new("common-menu-file-menu"))
@@ -303,14 +306,14 @@ fn build_image_menu<T: Data>() -> druid::MenuDesc<T> {
 fn build_view_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
     fn toggle_grid<T: Data>() -> druid::MenuItem<T> {
         druid::MenuItem::new(
-            druid::LocalizedString::new("menu-view-show-grid").with_placeholder("Show Grid"),
+            druid::LocalizedString::new(MENU_VIEW_SHOW_GRID).with_placeholder("Show Grid"),
             commands::VIEW_SHOW_GRID,
         )
     }
 
     let mut grid_selected = true;
-    if menu_opts.selected.contains_key("menu-view-show-grid") {
-        grid_selected = menu_opts.selected["menu-view-show-grid"];
+    if menu_opts.selected.contains_key(MENU_VIEW_SHOW_GRID) {
+        grid_selected = menu_opts.selected[MENU_VIEW_SHOW_GRID];
     }
 
     druid::MenuDesc::new(druid::LocalizedString::new("menu-view-menu").with_placeholder("View"))

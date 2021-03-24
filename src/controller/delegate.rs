@@ -144,7 +144,7 @@ fn show_grid(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppS
     data.show_grid = !data.show_grid;
 
     let mut menu_opts: view::MenuOpts = Default::default();
-    menu_opts.select("menu-view-show-grid".to_string(), data.show_grid);
+    menu_opts.select(view::MENU_VIEW_SHOW_GRID.to_string(), data.show_grid);
     rebuild_menu_bar(ctx, cmd, &menu_opts);
 }
 
@@ -154,7 +154,7 @@ fn check_for_save(data: &mut AppState) {
 
 fn enable_save(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
     let mut menu_opts: view::MenuOpts = Default::default();
-    menu_opts.disable("common-menu-file-save".to_string(), data.path.is_none());
+    menu_opts.disable(view::COMMON_MENU_FILE_SAVE.to_string(), data.path.is_none());
     rebuild_menu_bar(ctx, cmd, &menu_opts);
 }
 
