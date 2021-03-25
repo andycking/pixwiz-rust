@@ -1,7 +1,7 @@
 use druid::widget::prelude::*;
 
+use crate::commands;
 use crate::model;
-use crate::model::commands;
 use crate::model::state::AppState;
 use crate::model::types::ToolType;
 use crate::view::theme;

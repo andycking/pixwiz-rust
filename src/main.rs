@@ -1,5 +1,6 @@
 use druid::PlatformError;
 
+mod commands;
 mod controller;
 mod model;
 mod storage;

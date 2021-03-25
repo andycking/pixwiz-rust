@@ -1,5 +1,5 @@
+use crate::commands;
 use crate::controller;
-use crate::model::commands;
 use crate::model::state::AppState;
 
 pub struct Delegate;
