@@ -68,6 +68,26 @@ pub fn build_ui() -> impl druid::Widget<AppState> {
         .background(theme::MAIN_FILL)
 }
 
+pub fn build_menu_bar<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
+    druid::MenuDesc::new(druid::LocalizedString::new(""))
+        .append(druid::platform_menus::mac::application::default())
+        .append(build_file_menu(menu_opts))
+        .append(build_edit_menu())
+        .append(build_image_menu())
+        .append(build_view_menu(menu_opts))
+}
+
+pub fn rebuild_menu_bar(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, menu_opts: &MenuOpts) {
+    match cmd.target() {
+        druid::Target::Window(id) => {
+            let menu_bar: druid::MenuDesc<AppState> = build_menu_bar(&menu_opts);
+            ctx.set_menu(menu_bar, id);
+        }
+
+        _ => {}
+    }
+}
+
 fn build_tools_row<T: druid::Data>(
     a: impl Widget<T> + 'static,
     b: impl Widget<T> + 'static,
@@ -222,15 +242,6 @@ fn build_status_bar() -> impl druid::Widget<AppState> {
         .with_child(build_status_label())
         .with_default_spacer()
         .background(theme::STATUS_BAR_FILL)
-}
-
-pub fn build_menu_bar<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
-    druid::MenuDesc::new(druid::LocalizedString::new(""))
-        .append(druid::platform_menus::mac::application::default())
-        .append(build_file_menu(menu_opts))
-        .append(build_edit_menu())
-        .append(build_image_menu())
-        .append(build_view_menu(menu_opts))
 }
 
 fn build_file_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
