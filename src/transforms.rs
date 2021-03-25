@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
 use crate::model;
-use crate::model::state::AppState;
-use crate::model::types::PixelEnv;
-use crate::model::types::PixelHeader;
+use crate::model::app_state::AppState;
+use crate::model::pixel_env::PixelEnv;
+use crate::model::pixel_header::PixelHeader;
 
 pub mod colors;
 pub mod simple;

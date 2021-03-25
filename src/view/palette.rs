@@ -1,6 +1,6 @@
 use druid::widget::prelude::*;
 
-use crate::model::state::AppState;
+use crate::model::app_state::AppState;
 use crate::view::theme;
 
 /// A palette that displays available colors. Each value is stored as a u32 representation

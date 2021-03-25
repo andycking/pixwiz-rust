@@ -10,8 +10,8 @@ mod theme;
 mod tool_button;
 
 use crate::commands;
-use crate::model::state::AppState;
-use crate::model::types::ToolType;
+use crate::model::app_state::AppState;
+use crate::model::tool_type::ToolType;
 use crate::view::canvas::Canvas;
 use crate::view::canvas::CanvasController;
 use crate::view::palette::Palette;

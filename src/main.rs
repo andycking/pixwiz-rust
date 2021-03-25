@@ -8,7 +8,7 @@ mod transforms;
 mod view;
 
 use controller::delegate::Delegate;
-use model::state::AppState;
+use model::app_state::AppState;
 use view::MenuOpts;
 
 fn main() -> Result<(), PlatformError> {

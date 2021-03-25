@@ -1,5 +1,5 @@
 use crate::model;
-use crate::model::state::AppState;
+use crate::model::app_state::AppState;
 use crate::transforms;
 
 pub fn black_and_white(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {

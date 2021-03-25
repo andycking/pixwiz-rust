@@ -1,5 +1,3 @@
-use std::fmt;
-
 /// Generic pixel header.
 #[derive(Clone, druid::Data)]
 pub struct PixelHeader {
@@ -38,41 +36,5 @@ impl Default for PixelHeader {
             depth: Self::DEFAULT_DEPTH,
             bytes_per_pixel: Self::DEFAULT_BYTES_PER_PIXEL,
         }
-    }
-}
-
-/// Capture environment.
-pub struct PixelEnv {
-    pub color: druid::Color,
-    pub pos: druid::Point,
-    pub bounds: druid::Rect,
-}
-
-impl PixelEnv {
-    pub fn new(color: druid::Color, pos: druid::Point, bounds: druid::Rect) -> Self {
-        Self {
-            color: color,
-            pos: pos,
-            bounds: bounds,
-        }
-    }
-}
-
-/// Supported tool types.
-#[derive(Clone, Copy, druid::Data, Debug, PartialEq)]
-pub enum ToolType {
-    Cropper,
-    Dropper,
-    Eraser,
-    Fill,
-    Lasso,
-    Marquee,
-    Move,
-    Paint,
-}
-
-impl fmt::Display for ToolType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
     }
 }

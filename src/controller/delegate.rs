@@ -1,6 +1,6 @@
 use crate::commands;
 use crate::controller;
-use crate::model::state::AppState;
+use crate::model::app_state::AppState;
 
 pub struct Delegate;
 

@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use druid::widget::prelude::*;
 
-use crate::model::state::AppState;
-use crate::model::types::ToolType;
+use crate::model::app_state::AppState;
+use crate::model::tool_type::ToolType;
 use crate::view::theme;
 
 /// A tool button that displays an icon. Could also have been implemented as a Painter or

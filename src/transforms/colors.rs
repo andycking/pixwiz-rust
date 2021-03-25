@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
-use crate::model::types::PixelEnv;
-use crate::model::types::PixelHeader;
+use crate::model::pixel_env::PixelEnv;
+use crate::model::pixel_header::PixelHeader;
 
 pub fn black_and_white(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     for y in env.bounds.y0 as usize..env.bounds.y1 as usize {

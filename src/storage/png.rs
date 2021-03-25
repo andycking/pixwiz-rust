@@ -7,8 +7,8 @@ use std::path::Path;
 
 use png;
 
-use crate::model::state::PixelState;
-use crate::model::types::PixelHeader;
+use crate::model::pixel_header::PixelHeader;
+use crate::model::pixel_state::PixelState;
 
 pub fn write(path_str: &str, pixels: &PixelState) -> Result<()> {
     let path = Path::new(path_str);

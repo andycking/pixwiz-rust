@@ -1,10 +1,14 @@
 use std::sync::Arc;
 
-pub mod state;
-pub mod types;
+pub mod app_state;
+pub mod mod_record;
+pub mod pixel_env;
+pub mod pixel_header;
+pub mod pixel_state;
+pub mod tool_type;
 
-use crate::model::state::AppState;
-use crate::model::state::ModRecord;
+use crate::model::app_state::AppState;
+use crate::model::mod_record::ModRecord;
 
 pub fn get_bounds(data: &AppState) -> druid::Rect {
     let mut bounds = match data.selection {

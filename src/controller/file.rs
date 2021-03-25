@@ -1,4 +1,4 @@
-use crate::model::state::AppState;
+use crate::model::app_state::AppState;
 use crate::storage;
 use crate::view;
 

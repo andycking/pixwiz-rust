@@ -1,4 +1,4 @@
-use crate::model::state::AppState;
+use crate::model::app_state::AppState;
 use crate::view;
 
 pub fn show_grid(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
