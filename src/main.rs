@@ -4,6 +4,7 @@ mod controller;
 mod model;
 mod storage;
 mod transforms;
+mod util;
 mod view;
 
 use controller::delegate::Delegate;

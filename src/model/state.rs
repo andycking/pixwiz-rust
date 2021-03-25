@@ -102,24 +102,6 @@ pub struct AppState {
     pub show_grid: bool,
 }
 
-impl AppState {
-    pub fn get_bounds(&self) -> druid::Rect {
-        let mut bounds = match self.selection {
-            Some(rect) => rect,
-            _ => druid::Rect::new(
-                1.0,
-                1.0,
-                self.pixels.header.width as f64,
-                self.pixels.header.height as f64,
-            ),
-        };
-        bounds.x1 += 1.0;
-        bounds.y1 += 1.0;
-
-        bounds
-    }
-}
-
 impl Default for AppState {
     fn default() -> Self {
         Self {
