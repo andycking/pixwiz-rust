@@ -12,7 +12,11 @@ pub fn apply<F>(data: &mut AppState, f: F)
 where
     F: Fn(&PixelHeader, &PixelEnv, &mut Vec<u8>),
 {
+    // We have all the information we need for a mod record, so just create it here.
+    // That way the caller, and the f() we're applying, don't need to worry about it.
     let bounds = model::get_bounds(data);
+    model::push_mod_record_rect(data, bounds);
+
     let env = PixelEnv::new(data.brush_color.clone(), data.current_pos, bounds);
     let bytes = Arc::make_mut(&mut data.pixels.bytes);
 
