@@ -177,7 +177,8 @@ impl Canvas {
             ToolType::Eraser => {
                 let bounds = model::get_bounds(data);
                 if bounds.contains(p) {
-                    ctx.submit_command(commands::IMAGE_ERASER.with(p));
+                    let image_info = commands::ImageInfo::new(p);
+                    ctx.submit_command(commands::IMAGE_ERASER.with(image_info));
                 }
             }
 
@@ -203,7 +204,8 @@ impl Canvas {
             ToolType::Paint => {
                 let bounds = model::get_bounds(data);
                 if bounds.contains(p) {
-                    ctx.submit_command(commands::IMAGE_PAINT.with(p));
+                    let image_info = commands::ImageInfo::new(p);
+                    ctx.submit_command(commands::IMAGE_PAINT.with(image_info));
                 }
             }
 

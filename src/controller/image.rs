@@ -20,11 +20,11 @@ pub fn dither_floyd(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: 
 }
 
 pub fn eraser(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
-    let p = cmd.get_unchecked(commands::IMAGE_ERASER);
+    let image_info = cmd.get_unchecked(commands::IMAGE_ERASER);
 
-    model::push_mod_record_point(data, *p);
+    model::push_mod_record_point(data, image_info.p);
 
-    let idx = data.pixels.point_to_idx(*p);
+    let idx = data.pixels.point_to_idx(image_info.p);
     data.pixels.write(idx, &druid::Color::rgba8(0, 0, 0, 0));
 }
 
@@ -33,10 +33,10 @@ pub fn fill(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut App
 }
 
 pub fn paint(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
-    let p = cmd.get_unchecked(commands::IMAGE_PAINT);
+    let image_info = cmd.get_unchecked(commands::IMAGE_PAINT);
 
-    model::push_mod_record_point(data, *p);
+    model::push_mod_record_point(data, image_info.p);
 
-    let idx = data.pixels.point_to_idx(*p);
+    let idx = data.pixels.point_to_idx(image_info.p);
     data.pixels.write(idx, &data.brush_color);
 }
