@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::sync::Arc;
 
 use crate::model::types::PixelHeader;
@@ -88,6 +89,21 @@ impl Default for PixelState {
     }
 }
 
+/// Modification record. This holds undo state.
+pub struct ModRecord {
+    pub area: druid::Rect,
+    pub bytes: Arc<Vec<u8>>,
+}
+
+impl ModRecord {
+    pub fn new(area: druid::Rect, bytes: Vec<u8>) -> Self {
+        Self {
+            area: area,
+            bytes: Arc::new(bytes),
+        }
+    }
+}
+
 /// Application state.
 #[derive(Clone, druid::Data)]
 pub struct AppState {
@@ -100,6 +116,7 @@ pub struct AppState {
     pub pixels: PixelState,
     pub path: Option<String>,
     pub show_grid: bool,
+    pub mod_stack: Arc<VecDeque<ModRecord>>,
 }
 
 impl Default for AppState {
@@ -114,6 +131,7 @@ impl Default for AppState {
             pixels: Default::default(),
             path: None,
             show_grid: true,
+            mod_stack: Arc::new(VecDeque::new()),
         }
     }
 }
