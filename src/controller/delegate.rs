@@ -52,6 +52,10 @@ impl druid::AppDelegate<AppState> for Delegate {
                 controller::image::dither_floyd(ctx, cmd, data);
                 druid::Handled::Yes
             }
+            _ if cmd.is(commands::IMAGE_ERASER) => {
+                controller::image::eraser(ctx, cmd, data);
+                druid::Handled::Yes
+            }
             _ if cmd.is(commands::IMAGE_FILL) => {
                 controller::image::fill(ctx, cmd, data);
                 druid::Handled::Yes

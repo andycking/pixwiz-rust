@@ -175,7 +175,10 @@ impl Canvas {
             }
 
             ToolType::Eraser => {
-                data.pixels.write(idx, &druid::Color::rgba8(0, 0, 0, 0));
+                let bounds = model::get_bounds(data);
+                if bounds.contains(p) {
+                    ctx.submit_command(commands::IMAGE_ERASER.with(p));
+                }
             }
 
             ToolType::Fill => {

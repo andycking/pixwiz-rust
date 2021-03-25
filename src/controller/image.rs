@@ -19,6 +19,15 @@ pub fn dither_floyd(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: 
     transforms::apply(data, transforms::colors::dither_floyd);
 }
 
+pub fn eraser(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+    let p = cmd.get_unchecked(commands::IMAGE_ERASER);
+
+    model::push_mod_record_point(data, *p);
+
+    let idx = data.pixels.point_to_idx(*p);
+    data.pixels.write(idx, &druid::Color::rgba8(0, 0, 0, 0));
+}
+
 pub fn fill(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     transforms::apply(data, transforms::colors::fill);
 }
