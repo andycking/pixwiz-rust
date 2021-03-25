@@ -1,9 +1,9 @@
 use druid::widget::prelude::*;
 
+use crate::model;
 use crate::model::commands;
 use crate::model::state::AppState;
 use crate::model::types::ToolType;
-use crate::util;
 use crate::view::theme;
 
 /// A canvas that allows for the display and modification of pixels. The size is currently
@@ -198,9 +198,9 @@ impl Canvas {
             }
 
             ToolType::Paint => {
-                let bounds = util::get_bounds(data);
+                let bounds = model::get_bounds(data);
                 if bounds.contains(p) {
-                    util::push_mod_record_point(data, p);
+                    model::push_mod_record_point(data, p);
                     data.pixels.write(idx, &data.brush_color);
                 }
             }
