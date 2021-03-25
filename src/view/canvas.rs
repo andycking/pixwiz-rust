@@ -177,13 +177,15 @@ impl Canvas {
             ToolType::Eraser => {
                 let bounds = model::get_bounds(data);
                 if bounds.contains(p) {
-                    let image_info = commands::ImageInfo::new(p);
-                    ctx.submit_command(commands::IMAGE_ERASER.with(image_info));
+                    ctx.submit_command(commands::IMAGE_ERASER);
                 }
             }
 
             ToolType::Fill => {
-                ctx.submit_command(commands::IMAGE_FILL);
+                let bounds = model::get_bounds(data);
+                if bounds.contains(p) {
+                    ctx.submit_command(commands::IMAGE_FILL);
+                }
             }
 
             ToolType::Marquee => {
@@ -204,8 +206,7 @@ impl Canvas {
             ToolType::Paint => {
                 let bounds = model::get_bounds(data);
                 if bounds.contains(p) {
-                    let image_info = commands::ImageInfo::new(p);
-                    ctx.submit_command(commands::IMAGE_PAINT.with(image_info));
+                    ctx.submit_command(commands::IMAGE_PAINT);
                 }
             }
 
@@ -233,9 +234,13 @@ impl druid::Widget<AppState> for Canvas {
                     match Self::screen_coords_to_canvas_coords(e.pos) {
                         Some(p) => {
                             data.start_pos = p;
+                            data.current_pos = p;
                             self.tool(ctx, data, p);
                         }
-                        _ => data.start_pos = druid::Point::ZERO,
+                        _ => {
+                            data.start_pos = druid::Point::ZERO;
+                            data.current_pos = druid::Point::ZERO;
+                        }
                     }
                     ctx.set_active(true);
                 }

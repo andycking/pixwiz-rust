@@ -24,10 +24,6 @@ pub fn desaturate(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
 }
 
 pub fn fill(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
-    if !env.bounds.contains(env.pos) {
-        return;
-    }
-
     let x = env.pos.x as usize;
     let y = env.pos.y as usize;
     let start_color = super::read(x, y, header, bytes);
