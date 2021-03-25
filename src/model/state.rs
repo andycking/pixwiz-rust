@@ -90,6 +90,7 @@ impl Default for PixelState {
 }
 
 /// Modification record. This holds undo state.
+#[derive(Clone, druid::Data)]
 pub struct ModRecord {
     pub area: druid::Rect,
     pub bytes: Arc<Vec<u8>>,
@@ -131,7 +132,7 @@ impl Default for AppState {
             pixels: Default::default(),
             path: None,
             show_grid: true,
-            mod_stack: Arc::new(VecDeque::new()),
+            mod_stack: Arc::new(VecDeque::with_capacity(1)),
         }
     }
 }

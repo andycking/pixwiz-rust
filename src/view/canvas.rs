@@ -200,6 +200,7 @@ impl Canvas {
             ToolType::Paint => {
                 let bounds = util::get_bounds(data);
                 if bounds.contains(p) {
+                    util::push_mod_record_point(data, p);
                     data.pixels.write(idx, &data.brush_color);
                 }
             }
