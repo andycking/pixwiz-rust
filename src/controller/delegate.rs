@@ -40,6 +40,10 @@ impl druid::AppDelegate<AppState> for Delegate {
                 controller::image::black_and_white(ctx, cmd, data);
                 druid::Handled::Yes
             }
+            _ if cmd.is(commands::IMAGE_CLEAR) => {
+                controller::image::clear(ctx, cmd, data);
+                druid::Handled::Yes
+            }
             _ if cmd.is(commands::IMAGE_DESATURATE) => {
                 controller::image::desaturate(ctx, cmd, data);
                 druid::Handled::Yes
@@ -48,12 +52,12 @@ impl druid::AppDelegate<AppState> for Delegate {
                 controller::image::dither_floyd(ctx, cmd, data);
                 druid::Handled::Yes
             }
-            _ if cmd.is(commands::IMAGE_ERASE) => {
-                controller::image::erase(ctx, cmd, data);
-                druid::Handled::Yes
-            }
             _ if cmd.is(commands::IMAGE_FILL) => {
                 controller::image::fill(ctx, cmd, data);
+                druid::Handled::Yes
+            }
+            _ if cmd.is(commands::IMAGE_PAINT) => {
+                controller::image::paint(ctx, cmd, data);
                 druid::Handled::Yes
             }
 

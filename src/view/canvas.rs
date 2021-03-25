@@ -200,8 +200,7 @@ impl Canvas {
             ToolType::Paint => {
                 let bounds = model::get_bounds(data);
                 if bounds.contains(p) {
-                    model::push_mod_record_point(data, p);
-                    data.pixels.write(idx, &data.brush_color);
+                    ctx.submit_command(commands::IMAGE_PAINT.with(p));
                 }
             }
 
@@ -215,7 +214,7 @@ impl druid::Widget<AppState> for Canvas {
         match event {
             Event::KeyUp(e) => match e.code {
                 druid::Code::Delete | druid::Code::Backspace => {
-                    ctx.submit_command(commands::IMAGE_ERASE);
+                    ctx.submit_command(commands::IMAGE_CLEAR);
                 }
 
                 druid::Code::Escape => {
