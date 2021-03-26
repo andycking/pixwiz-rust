@@ -90,6 +90,27 @@ impl PixelState {
 
         self.dirty = true;
     }
+
+    /// Write an area of storage.
+    pub fn write_area(&mut self, area: druid::Rect, src_bytes: Vec<u8>) {
+        let dst_bytes = Arc::make_mut(&mut self.bytes);
+
+        let mut src_idx = 0;
+
+        for y in area.y0 as usize..area.y1 as usize {
+            for x in area.x0 as usize..area.x1 as usize {
+                let idx = (y - 1) * self.header.width + (x - 1);
+                let dst_idx = idx * self.header.bytes_per_pixel;
+
+                dst_bytes[dst_idx + 0] = src_bytes[src_idx + 0];
+                dst_bytes[dst_idx + 1] = src_bytes[src_idx + 1];
+                dst_bytes[dst_idx + 2] = src_bytes[src_idx + 2];
+                dst_bytes[dst_idx + 3] = src_bytes[src_idx + 3];
+
+                src_idx += 4;
+            }
+        }
+    }
 }
 
 impl Default for PixelState {
