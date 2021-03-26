@@ -31,9 +31,9 @@ pub fn push_mod_record_point(data: &mut AppState, p: druid::Point) {
     push_mod_record_rect(data, area);
 }
 
-pub fn push_mod_record_rect(data: &mut AppState, r: druid::Rect) {
-    let bytes = vec![0; 0]; // Vile lies.
-    let record = ModRecord::new(r, bytes);
+pub fn push_mod_record_rect(data: &mut AppState, area: druid::Rect) {
+    let bytes = data.pixels.read_area(area);
+    let record = ModRecord::new(area, bytes);
 
     let mod_stack = Arc::make_mut(&mut data.mod_stack);
 

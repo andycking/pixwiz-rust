@@ -56,6 +56,25 @@ impl PixelState {
         )
     }
 
+    /// Read an area of storage.
+    pub fn read_area(&self, area: druid::Rect) -> Vec<u8> {
+        let dst_size = (area.width() * area.height()) as usize * self.header.bytes_per_pixel;
+        let mut dst_bytes = Vec::with_capacity(dst_size);
+
+        for y in area.y0 as usize..area.y1 as usize {
+            for x in area.x0 as usize..area.x1 as usize {
+                let src_idx = self.xy_to_idx(x, y) * self.header.bytes_per_pixel;
+
+                dst_bytes.push(self.bytes[src_idx + 0]);
+                dst_bytes.push(self.bytes[src_idx + 1]);
+                dst_bytes.push(self.bytes[src_idx + 2]);
+                dst_bytes.push(self.bytes[src_idx + 3]);
+            }
+        }
+
+        dst_bytes
+    }
+
     /// Write a value to an index in storage. This is a function and not an IndexMut
     /// because we want to control the dirty flag.
     #[inline]
