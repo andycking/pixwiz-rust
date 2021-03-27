@@ -10,6 +10,10 @@ pub mod tool_type;
 use crate::model::app_state::AppState;
 use crate::model::mod_record::ModRecord;
 
+/// Depth of the modification stack. This seems big, but remember that we're dealing
+/// with tiny little bitmaps, and we only record what's changed.
+const MOD_STACK_DEPTH: usize = 16;
+
 pub fn get_bounds(data: &AppState) -> druid::Rect {
     let mut bounds = match data.selection {
         Some(rect) => rect,
@@ -38,5 +42,16 @@ pub fn push_mod_record_rect(data: &mut AppState, area: druid::Rect) {
     let mod_stack = Arc::make_mut(&mut data.mod_stack);
 
     mod_stack.push_front(record);
-    mod_stack.truncate(1);
+    mod_stack.truncate(MOD_STACK_DEPTH);
+}
+
+pub fn pop_mod_record(data: &mut AppState) {
+    let mod_stack = Arc::make_mut(&mut data.mod_stack);
+
+    match mod_stack.pop_front() {
+        Some(record) => {
+            data.pixels.write_area(record.area, &*record.bytes);
+        }
+        _ => {}
+    }
 }

@@ -93,7 +93,7 @@ impl PixelState {
     }
 
     /// Write an area of storage.
-    pub fn write_area(&mut self, area: druid::Rect, src_bytes: Vec<u8>) {
+    pub fn write_area(&mut self, area: druid::Rect, src_bytes: &Vec<u8>) {
         let dst_bytes = Arc::make_mut(&mut self.bytes);
 
         let mut src_idx = 0;
@@ -111,6 +111,8 @@ impl PixelState {
                 src_idx += 4;
             }
         }
+
+        self.dirty = true;
     }
 }
 
