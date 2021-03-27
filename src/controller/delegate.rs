@@ -19,12 +19,10 @@ impl druid::AppDelegate<AppState> for Delegate {
                 controller::file::new_file(ctx, cmd, data);
                 druid::Handled::Yes
             }
-
             _ if cmd.is(druid::commands::OPEN_FILE) => {
                 controller::file::open_file(ctx, cmd, data);
                 druid::Handled::Yes
             }
-
             _ if cmd.is(druid::commands::SAVE_FILE) => {
                 controller::file::save_file(ctx, cmd, data);
                 druid::Handled::Yes
@@ -32,6 +30,28 @@ impl druid::AppDelegate<AppState> for Delegate {
 
             _ if cmd.is(druid::commands::SAVE_FILE_AS) => {
                 controller::file::save_file_as(ctx, cmd, data);
+                druid::Handled::Yes
+            }
+
+            // Edit.
+            _ if cmd.is(druid::commands::UNDO) => {
+                controller::edit::undo(ctx, cmd, data);
+                druid::Handled::Yes
+            }
+            _ if cmd.is(druid::commands::REDO) => {
+                controller::edit::redo(ctx, cmd, data);
+                druid::Handled::Yes
+            }
+            _ if cmd.is(druid::commands::CUT) => {
+                controller::edit::cut(ctx, cmd, data);
+                druid::Handled::Yes
+            }
+            _ if cmd.is(druid::commands::COPY) => {
+                controller::edit::copy(ctx, cmd, data);
+                druid::Handled::Yes
+            }
+            _ if cmd.is(druid::commands::PASTE) => {
+                controller::edit::paste(ctx, cmd, data);
                 druid::Handled::Yes
             }
 
