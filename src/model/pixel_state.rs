@@ -63,7 +63,8 @@ impl PixelState {
 
         for y in area.y0 as usize..area.y1 as usize {
             for x in area.x0 as usize..area.x1 as usize {
-                let src_idx = self.xy_to_idx(x, y) * self.header.bytes_per_pixel;
+                let idx = (y - 1) * self.header.width + (x - 1);
+                let src_idx = idx * self.header.bytes_per_pixel;
 
                 dst_bytes.push(self.bytes[src_idx + 0]);
                 dst_bytes.push(self.bytes[src_idx + 1]);
