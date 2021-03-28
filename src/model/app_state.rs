@@ -1,7 +1,4 @@
-use std::collections::VecDeque;
-use std::sync::Arc;
-
-use crate::model::mod_record::ModRecord;
+use crate::model::mod_stack::ModStack;
 use crate::model::pixel_state::PixelState;
 use crate::model::tool_type::ToolType;
 
@@ -17,7 +14,7 @@ pub struct AppState {
     pub pixels: PixelState,
     pub path: Option<String>,
     pub show_grid: bool,
-    pub mod_stack: Arc<VecDeque<ModRecord>>,
+    pub undo: ModStack,
 }
 
 impl Default for AppState {
@@ -32,7 +29,7 @@ impl Default for AppState {
             pixels: Default::default(),
             path: None,
             show_grid: true,
-            mod_stack: Arc::new(VecDeque::with_capacity(1)),
+            undo: Default::default(),
         }
     }
 }
