@@ -55,6 +55,14 @@ impl druid::AppDelegate<AppState> for Delegate {
                 controller::edit::paste(ctx, cmd, data);
                 druid::Handled::Yes
             }
+            _ if cmd.is(commands::EDIT_SELECT_ALL) => {
+                controller::edit::select_all(ctx, cmd, data);
+                druid::Handled::Yes
+            }
+            _ if cmd.is(commands::EDIT_DESELECT) => {
+                controller::edit::deselect(ctx, cmd, data);
+                druid::Handled::Yes
+            }
 
             // Image.
             _ if cmd.is(commands::IMAGE_BLACK_AND_WHITE) => {
@@ -112,6 +120,10 @@ fn update(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppStat
     );
     menu_opts.disable(view::COMMON_MENU_UNDO.to_string(), data.undo.is_empty());
     menu_opts.disable(view::COMMON_MENU_REDO.to_string(), data.redo.is_empty());
+    menu_opts.disable(
+        view::EDIT_MENU_DESELECT.to_string(),
+        data.selection.is_none(),
+    );
     menu_opts.select(view::MENU_VIEW_SHOW_GRID.to_string(), data.show_grid);
 
     view::rebuild_menu_bar(ctx, cmd, &menu_opts);

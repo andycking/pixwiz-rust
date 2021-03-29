@@ -20,6 +20,7 @@ use crate::view::tool_button::ToolButton;
 pub const COMMON_MENU_FILE_SAVE: &'static str = "common-menu-file-save";
 pub const COMMON_MENU_UNDO: &'static str = "common-menu-undo";
 pub const COMMON_MENU_REDO: &'static str = "common-menu-redo";
+pub const EDIT_MENU_DESELECT: &'static str = "edit-menu-deselect";
 pub const MENU_VIEW_SHOW_GRID: &'static str = "menu-view-show-grid";
 
 /// Druid menus are immutable, so if you want to update a menu item at runtime, you have to
@@ -53,6 +54,9 @@ impl Default for MenuOpts {
         // Undo/redo are disabled until you actually make a change.
         disabled.insert(COMMON_MENU_UNDO.to_string(), true);
         disabled.insert(COMMON_MENU_REDO.to_string(), true);
+
+        // Deselect is disabled until there's a selection.
+        disabled.insert(EDIT_MENU_DESELECT.to_string(), true);
 
         // We show the canvas grid by default.
         selected.insert(MENU_VIEW_SHOW_GRID.to_string(), true);
@@ -289,6 +293,20 @@ fn build_file_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
 }
 
 fn build_edit_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
+    fn edit_menu_select_all<T: Data>() -> druid::MenuItem<T> {
+        druid::MenuItem::new(
+            druid::LocalizedString::new("menu-edit-select-all").with_placeholder("Select All"),
+            commands::EDIT_SELECT_ALL,
+        )
+        .hotkey(druid::SysMods::Cmd, "a")
+    }
+    fn edit_menu_deselect<T: Data>() -> druid::MenuItem<T> {
+        druid::MenuItem::new(
+            druid::LocalizedString::new("menu-edit-deselect").with_placeholder("Deselect"),
+            commands::EDIT_DESELECT,
+        )
+    }
+
     let mut undo_disabled = false;
     if menu_opts.disabled.contains_key(COMMON_MENU_UNDO) {
         undo_disabled = menu_opts.disabled[COMMON_MENU_UNDO];
@@ -299,6 +317,11 @@ fn build_edit_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
         redo_disabled = menu_opts.disabled[COMMON_MENU_REDO];
     }
 
+    let mut deselect = false;
+    if menu_opts.disabled.contains_key(EDIT_MENU_DESELECT) {
+        deselect = menu_opts.disabled[EDIT_MENU_DESELECT];
+    }
+
     druid::MenuDesc::new(druid::LocalizedString::new("common-menu-edit-menu"))
         .append(druid::platform_menus::common::undo().disabled_if(|| undo_disabled))
         .append(druid::platform_menus::common::redo().disabled_if(|| redo_disabled))
@@ -306,6 +329,9 @@ fn build_edit_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
         .append(druid::platform_menus::common::cut())
         .append(druid::platform_menus::common::copy())
         .append(druid::platform_menus::common::paste())
+        .append_separator()
+        .append(edit_menu_select_all())
+        .append(edit_menu_deselect().disabled_if(|| deselect))
 }
 
 fn build_image_menu<T: Data>() -> druid::MenuDesc<T> {

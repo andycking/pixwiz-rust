@@ -223,7 +223,7 @@ impl druid::Widget<AppState> for Canvas {
                 }
 
                 druid::Code::Escape => {
-                    data.selection = None;
+                    ctx.submit_command(commands::EDIT_DESELECT);
                 }
                 _ => {}
             },

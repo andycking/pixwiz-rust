@@ -1,5 +1,8 @@
 use druid::Selector;
 
+pub const EDIT_SELECT_ALL: Selector = Selector::new("edit-select-all");
+pub const EDIT_DESELECT: Selector = Selector::new("edit-deselect");
+
 pub const IMAGE_BLACK_AND_WHITE: Selector = Selector::new("image-black-and-white");
 pub const IMAGE_CLEAR: Selector = Selector::new("image-clear");
 pub const IMAGE_DESATURATE: Selector = Selector::new("image-desaturate");
