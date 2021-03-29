@@ -4,7 +4,11 @@ use crate::storage;
 pub fn new_file(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     check_for_save(data);
 
+    data.selection = None;
     data.pixels = Default::default();
+    data.path = None;
+    data.undo.clear();
+    data.redo.clear();
 }
 
 pub fn open_file(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
@@ -17,8 +21,11 @@ pub fn open_file(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut
 
     match storage::png::read(path) {
         Ok(pixels) => {
+            data.selection = None;
             data.pixels = pixels;
             data.path = Some(String::from(path));
+            data.undo.clear();
+            data.redo.clear();
         }
         Err(_e) => {}
     }
