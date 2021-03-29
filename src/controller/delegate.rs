@@ -104,14 +104,16 @@ impl druid::AppDelegate<AppState> for Delegate {
         };
 
         if handled.is_handled() {
-            update(ctx, cmd, data);
+            rebuild_menu_bar(ctx, cmd, data);
         }
 
         handled
     }
 }
 
-fn update(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+/// Rebuild the menu bar to reflect the current state of the application.
+/// Druid menus are immutable, so we have to rebuild the entire thing from scratch.
+fn rebuild_menu_bar(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
     let mut menu_opts: view::MenuOpts = Default::default();
 
     menu_opts.disable(
