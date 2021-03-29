@@ -25,19 +25,19 @@ pub fn get_bounds(data: &AppState) -> druid::Rect {
     bounds
 }
 
-pub fn push_mod_record_point(data: &mut AppState, p: druid::Point) {
+pub fn push_undo_point(data: &mut AppState, p: druid::Point) {
     let area = druid::Rect::new(p.x, p.y, p.x + 1.0, p.y + 1.0);
-    push_mod_record_rect(data, area);
+    push_undo_rect(data, area);
 }
 
-pub fn push_mod_record_rect(data: &mut AppState, area: druid::Rect) {
+pub fn push_undo_rect(data: &mut AppState, area: druid::Rect) {
     let bytes = data.pixels.read_area(area);
     let record = ModRecord::new(area, bytes);
 
     data.undo.push(record);
 }
 
-pub fn pop_mod_record(data: &mut AppState) {
+pub fn pop_undo(data: &mut AppState) {
     match data.undo.pop() {
         Some(record) => {
             data.pixels.write_area(record.area, &*record.bytes);
