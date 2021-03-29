@@ -15,6 +15,7 @@ pub struct AppState {
     pub path: Option<String>,
     pub show_grid: bool,
     pub undo: ModStack,
+    pub redo: ModStack,
 }
 
 impl Default for AppState {
@@ -30,6 +31,7 @@ impl Default for AppState {
             path: None,
             show_grid: true,
             undo: Default::default(),
+            redo: Default::default(),
         }
     }
 }
