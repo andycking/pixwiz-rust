@@ -18,6 +18,8 @@ use crate::view::palette::Palette;
 use crate::view::tool_button::ToolButton;
 
 pub const COMMON_MENU_FILE_SAVE: &'static str = "common-menu-file-save";
+pub const COMMON_MENU_UNDO: &'static str = "common-menu-undo";
+pub const COMMON_MENU_REDO: &'static str = "common-menu-redo";
 pub const MENU_VIEW_SHOW_GRID: &'static str = "menu-view-show-grid";
 
 /// Druid menus are immutable, so if you want to update a menu item at runtime, you have to
@@ -40,15 +42,20 @@ impl MenuOpts {
 
 impl Default for MenuOpts {
     fn default() -> Self {
+        let mut disabled: HashMap<String, bool> = HashMap::new();
+        let mut selected: HashMap<String, bool> = HashMap::new();
+
         // We typically start with an untitled document (no path), so the save menu item
         // is disabled by default. It will get enabled when the user performs a save-as,
         // or opens an existing document.
-        let mut disabled: HashMap<String, bool> = HashMap::new();
         disabled.insert(COMMON_MENU_FILE_SAVE.to_string(), true);
 
+        // Undo/redo are disabled until you actually make a change.
+        disabled.insert(COMMON_MENU_UNDO.to_string(), true);
+        disabled.insert(COMMON_MENU_REDO.to_string(), true);
+
         // We show the canvas grid by default.
-        let mut selected: HashMap<String, bool> = HashMap::new();
-        selected.insert("menu-view-show-grid".to_string(), true);
+        selected.insert(MENU_VIEW_SHOW_GRID.to_string(), true);
 
         Self {
             disabled: disabled,
@@ -72,7 +79,7 @@ pub fn build_menu_bar<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
     druid::MenuDesc::new(druid::LocalizedString::new(""))
         .append(druid::platform_menus::mac::application::default())
         .append(build_file_menu(menu_opts))
-        .append(build_edit_menu())
+        .append(build_edit_menu(menu_opts))
         .append(build_image_menu())
         .append(build_view_menu(menu_opts))
 }
@@ -281,10 +288,20 @@ fn build_file_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
         .append(save_as())
 }
 
-fn build_edit_menu<T: Data>() -> druid::MenuDesc<T> {
+fn build_edit_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
+    let mut undo_disabled = false;
+    if menu_opts.disabled.contains_key(COMMON_MENU_UNDO) {
+        undo_disabled = menu_opts.disabled[COMMON_MENU_UNDO];
+    }
+
+    let mut redo_disabled = false;
+    if menu_opts.disabled.contains_key(COMMON_MENU_REDO) {
+        redo_disabled = menu_opts.disabled[COMMON_MENU_REDO];
+    }
+
     druid::MenuDesc::new(druid::LocalizedString::new("common-menu-edit-menu"))
-        .append(druid::platform_menus::common::undo())
-        .append(druid::platform_menus::common::redo())
+        .append(druid::platform_menus::common::undo().disabled_if(|| undo_disabled))
+        .append(druid::platform_menus::common::redo().disabled_if(|| redo_disabled))
         .append_separator()
         .append(druid::platform_menus::common::cut())
         .append(druid::platform_menus::common::copy())
