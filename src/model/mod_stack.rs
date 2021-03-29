@@ -31,4 +31,9 @@ impl ModStack {
         let q = Arc::make_mut(&mut self.q);
         q.pop_front()
     }
+
+    pub fn clear(&mut self) {
+        let q = Arc::make_mut(&mut self.q);
+        q.clear();
+    }
 }

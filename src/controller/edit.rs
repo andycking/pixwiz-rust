@@ -5,7 +5,9 @@ pub fn undo(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut App
     model::pop_undo(data);
 }
 
-pub fn redo(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut AppState) {}
+pub fn redo(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+    model::pop_redo(data);
+}
 
 pub fn cut(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut AppState) {}
 
