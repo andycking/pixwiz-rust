@@ -1,12 +1,12 @@
-use crate::model;
+use crate::controller::undo;
 use crate::model::app_state::AppState;
 
 pub fn undo(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    model::pop_undo(data);
+    undo::pop(data);
 }
 
 pub fn redo(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    model::pop_redo(data);
+    undo::pop_redo(data);
 }
 
 pub fn cut(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut AppState) {}

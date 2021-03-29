@@ -1,4 +1,4 @@
-use crate::model;
+use crate::controller::undo;
 use crate::model::app_state::AppState;
 use crate::transforms;
 
@@ -19,7 +19,7 @@ pub fn dither_floyd(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: 
 }
 
 pub fn eraser(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    model::push_undo_point(data, data.current_pos);
+    undo::push_point(data, data.current_pos);
 
     let idx = data.pixels.point_to_idx(data.current_pos);
     data.pixels.write(idx, &druid::Color::rgba8(0, 0, 0, 0));
@@ -30,7 +30,7 @@ pub fn fill(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut App
 }
 
 pub fn paint(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    model::push_undo_point(data, data.current_pos);
+    undo::push_point(data, data.current_pos);
 
     let idx = data.pixels.point_to_idx(data.current_pos);
     data.pixels.write(idx, &data.brush_color);
