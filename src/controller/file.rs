@@ -1,6 +1,5 @@
 use crate::model::app_state::AppState;
 use crate::storage;
-use crate::view;
 
 pub fn new_file(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     check_for_save(data);
@@ -8,7 +7,7 @@ pub fn new_file(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut
     data.pixels = Default::default();
 }
 
-pub fn open_file(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+pub fn open_file(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
     check_for_save(data);
 
     let file_info = cmd.get_unchecked(druid::commands::OPEN_FILE);
@@ -20,7 +19,6 @@ pub fn open_file(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut 
         Ok(pixels) => {
             data.pixels = pixels;
             data.path = Some(String::from(path));
-            enable_save(ctx, cmd, data);
         }
         Err(_e) => {}
     }
@@ -36,7 +34,7 @@ pub fn save_file(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mu
     }
 }
 
-pub fn save_file_as(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+pub fn save_file_as(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
     let file_info = cmd.get_unchecked(druid::commands::SAVE_FILE_AS);
 
     // If the file dialog passes us an invalid path then all bets are off. Just let it panic.
@@ -45,7 +43,6 @@ pub fn save_file_as(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &m
     match storage::png::write(path, &data.pixels) {
         Ok(()) => {
             data.path = Some(String::from(path));
-            enable_save(ctx, cmd, data);
         }
         Err(_e) => {}
     }
@@ -53,10 +50,4 @@ pub fn save_file_as(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &m
 
 fn check_for_save(data: &mut AppState) {
     if data.pixels.dirty {}
-}
-
-fn enable_save(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
-    let mut menu_opts: view::MenuOpts = Default::default();
-    menu_opts.disable(view::COMMON_MENU_FILE_SAVE.to_string(), data.path.is_none());
-    view::rebuild_menu_bar(ctx, cmd, &menu_opts);
 }

@@ -36,6 +36,10 @@ impl ModStack {
         q.pop_front()
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.q.is_empty()
+    }
+
     /// Clear out the modification stack.
     pub fn clear(&mut self) {
         let q = Arc::make_mut(&mut self.q);
