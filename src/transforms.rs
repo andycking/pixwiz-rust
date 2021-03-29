@@ -1,7 +1,6 @@
 use std::sync::Arc;
 
 use crate::controller::undo;
-use crate::model;
 use crate::model::app_state::AppState;
 use crate::model::pixel_env::PixelEnv;
 use crate::model::pixel_header::PixelHeader;
@@ -15,7 +14,7 @@ where
 {
     // We have all the information we need for a mod record, so just create it here.
     // That way the caller, and the f() we're applying, don't need to worry about it.
-    let bounds = model::get_bounds(data);
+    let bounds = data.get_bounds();
     undo::push(data, bounds);
 
     let env = PixelEnv::new(data.brush_color.clone(), data.current_pos, bounds);

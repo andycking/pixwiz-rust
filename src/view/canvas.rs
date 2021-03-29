@@ -1,7 +1,6 @@
 use druid::widget::prelude::*;
 
 use crate::commands;
-use crate::model;
 use crate::model::app_state::AppState;
 use crate::model::tool_type::ToolType;
 use crate::view::theme;
@@ -175,14 +174,14 @@ impl Canvas {
             }
 
             ToolType::Eraser => {
-                let bounds = model::get_bounds(data);
+                let bounds = data.get_bounds();
                 if bounds.contains(p) {
                     ctx.submit_command(commands::IMAGE_ERASER);
                 }
             }
 
             ToolType::Fill => {
-                let bounds = model::get_bounds(data);
+                let bounds = data.get_bounds();
                 if bounds.contains(p) {
                     ctx.submit_command(commands::IMAGE_FILL);
                 }
@@ -204,7 +203,7 @@ impl Canvas {
             }
 
             ToolType::Paint => {
-                let bounds = model::get_bounds(data);
+                let bounds = data.get_bounds();
                 if bounds.contains(p) {
                     ctx.submit_command(commands::IMAGE_PAINT);
                 }
