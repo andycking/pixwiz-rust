@@ -106,7 +106,10 @@ impl druid::AppDelegate<AppState> for Delegate {
 fn update(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
     let mut menu_opts: view::MenuOpts = Default::default();
 
-    menu_opts.disable(view::COMMON_MENU_FILE_SAVE.to_string(), data.path.is_none());
+    menu_opts.disable(
+        view::COMMON_MENU_FILE_SAVE.to_string(),
+        data.path.is_none() || !data.pixels.dirty,
+    );
     menu_opts.disable(view::COMMON_MENU_UNDO.to_string(), data.undo.is_empty());
     menu_opts.disable(view::COMMON_MENU_REDO.to_string(), data.redo.is_empty());
     menu_opts.select(view::MENU_VIEW_SHOW_GRID.to_string(), data.show_grid);
