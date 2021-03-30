@@ -8,6 +8,7 @@ use crate::view::theme;
 /// does internally.
 pub struct Palette {
     current_idx: usize,
+    current_val: u32,
     values: [u32; 256],
 }
 
@@ -20,6 +21,7 @@ impl Palette {
     pub fn new(bytes: &[u8]) -> Self {
         Self {
             current_idx: 0,
+            current_val: 0,
             values: Self::read_values(bytes),
         }
     }
@@ -113,8 +115,8 @@ impl druid::Widget<AppState> for Palette {
                 match Self::screen_coords_to_palette_coords(e.pos) {
                     Some(p) => {
                         self.current_idx = Self::palette_coords_to_idx(p);
-                        let val = self.values[self.current_idx];
-                        data.brush_color = druid::Color::from_rgba32_u32(val);
+                        self.current_val = self.values[self.current_idx];
+                        data.brush_color = druid::Color::from_rgba32_u32(self.current_val);
                         ctx.request_paint();
                     }
                     None => {}
@@ -135,7 +137,11 @@ impl druid::Widget<AppState> for Palette {
     ) {
     }
 
-    fn update(&mut self, _ctx: &mut UpdateCtx, _old_data: &AppState, _data: &AppState, _env: &Env) {
+    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &AppState, data: &AppState, _env: &Env) {
+        if old_data.brush_color != data.brush_color {
+            self.current_val = data.brush_color.as_rgba_u32();
+            ctx.request_paint();
+        }
     }
 
     fn layout(
@@ -153,7 +159,7 @@ impl druid::Widget<AppState> for Palette {
     fn paint(&mut self, ctx: &mut PaintCtx, _data: &AppState, _env: &Env) {
         for i in 0..self.values.len() {
             let color = self.values[i];
-            let selected = self.current_idx == i;
+            let selected = self.current_val == color;
             Self::paint_idx(ctx, i, color, selected);
         }
     }
