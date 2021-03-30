@@ -2,6 +2,8 @@ use druid::widget::prelude::*;
 
 use crate::model::app_state::AppState;
 
+/// A container one level up from the tool buttons. We use this to force a repaint of the
+/// tool buttons when a new tool is selected.
 pub struct ToolsController;
 
 impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for ToolsController {
