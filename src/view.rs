@@ -5,17 +5,20 @@ use druid::widget::Flex;
 use druid::WidgetExt;
 
 mod canvas;
+mod canvas_controller;
 mod palette;
 mod theme;
 mod tool_button;
+mod tool_controller;
 
 use crate::commands;
 use crate::model::app_state::AppState;
 use crate::model::tool_type::ToolType;
 use crate::view::canvas::Canvas;
-use crate::view::canvas::CanvasController;
+use crate::view::canvas_controller::CanvasController;
 use crate::view::palette::Palette;
 use crate::view::tool_button::ToolButton;
+use crate::view::tool_controller::ToolsController;
 
 pub const COMMON_MENU_FILE_SAVE: &'static str = "common-menu-file-save";
 pub const COMMON_MENU_UNDO: &'static str = "common-menu-undo";
@@ -140,6 +143,7 @@ fn build_tools() -> impl druid::Widget<AppState> {
             ToolButton::new(ToolType::Dropper, dropper_bytes),
         ))
         .with_spacer(8.0)
+        .controller(ToolsController)
 }
 
 fn build_color_well() -> impl druid::Widget<AppState> {
@@ -228,8 +232,7 @@ fn build_status_label() -> impl druid::Widget<AppState> {
         let (r, g, b, a) = data.pos_color.as_rgba8();
         let selection = data.selection.unwrap_or(druid::Rect::ZERO);
         format!(
-            "{:>10}  r:{:3} g:{:3} b:{:3} a:{:3}  {:02}:{:02}-{:02}:{:02}  {:02}:{:02}",
-            data.tool_type.to_string().to_lowercase(),
+            "r:{:3} g:{:3} b:{:3} a:{:3}  {:02}:{:02}-{:02}:{:02}  {:02}:{:02}",
             r,
             g,
             b,
