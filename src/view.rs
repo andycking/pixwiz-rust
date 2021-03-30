@@ -74,8 +74,6 @@ pub fn build_ui() -> impl druid::Widget<AppState> {
         .with_default_spacer()
         .with_child(build_main_pane())
         .with_default_spacer()
-        .with_child(build_status_bar())
-        .with_default_spacer()
         .background(theme::MAIN_FILL)
 }
 
@@ -204,9 +202,12 @@ fn build_right_pane() -> impl druid::Widget<AppState> {
 
 fn build_center_pane() -> impl druid::Widget<AppState> {
     Flex::column()
+        .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
         .with_child(build_canvas())
         .with_default_spacer()
         .with_child(build_palette())
+        .with_default_spacer()
+        .with_child(build_status_bar())
         .with_default_spacer()
 }
 
@@ -243,7 +244,6 @@ fn build_status_label() -> impl druid::Widget<AppState> {
     })
     .with_font(druid::FontDescriptor::new(druid::FontFamily::MONOSPACE))
     .with_text_color(theme::STATUS_BAR_STROKE)
-    .padding(3.0)
 }
 
 fn build_status_bar() -> impl druid::Widget<AppState> {
@@ -251,7 +251,6 @@ fn build_status_bar() -> impl druid::Widget<AppState> {
         .main_axis_alignment(druid::widget::MainAxisAlignment::End)
         .must_fill_main_axis(true)
         .with_child(build_status_label())
-        .with_default_spacer()
         .background(theme::STATUS_BAR_FILL)
 }
 

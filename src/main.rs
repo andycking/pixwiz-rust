@@ -20,7 +20,7 @@ fn main() -> Result<(), PlatformError> {
     let main_window = druid::WindowDesc::new(ui)
         .title("Pix Wiz")
         .menu(menu_bar)
-        .window_size((672.0, 712.0));
+        .window_size((672.0, 696.0));
 
     let data: AppState = Default::default();
 
