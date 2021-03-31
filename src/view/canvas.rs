@@ -191,14 +191,16 @@ impl Canvas {
                 ctx.submit_command(commands::IMAGE_MARQUEE);
             }
 
+            ToolType::Move => {
+                ctx.submit_command(commands::IMAGE_MOVE);
+            }
+
             ToolType::Paint => {
                 let bounds = data.get_bounds();
                 if bounds.contains(p) {
                     ctx.submit_command(commands::IMAGE_PAINT);
                 }
             }
-
-            _ => {}
         }
     }
 }

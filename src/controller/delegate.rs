@@ -93,6 +93,10 @@ impl druid::AppDelegate<AppState> for Delegate {
                 controller::image::marquee(ctx, cmd, data);
                 druid::Handled::Yes
             }
+            _ if cmd.is(commands::IMAGE_MOVE) => {
+                controller::image::move_(ctx, cmd, data);
+                druid::Handled::Yes
+            }
             _ if cmd.is(commands::IMAGE_PAINT) => {
                 controller::image::paint(ctx, cmd, data);
                 druid::Handled::Yes

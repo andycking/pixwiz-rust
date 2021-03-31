@@ -1,6 +1,6 @@
 use crate::model::mod_stack::ModStack;
 use crate::model::pixel_state::PixelState;
-use crate::model::types::ToolType;
+use crate::model::types::*;
 
 /// Application state.
 #[derive(Clone, druid::Data)]
@@ -10,6 +10,7 @@ pub struct AppState {
     pub start_pos: druid::Point,
     pub current_pos: druid::Point,
     pub selection: Option<druid::Rect>,
+    pub move_bytes: Option<PixelBytes>,
     pub tool_type: ToolType,
     pub pixels: PixelState,
     pub path: Option<String>,
@@ -26,6 +27,7 @@ impl Default for AppState {
             start_pos: druid::Point::ZERO,
             current_pos: druid::Point::ZERO,
             selection: None,
+            move_bytes: None,
             tool_type: ToolType::Paint,
             pixels: Default::default(),
             path: None,
