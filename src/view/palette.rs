@@ -106,9 +106,16 @@ impl druid::Widget<AppState> for Palette {
                 Some(p) => {
                     let idx = Self::palette_coords_to_idx(p);
                     let val = self.values[idx];
-                    data.pos_color = druid::Color::from_rgba32_u32(val);
+                    let color = druid::Color::from_rgba32_u32(val);
+                    if color != data.pos_color {
+                        data.pos_color = color;
+                    }
                 }
-                None => data.pos_color = data.brush_color.clone(),
+                None => {
+                    if data.pos_color != data.brush_color {
+                        data.pos_color = data.brush_color.clone();
+                    }
+                }
             },
 
             Event::MouseUp(e) if ctx.is_active() => {
