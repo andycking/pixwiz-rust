@@ -1,10 +1,12 @@
 use std::sync::Arc;
 
+use crate::model::types::PixelBytes;
+
 /// Modification record. This holds undo state.
 #[derive(Clone, druid::Data)]
 pub struct ModRecord {
     pub area: druid::Rect,
-    pub bytes: Arc<Vec<u8>>,
+    pub bytes: PixelBytes,
 }
 
 impl ModRecord {

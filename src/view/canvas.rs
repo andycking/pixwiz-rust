@@ -2,7 +2,7 @@ use druid::widget::prelude::*;
 
 use crate::commands;
 use crate::model::app_state::AppState;
-use crate::model::tool_type::ToolType;
+use crate::model::types::ToolType;
 use crate::view::theme;
 
 /// A canvas that allows for the display and modification of pixels. The size is currently

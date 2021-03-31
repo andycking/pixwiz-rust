@@ -1,6 +1,6 @@
 use crate::model::mod_stack::ModStack;
 use crate::model::pixel_state::PixelState;
-use crate::model::tool_type::ToolType;
+use crate::model::types::ToolType;
 
 /// Application state.
 #[derive(Clone, druid::Data)]

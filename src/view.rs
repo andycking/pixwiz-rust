@@ -13,7 +13,7 @@ mod tool_controller;
 
 use crate::commands;
 use crate::model::app_state::AppState;
-use crate::model::tool_type::ToolType;
+use crate::model::types::ToolType;
 use crate::view::canvas::Canvas;
 use crate::view::canvas_controller::CanvasController;
 use crate::view::palette::Palette;

@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::model::pixel_header::PixelHeader;
+use crate::model::types::PixelBytes;
 
 /// Pixel storage. Each value is stored as four contiguous bytes representing RGBA,
 /// respectively. We hold the values in an ARC, to avoid copying them.
@@ -8,7 +9,7 @@ use crate::model::pixel_header::PixelHeader;
 pub struct PixelState {
     pub header: PixelHeader,
     pub dirty: bool,
-    pub bytes: Arc<Vec<u8>>,
+    pub bytes: PixelBytes,
 }
 
 impl PixelState {

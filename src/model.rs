@@ -4,4 +4,4 @@ pub mod mod_stack;
 pub mod pixel_env;
 pub mod pixel_header;
 pub mod pixel_state;
-pub mod tool_type;
+pub mod types;
