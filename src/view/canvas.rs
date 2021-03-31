@@ -188,18 +188,7 @@ impl Canvas {
             }
 
             ToolType::Marquee => {
-                let x0 = data.start_pos.x.min(data.current_pos.x);
-                let y0 = data.start_pos.y.min(data.current_pos.y);
-                let x1 = data.start_pos.x.max(data.current_pos.x);
-                let y1 = data.start_pos.y.max(data.current_pos.y);
-
-                let new_selection = druid::Rect::new(x0, y0, x1, y1);
-
-                let old_selection = data.selection.unwrap_or(druid::Rect::ZERO);
-
-                if old_selection != new_selection {
-                    data.selection = Some(new_selection);
-                }
+                ctx.submit_command(commands::IMAGE_MARQUEE);
             }
 
             ToolType::Paint => {

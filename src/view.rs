@@ -21,6 +21,8 @@ use crate::view::tool_button::ToolButton;
 use crate::view::tool_controller::ToolsController;
 
 pub const COMMON_MENU_FILE_SAVE: &'static str = "common-menu-file-save";
+pub const COMMON_MENU_CUT: &'static str = "common-menu-cut";
+pub const COMMON_MENU_COPY: &'static str = "common-menu-copy";
 pub const COMMON_MENU_UNDO: &'static str = "common-menu-undo";
 pub const COMMON_MENU_REDO: &'static str = "common-menu-redo";
 pub const EDIT_MENU_DESELECT: &'static str = "edit-menu-deselect";
@@ -53,6 +55,10 @@ impl Default for MenuOpts {
         // is disabled by default. It will get enabled when the user performs a save-as,
         // or opens an existing document.
         disabled.insert(COMMON_MENU_FILE_SAVE.to_string(), true);
+
+        // Cut/copy are disabled until there's a selection.
+        disabled.insert(COMMON_MENU_CUT.to_string(), true);
+        disabled.insert(COMMON_MENU_COPY.to_string(), true);
 
         // Undo/redo are disabled until you actually make a change.
         disabled.insert(COMMON_MENU_UNDO.to_string(), true);
@@ -319,6 +325,16 @@ fn build_edit_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
         redo_disabled = menu_opts.disabled[COMMON_MENU_REDO];
     }
 
+    let mut cut_disabled = false;
+    if menu_opts.disabled.contains_key(COMMON_MENU_CUT) {
+        cut_disabled = menu_opts.disabled[COMMON_MENU_CUT];
+    }
+
+    let mut copy_disabled = false;
+    if menu_opts.disabled.contains_key(COMMON_MENU_COPY) {
+        copy_disabled = menu_opts.disabled[COMMON_MENU_COPY];
+    }
+
     let mut deselect = false;
     if menu_opts.disabled.contains_key(EDIT_MENU_DESELECT) {
         deselect = menu_opts.disabled[EDIT_MENU_DESELECT];
@@ -328,8 +344,8 @@ fn build_edit_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
         .append(druid::platform_menus::common::undo().disabled_if(|| undo_disabled))
         .append(druid::platform_menus::common::redo().disabled_if(|| redo_disabled))
         .append_separator()
-        .append(druid::platform_menus::common::cut())
-        .append(druid::platform_menus::common::copy())
+        .append(druid::platform_menus::common::cut().disabled_if(|| cut_disabled))
+        .append(druid::platform_menus::common::copy().disabled_if(|| copy_disabled))
         .append(druid::platform_menus::common::paste())
         .append_separator()
         .append(edit_menu_select_all())
