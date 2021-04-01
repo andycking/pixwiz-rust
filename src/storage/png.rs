@@ -24,6 +24,9 @@ pub fn write(path_str: &str, pixels: &PixelState) -> Result<()> {
     encoder.set_depth(png::BitDepth::Eight);
     let mut writer = encoder.write_header()?;
 
+    // Oof. If this is a file the user loaded, then we're dropping all the other fields.
+    // Someone is going to be super pissed when their file isn't the same.
+
     match writer.write_image_data(&pixels.bytes) {
         Ok(()) => Ok(()),
         Err(e) => Err(Error::new(ErrorKind::InvalidInput, e)),
@@ -36,6 +39,11 @@ pub fn read(path_str: &str) -> Result<PixelState> {
 
     let decoder = png::Decoder::new(file);
     let (info, mut reader) = decoder.read_info()?;
+
+    // We support 8-bit PNGs in RGBA format for now. Let's at least be upfront about it.
+    if info.bit_depth != png::BitDepth::Eight || info.color_type != png::ColorType::RGBA {
+        return Err(Error::new(ErrorKind::Other, "format not supported"));
+    }
 
     let mut bytes = vec![0; info.buffer_size()];
 
