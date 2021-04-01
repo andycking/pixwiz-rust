@@ -127,6 +127,7 @@ fn build_tools() -> impl druid::Widget<AppState> {
     let dropper_bytes = include_bytes!("./assets/dropper.png");
 
     Flex::column()
+        .with_spacer(1.0)
         .with_child(build_tools_row(
             ToolButton::new(ToolType::Marquee, marquee_bytes),
             ToolButton::new(ToolType::Move, move_bytes),
