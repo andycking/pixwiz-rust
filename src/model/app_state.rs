@@ -39,6 +39,18 @@ impl Default for AppState {
 }
 
 impl AppState {
+    /// Reset app state. This is used to blow away things that are specific to a document,
+    /// like the undo stack and the marquee selection. A good example of when to use this
+    /// is on New/Open File.
+    pub fn reset(&mut self) {
+        self.selection = None;
+        self.move_bytes = None;
+        self.pixels = Default::default();
+        self.path = None;
+        self.undo.clear();
+        self.redo.clear();
+    }
+
     /// Get the current boundary. If a selection exists, then that's the boundary.
     /// Otherwise, it's the entire canvas. The result is in canvas coords.
     pub fn get_bounds(&self) -> druid::Rect {

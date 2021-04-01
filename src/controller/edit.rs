@@ -26,4 +26,5 @@ pub fn select_all(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &m
 
 pub fn deselect(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     data.selection = None;
+    data.move_bytes = None;
 }

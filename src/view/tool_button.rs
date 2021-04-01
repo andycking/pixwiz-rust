@@ -37,11 +37,13 @@ impl druid::Widget<AppState> for ToolButton {
 
             Event::MouseUp(_e) if ctx.is_active() => {
                 if ctx.is_hot() {
-                    if self.tool_type == ToolType::Marquee {
-                        data.selection = None;
-                        ctx.request_paint();
-                    }
                     data.tool_type = self.tool_type;
+
+                    // Don't forget to clear out the move bytes. There has to be a better
+                    // place to put this.
+                    if data.tool_type != ToolType::Move && data.move_bytes.is_some() {
+                        data.move_bytes = None;
+                    }
                 }
                 ctx.set_active(false);
             }
