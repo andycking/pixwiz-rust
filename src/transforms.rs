@@ -32,11 +32,11 @@ where
     undo::push(data, bounds);
 
     let env = PixelEnv::new(data.brush_color.clone(), data.current_pos, bounds);
-    let bytes = Arc::make_mut(&mut data.pixels.bytes);
+    let bytes = Arc::make_mut(&mut data.doc.pixels.bytes);
 
-    f(&data.pixels.header, &env, bytes);
+    f(&data.doc.pixels.header, &env, bytes);
 
-    data.pixels.dirty = true;
+    data.doc.pixels.dirty = true;
 }
 
 /// Read RGBA from bytes. The underlying storage doesn't really matter: it can be a

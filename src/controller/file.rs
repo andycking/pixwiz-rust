@@ -18,7 +18,7 @@ use crate::storage;
 pub fn new_file(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     check_for_save(data);
 
-    data.reset();
+    data.doc = Default::default();
 }
 
 pub fn open_file(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
@@ -31,17 +31,17 @@ pub fn open_file(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut
 
     match storage::png::read_path(path) {
         Ok(pixels) => {
-            data.reset();
-            data.pixels = pixels;
-            data.path = Some(String::from(path));
+            data.doc = Default::default();
+            data.doc.pixels = pixels;
+            data.doc.path = Some(String::from(path));
         }
         Err(_e) => {}
     }
 }
 
 pub fn save_file(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    match &data.path {
-        Some(path) => match storage::png::write_path(path, &data.pixels) {
+    match &data.doc.path {
+        Some(path) => match storage::png::write_path(path, &data.doc.pixels) {
             Ok(()) => {}
             Err(_e) => {}
         },
@@ -55,14 +55,14 @@ pub fn save_file_as(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &
     // If the file dialog passes us an invalid path then all bets are off. Just let it panic.
     let path = file_info.path().to_str().unwrap();
 
-    match storage::png::write_path(path, &data.pixels) {
+    match storage::png::write_path(path, &data.doc.pixels) {
         Ok(()) => {
-            data.path = Some(String::from(path));
+            data.doc.path = Some(String::from(path));
         }
         Err(_e) => {}
     }
 }
 
 fn check_for_save(data: &mut AppState) {
-    if data.pixels.dirty {}
+    if data.doc.pixels.dirty {}
 }

@@ -35,8 +35,8 @@ pub fn dither_floyd(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: 
 pub fn eraser(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     undo::push_point(data, data.current_pos);
 
-    let idx = data.pixels.point_to_idx(data.current_pos);
-    data.pixels.write(idx, &druid::Color::rgba8(0, 0, 0, 0));
+    let idx = data.doc.pixels.point_to_idx(data.current_pos);
+    data.doc.pixels.write(idx, &druid::Color::rgba8(0, 0, 0, 0));
 }
 
 pub fn fill(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
@@ -51,10 +51,10 @@ pub fn marquee(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut 
 
     let new_selection = druid::Rect::new(x0, y0, x1, y1);
 
-    let old_selection = data.selection.unwrap_or(druid::Rect::ZERO);
+    let old_selection = data.doc.selection.unwrap_or(druid::Rect::ZERO);
 
     if old_selection != new_selection {
-        data.selection = Some(new_selection);
+        data.doc.selection = Some(new_selection);
     }
 }
 
@@ -63,6 +63,6 @@ pub fn move_(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut A
 pub fn paint(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     undo::push_point(data, data.current_pos);
 
-    let idx = data.pixels.point_to_idx(data.current_pos);
-    data.pixels.write(idx, &data.brush_color);
+    let idx = data.doc.pixels.point_to_idx(data.current_pos);
+    data.doc.pixels.write(idx, &data.brush_color);
 }

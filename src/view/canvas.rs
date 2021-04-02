@@ -115,8 +115,8 @@ impl Canvas {
     /// Paint pixels from storage onto the given render context. This will paint
     /// on top of the checkboard. Pixel transparency is via alpha value.
     fn paint_pixels(&self, ctx: &mut PaintCtx, data: &AppState) {
-        for i in 0..data.pixels.len() {
-            Self::paint_idx(ctx, i, &data.pixels.read(i));
+        for i in 0..data.doc.pixels.len() {
+            Self::paint_idx(ctx, i, &data.doc.pixels.read(i));
         }
     }
 
@@ -152,7 +152,7 @@ impl Canvas {
 
     /// Paint the currently selected area onto the given render context.
     fn paint_selection(&self, ctx: &mut PaintCtx, data: &AppState) {
-        match data.selection {
+        match data.doc.selection {
             Some(s) => {
                 let tl = Self::canvas_coords_to_screen_coords_f64(s.x0, s.y0);
                 let br = Self::canvas_coords_to_screen_coords_f64(s.x1, s.y1);
@@ -180,11 +180,11 @@ impl Canvas {
     /// Execute a tool at the given point on the canvas. The point is in
     /// canvas coordinates.
     fn tool(&mut self, ctx: &mut EventCtx, data: &mut AppState, p: druid::Point) {
-        let idx = data.pixels.point_to_idx(p);
+        let idx = data.doc.pixels.point_to_idx(p);
 
         match data.tool_type {
             ToolType::Dropper => {
-                data.brush_color = data.pixels.read(idx);
+                data.brush_color = data.doc.pixels.read(idx);
             }
 
             ToolType::Eraser => {
@@ -256,9 +256,9 @@ impl druid::Widget<AppState> for Canvas {
                     // canvas coords have changed (because of how big our pixels are).
                     // Avoid doing any work if we're still in the same place.
                     if p != data.current_pos {
-                        let idx = data.pixels.point_to_idx(p);
+                        let idx = data.doc.pixels.point_to_idx(p);
                         data.current_pos = p;
-                        data.pos_color = data.pixels.read(idx);
+                        data.pos_color = data.doc.pixels.read(idx);
 
                         if ctx.is_active() {
                             self.tool(ctx, data, p);
@@ -303,7 +303,7 @@ impl druid::Widget<AppState> for Canvas {
         data: &AppState,
         _env: &Env,
     ) -> Size {
-        let rect = Self::idx_to_screen_rect(data.pixels.len() - 1);
+        let rect = Self::idx_to_screen_rect(data.doc.pixels.len() - 1);
         let size = Size::new(rect.x1 + 1.0, rect.y1 + 1.0);
         bc.constrain(size)
     }

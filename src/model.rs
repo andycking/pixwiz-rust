@@ -13,6 +13,7 @@
 // limitations under the License.
 
 pub mod app_state;
+pub mod document;
 pub mod mod_record;
 pub mod mod_stack;
 pub mod pixel_env;

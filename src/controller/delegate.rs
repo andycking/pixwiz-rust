@@ -140,13 +140,13 @@ fn rebuild_menu_bar(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &m
 
     menu_opts.disable(
         view::COMMON_MENU_FILE_SAVE.to_string(),
-        data.path.is_none() || !data.pixels.dirty,
+        data.doc.path.is_none() || !data.doc.pixels.dirty,
     );
 
-    let selection = data.selection.is_none();
+    let selection = data.doc.selection.is_none();
 
-    menu_opts.disable(view::COMMON_MENU_UNDO.to_string(), data.undo.is_empty());
-    menu_opts.disable(view::COMMON_MENU_REDO.to_string(), data.redo.is_empty());
+    menu_opts.disable(view::COMMON_MENU_UNDO.to_string(), data.doc.undo.is_empty());
+    menu_opts.disable(view::COMMON_MENU_REDO.to_string(), data.doc.redo.is_empty());
     menu_opts.disable(view::COMMON_MENU_CUT.to_string(), selection);
     menu_opts.disable(view::COMMON_MENU_COPY.to_string(), selection);
     menu_opts.disable(view::EDIT_MENU_DESELECT.to_string(), selection);

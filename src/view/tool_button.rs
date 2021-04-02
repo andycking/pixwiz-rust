@@ -55,8 +55,8 @@ impl druid::Widget<AppState> for ToolButton {
 
                     // Don't forget to clear out the move bytes. There has to be a better
                     // place to put this.
-                    if data.tool_type != ToolType::Move && data.move_bytes.is_some() {
-                        data.move_bytes = None;
+                    if data.tool_type != ToolType::Move && data.doc.move_bytes.is_some() {
+                        data.doc.move_bytes = None;
                     }
                 }
                 ctx.set_active(false);

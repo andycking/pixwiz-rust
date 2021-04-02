@@ -186,7 +186,7 @@ fn build_preview() -> impl druid::Widget<AppState> {
             for x in 0..32 {
                 let rect = druid::Rect::new(x as f64, y as f64, (x as f64) + 1.0, (y as f64) + 1.0);
 
-                let color = data.pixels.read(i);
+                let color = data.doc.pixels.read(i);
                 let (_, _, _, a) = color.as_rgba8();
                 if a != 255 {
                     ctx.fill(rect, &theme::PREVIEW_FILL);
@@ -234,7 +234,7 @@ fn build_main_pane() -> impl druid::Widget<AppState> {
 fn build_status_label() -> impl druid::Widget<AppState> {
     druid::widget::Label::new(|data: &AppState, _env: &_| {
         let (r, g, b, a) = data.pos_color.as_rgba8();
-        let selection = data.selection.unwrap_or(druid::Rect::ZERO);
+        let selection = data.doc.selection.unwrap_or(druid::Rect::ZERO);
         format!(
             "r:{:3} g:{:3} b:{:3} a:{:3}  {:02}:{:02}-{:02}:{:02}  {:02}:{:02}",
             r,
