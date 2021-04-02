@@ -1,16 +1,15 @@
 use std::fs::File;
 use std::io::BufWriter;
-use std::io::Error;
-use std::io::ErrorKind;
-use std::io::Result;
 use std::path::Path;
+use std::result::Result;
 
 use png;
 
+use super::error::StorageError;
 use crate::model::pixel_header::PixelHeader;
 use crate::model::pixel_state::PixelState;
 
-pub fn write(path_str: &str, pixels: &PixelState) -> Result<()> {
+pub fn write(path_str: &str, pixels: &PixelState) -> Result<(), StorageError> {
     let path = Path::new(path_str);
     let file = File::create(path)?;
     let ref mut buf_writer = BufWriter::new(file);
@@ -28,12 +27,12 @@ pub fn write(path_str: &str, pixels: &PixelState) -> Result<()> {
     // Someone is going to be super pissed when their file isn't the same.
 
     match writer.write_image_data(&pixels.bytes) {
-        Ok(()) => Ok(()),
-        Err(e) => Err(Error::new(ErrorKind::InvalidInput, e)),
+        Err(_) => Err(StorageError::new()),
+        _ => Ok(()),
     }
 }
 
-pub fn read(path_str: &str) -> Result<PixelState> {
+pub fn read(path_str: &str) -> Result<PixelState, StorageError> {
     let path = Path::new(path_str);
     let file = File::open(path)?;
 
@@ -42,7 +41,7 @@ pub fn read(path_str: &str) -> Result<PixelState> {
 
     // We support 8-bit PNGs in RGBA format for now. Let's at least be upfront about it.
     if info.bit_depth != png::BitDepth::Eight || info.color_type != png::ColorType::RGBA {
-        return Err(Error::new(ErrorKind::Other, "format not supported"));
+        return Err(StorageError::new());
     }
 
     let mut bytes = vec![0; info.buffer_size()];
@@ -59,4 +58,16 @@ pub fn read(path_str: &str) -> Result<PixelState> {
     let pixels = PixelState::new(header, bytes);
 
     Ok(pixels)
+}
+
+impl From<png::EncodingError> for StorageError {
+    fn from(_: png::EncodingError) -> Self {
+        Self::new()
+    }
+}
+
+impl From<png::DecodingError> for StorageError {
+    fn from(_: png::DecodingError) -> Self {
+        Self::new()
+    }
 }
