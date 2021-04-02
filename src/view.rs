@@ -18,6 +18,7 @@ use druid::widget::prelude::*;
 use druid::widget::Flex;
 use druid::WidgetExt;
 
+mod button;
 mod canvas;
 mod canvas_controller;
 mod palette;
