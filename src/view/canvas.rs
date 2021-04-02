@@ -250,28 +250,36 @@ impl druid::Widget<AppState> for Canvas {
                 }
             }
 
-            Event::MouseMove(e) => match Self::screen_coords_to_canvas_coords(e.pos) {
-                Some(p) => {
-                    // The screen coords might have changed, but that doesn't mean the
-                    // canvas coords have changed (because of how big our pixels are).
-                    // Avoid doing any work if we're still in the same place.
-                    if p != data.current_pos {
-                        let idx = data.doc.pixels.point_to_idx(p);
-                        data.current_pos = p;
-                        data.pos_color = data.doc.pixels.read(idx);
+            Event::MouseMove(e) => {
+                match data.tool_type {
+                    ToolType::Marquee => ctx.set_cursor(&druid::Cursor::Crosshair),
+                    ToolType::Move => ctx.set_cursor(&druid::Cursor::OpenHand),
+                    _ => ctx.set_cursor(&druid::Cursor::Arrow),
+                }
 
-                        if ctx.is_active() {
-                            self.tool(ctx, data, p);
+                match Self::screen_coords_to_canvas_coords(e.pos) {
+                    Some(p) => {
+                        // The screen coords might have changed, but that doesn't mean the
+                        // canvas coords have changed (because of how big our pixels are).
+                        // Avoid doing any work if we're still in the same place.
+                        if p != data.current_pos {
+                            let idx = data.doc.pixels.point_to_idx(p);
+                            data.current_pos = p;
+                            data.pos_color = data.doc.pixels.read(idx);
+
+                            if ctx.is_active() {
+                                self.tool(ctx, data, p);
+                            }
+                        }
+                    }
+                    None => {
+                        if !ctx.is_active() && data.current_pos != druid::Point::ZERO {
+                            data.current_pos = druid::Point::ZERO;
+                            data.pos_color = data.brush_color.clone();
                         }
                     }
                 }
-                None => {
-                    if !ctx.is_active() && data.current_pos != druid::Point::ZERO {
-                        data.current_pos = druid::Point::ZERO;
-                        data.pos_color = data.brush_color.clone();
-                    }
-                }
-            },
+            }
 
             Event::MouseUp(_e) if ctx.is_active() => {
                 ctx.set_active(false);
