@@ -251,11 +251,12 @@ impl druid::Widget<AppState> for Canvas {
             }
 
             Event::MouseMove(e) => {
-                match data.tool_type {
-                    ToolType::Marquee => ctx.set_cursor(&druid::Cursor::Crosshair),
-                    ToolType::Move => ctx.set_cursor(&druid::Cursor::OpenHand),
-                    _ => ctx.set_cursor(&druid::Cursor::Arrow),
-                }
+                let cursor = match data.tool_type {
+                    ToolType::Marquee => druid::Cursor::Crosshair,
+                    ToolType::Move => druid::Cursor::OpenHand,
+                    _ => druid::Cursor::Arrow,
+                };
+                ctx.set_cursor(&cursor);
 
                 match Self::screen_coords_to_canvas_coords(e.pos) {
                     Some(p) => {
