@@ -14,7 +14,7 @@
 
 use crate::model::app_state::AppState;
 use crate::storage;
-use crate::view;
+use crate::view::alert;
 
 pub fn new_file(ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     check_for_save(ctx, data);
@@ -66,7 +66,7 @@ pub fn save_file_as(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &
 
 fn check_for_save(ctx: &mut druid::DelegateCtx, data: &mut AppState) {
     if data.doc.pixels.dirty {
-        let alert = view::build_alert(data.window_pos);
+        let alert = alert::unsaved(data.window_pos);
         ctx.new_window(alert);
     }
 }

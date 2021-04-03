@@ -15,7 +15,7 @@
 use crate::commands;
 use crate::controller;
 use crate::model::app_state::AppState;
-use crate::view;
+use crate::view::menu;
 
 pub struct Delegate;
 
@@ -136,26 +136,26 @@ impl druid::AppDelegate<AppState> for Delegate {
 /// Rebuild the menu bar to reflect the current state of the application.
 /// Druid menus are immutable, so we have to rebuild the entire thing from scratch.
 fn rebuild_menu_bar(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
-    let mut menu_opts: view::MenuOpts = Default::default();
+    let mut menu_opts: menu::MenuOpts = Default::default();
 
     menu_opts.disable(
-        view::COMMON_MENU_FILE_SAVE.to_string(),
+        menu::COMMON_MENU_FILE_SAVE.to_string(),
         data.doc.path.is_none() || !data.doc.pixels.dirty,
     );
 
     let selection = data.doc.selection.is_none();
 
-    menu_opts.disable(view::COMMON_MENU_UNDO.to_string(), data.doc.undo.is_empty());
-    menu_opts.disable(view::COMMON_MENU_REDO.to_string(), data.doc.redo.is_empty());
-    menu_opts.disable(view::COMMON_MENU_CUT.to_string(), selection);
-    menu_opts.disable(view::COMMON_MENU_COPY.to_string(), selection);
-    menu_opts.disable(view::EDIT_MENU_DESELECT.to_string(), selection);
+    menu_opts.disable(menu::COMMON_MENU_UNDO.to_string(), data.doc.undo.is_empty());
+    menu_opts.disable(menu::COMMON_MENU_REDO.to_string(), data.doc.redo.is_empty());
+    menu_opts.disable(menu::COMMON_MENU_CUT.to_string(), selection);
+    menu_opts.disable(menu::COMMON_MENU_COPY.to_string(), selection);
+    menu_opts.disable(menu::EDIT_MENU_DESELECT.to_string(), selection);
 
-    menu_opts.select(view::MENU_VIEW_SHOW_GRID.to_string(), data.show_grid);
+    menu_opts.select(menu::MENU_VIEW_SHOW_GRID.to_string(), data.show_grid);
 
     match cmd.target() {
         druid::Target::Window(id) => {
-            let menu_bar: druid::MenuDesc<AppState> = view::build_menu_bar(&menu_opts);
+            let menu_bar: druid::MenuDesc<AppState> = menu::menu_bar(&menu_opts);
             ctx.set_menu(menu_bar, id);
         }
 

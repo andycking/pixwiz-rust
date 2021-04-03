@@ -23,11 +23,14 @@ mod view;
 
 use controller::delegate::Delegate;
 use model::app_state::AppState;
+use view::window;
 
 fn main() -> Result<(), PlatformError> {
-    let main_window = view::build_main_window();
+    let window = window::window();
+
     let data: AppState = Default::default();
-    druid::AppLauncher::with_window(main_window)
+
+    druid::AppLauncher::with_window(window)
         .delegate(Delegate)
         .use_env_tracing()
         .launch(data)
