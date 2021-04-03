@@ -29,9 +29,12 @@ impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for CanvasContr
         data: &mut AppState,
         env: &Env,
     ) {
+        data.window_pos = ctx.window().get_position();
+
         if let Event::WindowConnected = event {
             ctx.request_focus();
         }
+
         child.event(ctx, event, data, env);
     }
 }

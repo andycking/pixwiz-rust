@@ -36,6 +36,9 @@ use crate::view::palette::Palette;
 use crate::view::tool_button::ToolButton;
 use crate::view::tool_controller::ToolsController;
 
+pub const MAIN_WINDOW_SIZE: druid::Size = druid::Size::new(672.0, 696.0);
+pub const ALERT_WINDOW_SIZE: druid::Size = druid::Size::new(192.0, 168.0);
+
 pub const COMMON_MENU_FILE_SAVE: &'static str = "common-menu-file-save";
 pub const COMMON_MENU_CUT: &'static str = "common-menu-cut";
 pub const COMMON_MENU_COPY: &'static str = "common-menu-copy";
@@ -93,13 +96,16 @@ impl Default for MenuOpts {
     }
 }
 
-pub fn build_ui() -> impl druid::Widget<AppState> {
-    Flex::column()
-        .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
-        .with_default_spacer()
-        .with_child(build_main_pane())
-        .with_default_spacer()
-        .background(theme::MAIN_FILL)
+pub fn build_main_window() -> druid::WindowDesc<AppState> {
+    let ui = build_ui();
+
+    let menu_opts: MenuOpts = Default::default();
+    let menu_bar = build_menu_bar(&menu_opts);
+
+    druid::WindowDesc::new(ui)
+        .title("Pix Wiz")
+        .menu(menu_bar)
+        .window_size(MAIN_WINDOW_SIZE)
 }
 
 pub fn build_menu_bar<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
@@ -111,20 +117,53 @@ pub fn build_menu_bar<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
         .append(build_view_menu(menu_opts))
 }
 
-pub fn build_alert() -> druid::WindowDesc<AppState> {
+pub fn build_alert(parent_window_pos: druid::Point) -> druid::WindowDesc<AppState> {
+    let message = druid::widget::Label::new("Do you want to save the changes you made?")
+        .with_text_color(druid::Color::BLACK)
+        .with_line_break_mode(druid::widget::LineBreaking::WordWrap)
+        .with_text_alignment(druid::TextAlignment::Center);
+
     let save = Button::new("Save", true);
+    let dont_save = Button::new("Don't Save", false);
+    let cancel = Button::new("Cancel", false);
 
     let panel = Flex::column()
+        .with_child(message.expand_width())
         .with_default_spacer()
-        .with_child(save)
+        .with_child(save.expand_width())
+        .with_default_spacer()
+        .with_child(dont_save.expand_width())
+        .with_default_spacer()
+        .with_default_spacer()
+        .with_child(cancel.expand_width())
+        .border(theme::MAIN_FILL, 10.0)
         .background(theme::MAIN_FILL);
+
+    let center = druid::Point::new(
+        parent_window_pos.x + MAIN_WINDOW_SIZE.width / 2.0,
+        parent_window_pos.y + MAIN_WINDOW_SIZE.height / 2.0,
+    );
+
+    let alert_pos = druid::Point::new(
+        center.x - ALERT_WINDOW_SIZE.width / 2.0,
+        center.y - ALERT_WINDOW_SIZE.width / 2.0,
+    );
 
     druid::WindowDesc::new(panel)
         .set_level(druid::WindowLevel::Modal)
         .show_titlebar(false)
-        .set_position((100.0, 100.0))
-        .window_size((100.0, 100.0))
+        .set_position(alert_pos)
+        .window_size(ALERT_WINDOW_SIZE)
         .resizable(false)
+}
+
+fn build_ui() -> impl druid::Widget<AppState> {
+    Flex::column()
+        .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
+        .with_default_spacer()
+        .with_child(build_main_pane())
+        .with_default_spacer()
+        .background(theme::MAIN_FILL)
 }
 
 fn build_tools_row<T: druid::Data>(
