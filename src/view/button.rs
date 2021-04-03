@@ -14,36 +14,40 @@
 // limitations under the License.
 
 use druid::widget::prelude::*;
-use druid::widget::{Click, ControllerHost, Label};
-use druid::{theme, Affine, Insets, LinearGradient, UnitPoint};
 
+use super::theme;
 use crate::model::app_state::AppState;
 
-const LABEL_INSETS: Insets = Insets::uniform_xy(8., 2.);
+const LABEL_INSETS: druid::Insets = druid::Insets::uniform_xy(8., 2.);
 
 /// A button with a text label.
 pub struct Button {
-    label: Label<AppState>,
+    label: druid::widget::Label<AppState>,
     label_size: Size,
+    is_default: bool,
 }
 
 impl Button {
-    pub fn new(text: String) -> Self {
-        Self::from_label(Label::new(text))
-    }
+    pub fn new(text: impl Into<druid::widget::LabelText<AppState>>, is_default: bool) -> Self {
+        let mut label = druid::widget::Label::new(text);
+        let label_color = match is_default {
+            true => druid::Color::WHITE,
+            _ => druid::Color::BLACK,
+        };
+        label.set_text_color(label_color);
 
-    pub fn from_label(label: Label<AppState>) -> Self {
         Self {
             label,
             label_size: Size::ZERO,
+            is_default: is_default,
         }
     }
 
     pub fn on_click(
         self,
         f: impl Fn(&mut EventCtx, &mut AppState, &Env) + 'static,
-    ) -> ControllerHost<Self, Click<AppState>> {
-        ControllerHost::new(self, Click::new(f))
+    ) -> druid::widget::ControllerHost<Self, druid::widget::Click<AppState>> {
+        druid::widget::ControllerHost::new(self, druid::widget::Click::new(f))
     }
 }
 
@@ -82,13 +86,12 @@ impl druid::Widget<AppState> for Button {
         data: &AppState,
         env: &Env,
     ) -> Size {
-        bc.debug_check("Button");
         let padding = Size::new(LABEL_INSETS.x_value(), LABEL_INSETS.y_value());
         let label_bc = bc.shrink(padding).loosen();
         self.label_size = self.label.layout(ctx, &label_bc, data, env);
         // HACK: to make sure we look okay at default sizes when beside a textbox,
         // we make sure we will have at least the same height as the default textbox.
-        let min_height = env.get(theme::BORDERED_WIDGET_HEIGHT);
+        let min_height = env.get(druid::theme::BORDERED_WIDGET_HEIGHT);
         let baseline = self.label.baseline_offset();
         ctx.set_baseline_offset(baseline + LABEL_INSETS.y1);
 
@@ -100,44 +103,31 @@ impl druid::Widget<AppState> for Button {
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, env: &Env) {
-        let is_active = ctx.is_active();
-        let is_hot = ctx.is_hot();
+        let is_default = self.is_default;
+        let is_active = ctx.is_active() && ctx.is_hot();
         let size = ctx.size();
-        let stroke_width = env.get(theme::BUTTON_BORDER_WIDTH);
 
         let rounded_rect = size
             .to_rect()
-            .inset(-stroke_width / 2.0)
-            .to_rounded_rect(env.get(theme::BUTTON_BORDER_RADIUS));
+            .to_rounded_rect(env.get(druid::theme::BUTTON_BORDER_RADIUS));
 
-        let bg_gradient = if is_active {
-            LinearGradient::new(
-                UnitPoint::TOP,
-                UnitPoint::BOTTOM,
-                (env.get(theme::BUTTON_DARK), env.get(theme::BUTTON_LIGHT)),
-            )
-        } else {
-            LinearGradient::new(
-                UnitPoint::TOP,
-                UnitPoint::BOTTOM,
-                (env.get(theme::BUTTON_LIGHT), env.get(theme::BUTTON_DARK)),
-            )
+        let bg_color = match is_active {
+            true => match is_default {
+                true => theme::BUTTON_DEFAULT_DARK,
+                _ => theme::BUTTON_DARK,
+            },
+            _ => match is_default {
+                true => theme::BUTTON_DEFAULT_LIGHT,
+                _ => theme::BUTTON_LIGHT,
+            },
         };
 
-        let border_color = if is_hot {
-            env.get(theme::BORDER_LIGHT)
-        } else {
-            env.get(theme::BORDER_DARK)
-        };
-
-        ctx.stroke(rounded_rect, &border_color, stroke_width);
-
-        ctx.fill(rounded_rect, &bg_gradient);
+        ctx.fill(rounded_rect, &bg_color);
 
         let label_offset = (size.to_vec2() - self.label_size.to_vec2()) / 2.0;
 
         ctx.with_save(|ctx| {
-            ctx.transform(Affine::translate(label_offset));
+            ctx.transform(druid::Affine::translate(label_offset));
             self.label.paint(ctx, data, env);
         });
     }

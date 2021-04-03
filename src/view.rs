@@ -29,6 +29,7 @@ mod tool_controller;
 use crate::commands;
 use crate::model::app_state::AppState;
 use crate::model::types::ToolType;
+use crate::view::button::Button;
 use crate::view::canvas::Canvas;
 use crate::view::canvas_controller::CanvasController;
 use crate::view::palette::Palette;
@@ -108,6 +109,22 @@ pub fn build_menu_bar<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
         .append(build_edit_menu(menu_opts))
         .append(build_image_menu())
         .append(build_view_menu(menu_opts))
+}
+
+pub fn alert() -> druid::WindowDesc<AppState> {
+    let save = Button::new("Save", true);
+
+    let panel = Flex::column()
+        .with_default_spacer()
+        .with_child(save)
+        .background(theme::MAIN_FILL);
+
+    druid::WindowDesc::new(panel)
+        .set_level(druid::WindowLevel::Modal)
+        .show_titlebar(false)
+        .set_position((100.0, 100.0))
+        .window_size((100.0, 100.0))
+        .resizable(false)
 }
 
 fn build_tools_row<T: druid::Data>(

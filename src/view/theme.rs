@@ -38,3 +38,8 @@ pub const CANVAS_STROKE_SELECTED_DARK: Color = Color::BLACK;
 pub const CANVAS_STROKE_SELECTED_LIGHT: Color = Color::WHITE;
 pub const CANVAS_STROKE_GRID_DARK: Color = Color::BLACK;
 pub const CANVAS_STROKE_GRID_LIGHT: Color = MAIN_STROKE;
+
+pub const BUTTON_DEFAULT_DARK: Color = Color::rgb8(0, 64, 252);
+pub const BUTTON_DEFAULT_LIGHT: Color = Color::rgb8(0, 124, 252);
+pub const BUTTON_DARK: Color = Color::rgb8(80, 80, 80);
+pub const BUTTON_LIGHT: Color = Color::rgb8(96, 96, 96);

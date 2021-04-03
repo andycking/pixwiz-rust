@@ -14,15 +14,16 @@
 
 use crate::model::app_state::AppState;
 use crate::storage;
+use crate::view;
 
-pub fn new_file(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    check_for_save(data);
+pub fn new_file(ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+    check_for_save(ctx, data);
 
     data.doc = Default::default();
 }
 
-pub fn open_file(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
-    check_for_save(data);
+pub fn open_file(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+    check_for_save(ctx, data);
 
     let file_info = cmd.get_unchecked(druid::commands::OPEN_FILE);
 
@@ -63,6 +64,9 @@ pub fn save_file_as(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &
     }
 }
 
-fn check_for_save(data: &mut AppState) {
-    if data.doc.pixels.dirty {}
+fn check_for_save(ctx: &mut druid::DelegateCtx, data: &mut AppState) {
+    if data.doc.pixels.dirty {
+        let alert = view::alert();
+        ctx.new_window(alert);
+    }
 }
