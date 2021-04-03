@@ -14,15 +14,16 @@
 
 use std::collections::VecDeque;
 
+use super::util;
 use crate::model::pixel_env::PixelEnv;
 use crate::model::pixel_header::PixelHeader;
 
 pub fn black_and_white(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     for y in env.bounds.y0 as usize..env.bounds.y1 as usize {
         for x in env.bounds.x0 as usize..env.bounds.x1 as usize {
-            let color = super::read(x, y, header, bytes);
-            let bw = super::black_and_white(&color, 0.5);
-            super::write(x, y, header, bytes, &bw);
+            let color = util::read(x, y, header, bytes);
+            let bw = util::black_and_white(&color, 0.5);
+            util::write(x, y, header, bytes, &bw);
         }
     }
 }
@@ -30,9 +31,9 @@ pub fn black_and_white(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>
 pub fn desaturate(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     for y in env.bounds.y0 as usize..env.bounds.y1 as usize {
         for x in env.bounds.x0 as usize..env.bounds.x1 as usize {
-            let color = super::read(x, y, header, bytes);
-            let gray = super::desaturate(&color);
-            super::write(x, y, header, bytes, &gray);
+            let color = util::read(x, y, header, bytes);
+            let gray = util::desaturate(&color);
+            util::write(x, y, header, bytes, &gray);
         }
     }
 }
@@ -40,7 +41,7 @@ pub fn desaturate(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
 pub fn fill(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     let x = env.pos.x as usize;
     let y = env.pos.y as usize;
-    let start_color = super::read(x, y, header, bytes);
+    let start_color = util::read(x, y, header, bytes);
     if start_color == env.color {
         return;
     }
@@ -51,8 +52,8 @@ pub fn fill(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
         let node = q.pop_front().unwrap();
         let x = node.x as usize;
         let y = node.y as usize;
-        if super::read(x, y, header, bytes) == start_color {
-            super::write(x, y, header, bytes, &env.color);
+        if util::read(x, y, header, bytes) == start_color {
+            util::write(x, y, header, bytes, &env.color);
 
             let left = node - (1.0, 0.0);
             if env.bounds.contains(left) {
@@ -105,17 +106,17 @@ pub fn dither_floyd(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     ) {
         let p = druid::Point::new(x as f64, y as f64);
         if env.bounds.contains(p) {
-            let oldpixel = super::read(x, y, header, bytes);
+            let oldpixel = util::read(x, y, header, bytes);
             let newpixel = apply_error(&oldpixel, quant_error, weight);
-            super::write(x, y, header, bytes, &newpixel);
+            util::write(x, y, header, bytes, &newpixel);
         }
     }
 
     for y in env.bounds.y0 as usize..env.bounds.y1 as usize {
         for x in env.bounds.x0 as usize..env.bounds.x1 as usize {
-            let oldpixel = super::read(x, y, header, bytes);
-            let newpixel = super::black_and_white(&oldpixel, 0.5);
-            super::write(x, y, header, bytes, &newpixel);
+            let oldpixel = util::read(x, y, header, bytes);
+            let newpixel = util::black_and_white(&oldpixel, 0.5);
+            util::write(x, y, header, bytes, &newpixel);
 
             let quant_error = calculate_error(&oldpixel, &newpixel);
 
