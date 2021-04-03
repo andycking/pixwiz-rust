@@ -37,7 +37,7 @@ use crate::view::tool_button::ToolButton;
 use crate::view::tool_controller::ToolsController;
 
 pub const MAIN_WINDOW_SIZE: druid::Size = druid::Size::new(672.0, 696.0);
-pub const ALERT_WINDOW_SIZE: druid::Size = druid::Size::new(192.0, 168.0);
+pub const ALERT_WINDOW_SIZE: druid::Size = druid::Size::new(208.0, 212.0);
 
 pub const COMMON_MENU_FILE_SAVE: &'static str = "common-menu-file-save";
 pub const COMMON_MENU_CUT: &'static str = "common-menu-cut";
@@ -118,7 +118,17 @@ pub fn build_menu_bar<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
 }
 
 pub fn build_alert(parent_window_pos: druid::Point) -> druid::WindowDesc<AppState> {
+    let font = druid::FontDescriptor::new(druid::FontFamily::SYSTEM_UI)
+        .with_weight(druid::FontWeight::BOLD);
     let message = druid::widget::Label::new("Do you want to save the changes you made?")
+        .with_font(font)
+        .with_text_color(druid::Color::BLACK)
+        .with_line_break_mode(druid::widget::LineBreaking::WordWrap)
+        .with_text_alignment(druid::TextAlignment::Center);
+
+    let sub_font = druid::FontDescriptor::new(druid::FontFamily::SYSTEM_UI);
+    let sub_message = druid::widget::Label::new("Your changes will be lost if you don't save them.")
+        .with_font(sub_font)
         .with_text_color(druid::Color::BLACK)
         .with_line_break_mode(druid::widget::LineBreaking::WordWrap)
         .with_text_alignment(druid::TextAlignment::Center);
@@ -128,7 +138,10 @@ pub fn build_alert(parent_window_pos: druid::Point) -> druid::WindowDesc<AppStat
     let cancel = Button::new("Cancel", false);
 
     let panel = Flex::column()
-        .with_child(message.expand_width())
+        .with_child(message)
+        .with_default_spacer()
+        .with_child(sub_message)
+        .with_default_spacer()
         .with_default_spacer()
         .with_child(save.expand_width())
         .with_default_spacer()
@@ -136,7 +149,7 @@ pub fn build_alert(parent_window_pos: druid::Point) -> druid::WindowDesc<AppStat
         .with_default_spacer()
         .with_default_spacer()
         .with_child(cancel.expand_width())
-        .border(theme::MAIN_FILL, 10.0)
+        .border(theme::MAIN_FILL, druid::theme::WIDGET_PADDING_VERTICAL)
         .background(theme::MAIN_FILL);
 
     let center = druid::Point::new(

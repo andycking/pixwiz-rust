@@ -29,12 +29,13 @@ pub struct Button {
 
 impl Button {
     pub fn new(text: impl Into<druid::widget::LabelText<AppState>>, is_default: bool) -> Self {
-        let mut label = druid::widget::Label::new(text);
         let label_color = match is_default {
             true => druid::Color::WHITE,
             _ => druid::Color::BLACK,
         };
-        label.set_text_color(label_color);
+        let label = druid::widget::Label::new(text)
+            .with_font(druid::FontDescriptor::new(druid::FontFamily::SYSTEM_UI))
+            .with_text_color(label_color);
 
         Self {
             label,
