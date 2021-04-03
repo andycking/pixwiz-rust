@@ -21,10 +21,10 @@ use super::theme;
 use crate::model::app_state::AppState;
 use crate::model::types::ToolType;
 use crate::view::canvas::Canvas;
-use crate::view::canvas_controller::CanvasController;
+use crate::view::canvas::CanvasController;
 use crate::view::palette::Palette;
-use crate::view::tool_button::ToolButton;
-use crate::view::tool_controller::ToolsController;
+use crate::view::tool::ToolButton;
+use crate::view::tool::ToolsController;
 
 pub const WINDOW_SIZE: druid::Size = druid::Size::new(672.0, 696.0);
 

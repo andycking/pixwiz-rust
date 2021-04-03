@@ -324,3 +324,26 @@ impl druid::Widget<AppState> for Canvas {
         self.paint_selection(ctx, data);
     }
 }
+
+/// A controller one level up from the canvas. We use this to steal the focus when the
+/// app starts, so that key events go to the canvas.
+pub struct CanvasController;
+
+impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for CanvasController {
+    fn event(
+        &mut self,
+        child: &mut W,
+        ctx: &mut EventCtx<'_, '_>,
+        event: &Event,
+        data: &mut AppState,
+        env: &Env,
+    ) {
+        data.window_pos = ctx.window().get_position();
+
+        if let Event::WindowConnected = event {
+            ctx.request_focus();
+        }
+
+        child.event(ctx, event, data, env);
+    }
+}

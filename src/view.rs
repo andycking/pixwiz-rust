@@ -15,10 +15,8 @@
 pub mod alert;
 mod button;
 mod canvas;
-mod canvas_controller;
 pub mod menu;
 mod palette;
 mod theme;
-mod tool_button;
-mod tool_controller;
+mod tool;
 pub mod window;
