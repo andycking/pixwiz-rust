@@ -111,7 +111,7 @@ pub fn build_menu_bar<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
         .append(build_view_menu(menu_opts))
 }
 
-pub fn alert() -> druid::WindowDesc<AppState> {
+pub fn build_alert() -> druid::WindowDesc<AppState> {
     let save = Button::new("Save", true);
 
     let panel = Flex::column()

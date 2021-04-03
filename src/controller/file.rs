@@ -66,7 +66,7 @@ pub fn save_file_as(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &
 
 fn check_for_save(ctx: &mut druid::DelegateCtx, data: &mut AppState) {
     if data.doc.pixels.dirty {
-        let alert = view::alert();
+        let alert = view::build_alert();
         ctx.new_window(alert);
     }
 }
