@@ -18,6 +18,7 @@ use super::util;
 use crate::model::pixel_env::PixelEnv;
 use crate::model::pixel_header::PixelHeader;
 
+/// Convert pixels to black & white.
 pub fn black_and_white(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     for y in env.bounds.y0 as usize..env.bounds.y1 as usize {
         for x in env.bounds.x0 as usize..env.bounds.x1 as usize {
@@ -28,6 +29,7 @@ pub fn black_and_white(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>
     }
 }
 
+/// Desaturate pixels (make them grayscale).
 pub fn desaturate(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     for y in env.bounds.y0 as usize..env.bounds.y1 as usize {
         for x in env.bounds.x0 as usize..env.bounds.x1 as usize {
@@ -38,6 +40,7 @@ pub fn desaturate(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     }
 }
 
+/// Fill the given pixels with a color.
 pub fn fill(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     let x = env.pos.x as usize;
     let y = env.pos.y as usize;
@@ -75,6 +78,7 @@ pub fn fill(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     }
 }
 
+/// Dither pixels using Floyd–Steinberg.
 pub fn dither_floyd(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     fn calculate_error(oldpixel: &druid::Color, newpixel: &druid::Color) -> (f64, f64, f64) {
         let (old_r, old_g, old_b, _) = oldpixel.as_rgba();
