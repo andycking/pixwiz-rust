@@ -153,12 +153,8 @@ fn rebuild_menu_bar(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &m
 
     menu_opts.select(menu::MENU_VIEW_SHOW_GRID.to_string(), data.show_grid);
 
-    match cmd.target() {
-        druid::Target::Window(id) => {
-            let menu_bar: druid::MenuDesc<AppState> = menu::menu_bar(&menu_opts);
-            ctx.set_menu(menu_bar, id);
-        }
-
-        _ => {}
+    if let druid::Target::Window(id) = cmd.target() {
+        let menu_bar: druid::MenuDesc<AppState> = menu::menu_bar(&menu_opts);
+        ctx.set_menu(menu_bar, id);
     }
 }

@@ -41,12 +41,11 @@ pub fn open_file(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut 
 }
 
 pub fn save_file(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    match &data.doc.path {
-        Some(path) => match storage::png::write_path(path, &data.doc.pixels) {
+    if let Some(path) = &data.doc.path {
+        match storage::png::write_path(path, &data.doc.pixels) {
             Ok(()) => {}
             Err(_e) => {}
-        },
-        _ => {}
+        };
     }
 }
 

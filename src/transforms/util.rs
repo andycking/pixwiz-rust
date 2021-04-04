@@ -16,16 +16,16 @@ use crate::model::pixel_header::PixelHeader;
 
 /// Read RGBA from bytes. The underlying storage doesn't really matter: it can be a
 /// PixelState, or a copy thereof, or something else, as long as it's bytes.
-pub fn read(x: usize, y: usize, header: &PixelHeader, bytes: &Vec<u8>) -> druid::Color {
+pub fn read(x: usize, y: usize, header: &PixelHeader, bytes: &[u8]) -> druid::Color {
     let idx = (y - 1) * header.width + (x - 1);
     let byte_idx = idx * header.bytes_per_pixel;
 
-    let r = bytes[byte_idx + 0];
-    let g = bytes[byte_idx + 1];
-    let b = bytes[byte_idx + 2];
-    let a = bytes[byte_idx + 3];
+    let red = bytes[byte_idx];
+    let green = bytes[byte_idx + 1];
+    let blue = bytes[byte_idx + 2];
+    let alpha = bytes[byte_idx + 3];
 
-    druid::Color::rgba8(r, g, b, a)
+    druid::Color::rgba8(red, green, blue, alpha)
 }
 
 /// Write RGBA to bytes. The underlying storage doesn't really matter; it can be a
@@ -34,24 +34,24 @@ pub fn write(x: usize, y: usize, header: &PixelHeader, bytes: &mut Vec<u8>, colo
     let idx = (y - 1) * header.width + (x - 1);
     let byte_idx = idx * header.bytes_per_pixel;
 
-    let (r, g, b, a) = color.as_rgba8();
+    let (red, green, blue, alpha) = color.as_rgba8();
 
-    bytes[byte_idx + 0] = r;
-    bytes[byte_idx + 1] = g;
-    bytes[byte_idx + 2] = b;
-    bytes[byte_idx + 3] = a;
+    bytes[byte_idx] = red;
+    bytes[byte_idx + 1] = green;
+    bytes[byte_idx + 2] = blue;
+    bytes[byte_idx + 3] = alpha;
 }
 
 /// Convert given color to black and white. This will desaturate the color first, and then
 /// pick black or white depending on which side of the threshold they land.
 pub fn black_and_white(color: &druid::Color, threshold: f64) -> druid::Color {
     let gray = desaturate(color);
-    let (r, _, _, a) = gray.as_rgba();
-    let bw = match r < threshold {
+    let (red, _, _, alpha) = gray.as_rgba();
+    let bw = match red < threshold {
         true => 0.0,
         _ => 1.0,
     };
-    druid::Color::rgba(bw, bw, bw, a)
+    druid::Color::rgba(bw, bw, bw, alpha)
 }
 
 /// Desaturate the given color (make it grayscale).

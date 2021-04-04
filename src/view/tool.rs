@@ -34,7 +34,7 @@ impl ToolButton {
         let image_buf = druid::ImageBuf::from_data(bytes).unwrap();
 
         Self {
-            tool_type: tool_type,
+            tool_type,
             image_buf: Arc::new(image_buf),
         }
     }

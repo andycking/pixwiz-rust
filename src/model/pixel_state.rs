@@ -32,7 +32,7 @@ impl PixelState {
         assert!(bytes.len() == header.width * header.height * header.bytes_per_pixel);
 
         Self {
-            header: header,
+            header,
             dirty: false,
             bytes: Arc::new(bytes),
         }
@@ -64,7 +64,7 @@ impl PixelState {
     pub fn read(&self, idx: usize) -> druid::Color {
         let byte_idx = idx * self.header.bytes_per_pixel;
         druid::Color::rgba8(
-            self.bytes[byte_idx + 0],
+            self.bytes[byte_idx],
             self.bytes[byte_idx + 1],
             self.bytes[byte_idx + 2],
             self.bytes[byte_idx + 3],
@@ -81,7 +81,7 @@ impl PixelState {
                 let idx = (y - 1) * self.header.width + (x - 1);
                 let src_idx = idx * self.header.bytes_per_pixel;
 
-                dst_bytes.push(self.bytes[src_idx + 0]);
+                dst_bytes.push(self.bytes[src_idx]);
                 dst_bytes.push(self.bytes[src_idx + 1]);
                 dst_bytes.push(self.bytes[src_idx + 2]);
                 dst_bytes.push(self.bytes[src_idx + 3]);
@@ -96,19 +96,19 @@ impl PixelState {
     #[inline]
     pub fn write(&mut self, idx: usize, color: &druid::Color) {
         let byte_idx = idx * self.header.bytes_per_pixel;
-        let (r, g, b, a) = color.as_rgba8();
+        let (red, green, blue, alpha) = color.as_rgba8();
 
         let pixels = Arc::make_mut(&mut self.bytes);
-        pixels[byte_idx + 0] = r;
-        pixels[byte_idx + 1] = g;
-        pixels[byte_idx + 2] = b;
-        pixels[byte_idx + 3] = a;
+        pixels[byte_idx] = red;
+        pixels[byte_idx + 1] = green;
+        pixels[byte_idx + 2] = blue;
+        pixels[byte_idx + 3] = alpha;
 
         self.dirty = true;
     }
 
     /// Write an area of storage.
-    pub fn write_area(&mut self, area: druid::Rect, src_bytes: &Vec<u8>) {
+    pub fn write_area(&mut self, area: druid::Rect, src_bytes: &[u8]) {
         let dst_bytes = Arc::make_mut(&mut self.bytes);
 
         let mut src_idx = 0;
@@ -118,7 +118,7 @@ impl PixelState {
                 let idx = (y - 1) * self.header.width + (x - 1);
                 let dst_idx = idx * self.header.bytes_per_pixel;
 
-                dst_bytes[dst_idx + 0] = src_bytes[src_idx + 0];
+                dst_bytes[dst_idx] = src_bytes[src_idx];
                 dst_bytes[dst_idx + 1] = src_bytes[src_idx + 1];
                 dst_bytes[dst_idx + 2] = src_bytes[src_idx + 2];
                 dst_bytes[dst_idx + 3] = src_bytes[src_idx + 3];
@@ -138,7 +138,7 @@ impl Default for PixelState {
         let size: usize = header.width * header.height * header.bytes_per_pixel;
 
         Self {
-            header: header,
+            header,
             dirty: false,
             bytes: Arc::new(vec![0; size]),
         }

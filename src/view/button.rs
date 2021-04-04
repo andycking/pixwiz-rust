@@ -40,7 +40,7 @@ impl Button {
         Self {
             label,
             label_size: Size::ZERO,
-            is_default: is_default,
+            is_default,
         }
     }
 
@@ -96,11 +96,10 @@ impl druid::Widget<AppState> for Button {
         let baseline = self.label.baseline_offset();
         ctx.set_baseline_offset(baseline + LABEL_INSETS.y1);
 
-        let button_size = bc.constrain(Size::new(
+        bc.constrain(Size::new(
             self.label_size.width + padding.width,
             (self.label_size.height + padding.height).max(min_height),
-        ));
-        button_size
+        ))
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, env: &Env) {

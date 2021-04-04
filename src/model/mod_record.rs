@@ -26,7 +26,7 @@ pub struct ModRecord {
 impl ModRecord {
     pub fn new(area: druid::Rect, bytes: Vec<u8>) -> Self {
         Self {
-            area: area,
+            area,
             bytes: Arc::new(bytes),
         }
     }

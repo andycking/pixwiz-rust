@@ -34,10 +34,10 @@ impl PixelHeader {
         assert!(bytes_per_pixel == Self::DEFAULT_BYTES_PER_PIXEL);
 
         Self {
-            width: width,
-            height: height,
-            depth: depth,
-            bytes_per_pixel: bytes_per_pixel,
+            width,
+            height,
+            depth,
+            bytes_per_pixel,
         }
     }
 }

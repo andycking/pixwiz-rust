@@ -152,28 +152,24 @@ impl Canvas {
 
     /// Paint the currently selected area onto the given render context.
     fn paint_selection(&self, ctx: &mut PaintCtx, data: &AppState) {
-        match data.doc.selection {
-            Some(s) => {
-                let tl = Self::canvas_coords_to_screen_coords_f64(s.x0, s.y0);
-                let br = Self::canvas_coords_to_screen_coords_f64(s.x1, s.y1);
+        if let Some(s) = data.doc.selection {
+            let tl = Self::canvas_coords_to_screen_coords_f64(s.x0, s.y0);
+            let br = Self::canvas_coords_to_screen_coords_f64(s.x1, s.y1);
 
-                let rect = druid::Rect::new(tl.x, tl.y, br.x + 16.0, br.y + 16.0);
+            let rect = druid::Rect::new(tl.x, tl.y, br.x + 16.0, br.y + 16.0);
 
-                ctx.stroke_styled(
-                    rect,
-                    &theme::CANVAS_STROKE_SELECTED_DARK,
-                    2.0,
-                    &self.long_dash[0],
-                );
-                ctx.stroke_styled(
-                    rect,
-                    &theme::CANVAS_STROKE_SELECTED_LIGHT,
-                    2.0,
-                    &self.long_dash[1],
-                );
-            }
-
-            _ => {}
+            ctx.stroke_styled(
+                rect,
+                &theme::CANVAS_STROKE_SELECTED_DARK,
+                2.0,
+                &self.long_dash[0],
+            );
+            ctx.stroke_styled(
+                rect,
+                &theme::CANVAS_STROKE_SELECTED_LIGHT,
+                2.0,
+                &self.long_dash[1],
+            );
         }
     }
 

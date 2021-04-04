@@ -18,13 +18,13 @@ use druid::widget::prelude::*;
 
 use crate::commands;
 
-pub const COMMON_MENU_FILE_SAVE: &'static str = "common-menu-file-save";
-pub const COMMON_MENU_CUT: &'static str = "common-menu-cut";
-pub const COMMON_MENU_COPY: &'static str = "common-menu-copy";
-pub const COMMON_MENU_UNDO: &'static str = "common-menu-undo";
-pub const COMMON_MENU_REDO: &'static str = "common-menu-redo";
-pub const EDIT_MENU_DESELECT: &'static str = "edit-menu-deselect";
-pub const MENU_VIEW_SHOW_GRID: &'static str = "menu-view-show-grid";
+pub const COMMON_MENU_FILE_SAVE: &str = "common-menu-file-save";
+pub const COMMON_MENU_CUT: &str = "common-menu-cut";
+pub const COMMON_MENU_COPY: &str = "common-menu-copy";
+pub const COMMON_MENU_UNDO: &str = "common-menu-undo";
+pub const COMMON_MENU_REDO: &str = "common-menu-redo";
+pub const EDIT_MENU_DESELECT: &str = "edit-menu-deselect";
+pub const MENU_VIEW_SHOW_GRID: &str = "menu-view-show-grid";
 
 /// Druid menus are immutable, so if you want to update a menu item at runtime, you have to
 /// reconstruct the menu bar from scratch. Use a map to make it easier to tell the menu
@@ -68,10 +68,7 @@ impl Default for MenuOpts {
         // We show the canvas grid by default.
         selected.insert(MENU_VIEW_SHOW_GRID.to_string(), true);
 
-        Self {
-            disabled: disabled,
-            selected: selected,
-        }
+        Self { disabled, selected }
     }
 }
 

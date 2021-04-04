@@ -19,8 +19,6 @@ use std::io::Write;
 use std::path::Path;
 use std::result::Result;
 
-use png;
-
 use super::error::StorageError;
 use crate::model::pixel_header::PixelHeader;
 use crate::model::pixel_state::PixelState;
@@ -29,7 +27,7 @@ use crate::model::pixel_state::PixelState;
 pub fn write_path(path_str: &str, pixels: &PixelState) -> Result<(), StorageError> {
     let path = Path::new(path_str);
     let file = File::create(path)?;
-    let ref mut buf_writer = BufWriter::new(file);
+    let buf_writer = &mut BufWriter::new(file);
 
     write(buf_writer, pixels)
 }

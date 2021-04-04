@@ -50,7 +50,7 @@ impl Palette {
 
         for i in 0..values.len() {
             let j = i * 4;
-            let argb = [bytes[j + 0], bytes[j + 1], bytes[j + 2], bytes[j + 3]];
+            let argb = [bytes[j], bytes[j + 1], bytes[j + 2], bytes[j + 3]];
             values[i] = u32::from_le_bytes(argb);
         }
 
@@ -133,14 +133,11 @@ impl druid::Widget<AppState> for Palette {
             },
 
             Event::MouseUp(e) if ctx.is_active() => {
-                match Self::screen_coords_to_palette_coords(e.pos) {
-                    Some(p) => {
-                        self.current_idx = Self::palette_coords_to_idx(p);
-                        self.current_val = self.values[self.current_idx];
-                        data.brush_color = druid::Color::from_rgba32_u32(self.current_val);
-                        ctx.request_paint();
-                    }
-                    None => {}
+                if let Some(p) = Self::screen_coords_to_palette_coords(e.pos) {
+                    self.current_idx = Self::palette_coords_to_idx(p);
+                    self.current_val = self.values[self.current_idx];
+                    data.brush_color = druid::Color::from_rgba32_u32(self.current_val);
+                    ctx.request_paint();
                 }
                 ctx.set_active(false);
             }

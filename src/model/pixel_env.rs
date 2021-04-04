@@ -21,10 +21,6 @@ pub struct PixelEnv {
 
 impl PixelEnv {
     pub fn new(color: druid::Color, pos: druid::Point, bounds: druid::Rect) -> Self {
-        Self {
-            color: color,
-            pos: pos,
-            bounds: bounds,
-        }
+        Self { color, pos, bounds }
     }
 }

@@ -93,9 +93,9 @@ pub fn dither_floyd(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
         weight: f64,
     ) -> druid::Color {
         let (mut r, mut g, mut b, a) = color.as_rgba();
-        r = r + (quant_error.0 * weight / 16.0);
-        g = g + (quant_error.1 * weight / 16.0);
-        b = b + (quant_error.2 * weight / 16.0);
+        r += quant_error.0 * weight / 16.0;
+        g += quant_error.1 * weight / 16.0;
+        b += quant_error.2 * weight / 16.0;
         druid::Color::rgba(r, g, b, a)
     }
 
@@ -124,9 +124,9 @@ pub fn dither_floyd(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
 
             let quant_error = calculate_error(&oldpixel, &newpixel);
 
-            mod_pixel(x + 1, y + 0, quant_error, 7.0, header, env, bytes);
+            mod_pixel(x + 1, y, quant_error, 7.0, header, env, bytes);
             mod_pixel(x - 1, y + 1, quant_error, 3.0, header, env, bytes);
-            mod_pixel(x + 0, y + 1, quant_error, 5.0, header, env, bytes);
+            mod_pixel(x, y + 1, quant_error, 5.0, header, env, bytes);
             mod_pixel(x + 1, y + 1, quant_error, 1.0, header, env, bytes);
         }
     }
