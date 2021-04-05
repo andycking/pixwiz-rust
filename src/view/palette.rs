@@ -48,10 +48,10 @@ impl Palette {
 
         let mut values: [u32; 256] = [0; 256];
 
-        for i in 0..values.len() {
+        for (i, item) in values.iter_mut().enumerate() {
             let j = i * 4;
             let argb = [bytes[j], bytes[j + 1], bytes[j + 2], bytes[j + 3]];
-            values[i] = u32::from_le_bytes(argb);
+            *item = u32::from_le_bytes(argb);
         }
 
         values
