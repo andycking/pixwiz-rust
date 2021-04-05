@@ -14,6 +14,8 @@
 
 use druid::Selector;
 
+pub const INTERNAL_CLEAR_DOCUMENT: Selector = Selector::new("clear-document");
+
 pub const EDIT_SELECT_ALL: Selector = Selector::new("edit-select-all");
 pub const EDIT_DESELECT: Selector = Selector::new("edit-deselect");
 

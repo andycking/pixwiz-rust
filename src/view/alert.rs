@@ -17,6 +17,7 @@ use druid::WidgetExt;
 
 use super::theme;
 use super::window::WINDOW_SIZE;
+use crate::commands;
 use crate::model::app_state::AppState;
 use crate::view::button::Button;
 
@@ -33,7 +34,12 @@ pub fn unsaved(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
         build_message("Your changes will be lost if you don't save them.").with_font(MESSAGE_FONT);
 
     let save = Button::new("Save", true);
-    let dont_save = Button::new("Don't Save", false);
+
+    let dont_save = Button::new("Don't Save", false).on_click(|ctx, _data, _env| {
+        ctx.submit_command(druid::commands::CLOSE_WINDOW);
+        ctx.submit_command(commands::INTERNAL_CLEAR_DOCUMENT);
+    });
+
     let cancel = Button::new("Cancel", false);
 
     let panel = Flex::column()

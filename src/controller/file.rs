@@ -18,8 +18,6 @@ use crate::view::alert;
 
 pub fn new_file(ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     check_for_save(ctx, data);
-
-    data.doc = Default::default();
 }
 
 pub fn open_file(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
