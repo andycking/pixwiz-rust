@@ -22,22 +22,15 @@ use crate::view::button::Button;
 
 const UNSAVED_ALERT_SIZE: druid::Size = druid::Size::new(208.0, 212.0);
 
-pub fn unsaved(parent_window_pos: druid::Point) -> druid::WindowDesc<AppState> {
-    let font = druid::FontDescriptor::new(druid::FontFamily::SYSTEM_UI)
-        .with_weight(druid::FontWeight::BOLD);
-    let message = druid::widget::Label::new("Do you want to save the changes you made?")
-        .with_font(font)
-        .with_text_color(druid::Color::BLACK)
-        .with_line_break_mode(druid::widget::LineBreaking::WordWrap)
-        .with_text_alignment(druid::TextAlignment::Center);
+const MESSAGE_FONT: druid::FontDescriptor =
+    druid::FontDescriptor::new(druid::FontFamily::SYSTEM_UI);
+const MESSAGE_FONT_BOLD: druid::FontDescriptor = MESSAGE_FONT.with_weight(druid::FontWeight::BOLD);
 
-    let sub_font = druid::FontDescriptor::new(druid::FontFamily::SYSTEM_UI);
+pub fn unsaved(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
+    let message =
+        build_message("Do you want to save the changes you made?").with_font(MESSAGE_FONT_BOLD);
     let sub_message =
-        druid::widget::Label::new("Your changes will be lost if you don't save them.")
-            .with_font(sub_font)
-            .with_text_color(druid::Color::BLACK)
-            .with_line_break_mode(druid::widget::LineBreaking::WordWrap)
-            .with_text_alignment(druid::TextAlignment::Center);
+        build_message("Your changes will be lost if you don't save them.").with_font(MESSAGE_FONT);
 
     let save = Button::new("Save", true);
     let dont_save = Button::new("Don't Save", false);
@@ -58,20 +51,28 @@ pub fn unsaved(parent_window_pos: druid::Point) -> druid::WindowDesc<AppState> {
         .border(theme::MAIN_FILL, druid::theme::WIDGET_PADDING_VERTICAL)
         .background(theme::MAIN_FILL);
 
-    let center = druid::Point::new(
-        parent_window_pos.x + WINDOW_SIZE.width / 2.0,
-        parent_window_pos.y + WINDOW_SIZE.height / 2.0,
-    );
-
-    let alert_pos = druid::Point::new(
-        center.x - UNSAVED_ALERT_SIZE.width / 2.0,
-        center.y - UNSAVED_ALERT_SIZE.width / 2.0,
-    );
+    let pos = center(parent_pos, WINDOW_SIZE, UNSAVED_ALERT_SIZE);
 
     druid::WindowDesc::new(panel)
         .set_level(druid::WindowLevel::Modal)
         .show_titlebar(false)
-        .set_position(alert_pos)
+        .set_position(pos)
         .window_size(UNSAVED_ALERT_SIZE)
         .resizable(false)
+}
+
+fn build_message(message: &'static str) -> druid::widget::Label<AppState> {
+    druid::widget::Label::new(message)
+        .with_text_color(druid::Color::BLACK)
+        .with_line_break_mode(druid::widget::LineBreaking::WordWrap)
+        .with_text_alignment(druid::TextAlignment::Center)
+}
+
+fn center(parent_pos: druid::Point, parent_size: druid::Size, size: druid::Size) -> druid::Point {
+    let center = druid::Point::new(
+        parent_pos.x + parent_size.width / 2.0,
+        parent_pos.y + parent_size.height / 2.0,
+    );
+
+    druid::Point::new(center.x - size.width / 2.0, center.y - size.width / 2.0)
 }
