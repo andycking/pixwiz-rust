@@ -121,12 +121,13 @@ fn build_palette() -> impl druid::Widget<AppState> {
 
 fn build_preview() -> impl druid::Widget<AppState> {
     druid::widget::Painter::new(|ctx, data: &AppState, _env| {
+        let pixels = &data.doc.pixels;
         let mut i = 0;
-        for y in 0..32 {
-            for x in 0..32 {
+        for y in 0..pixels.header.height {
+            for x in 0..pixels.header.width {
                 let rect = druid::Rect::new(x as f64, y as f64, (x as f64) + 1.0, (y as f64) + 1.0);
 
-                let color = data.doc.pixels.read(i);
+                let color = pixels.read(i);
                 let (_, _, _, a) = color.as_rgba8();
                 if a != 255 {
                     ctx.fill(rect, &theme::PREVIEW_FILL);
