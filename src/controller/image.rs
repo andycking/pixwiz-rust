@@ -20,9 +20,15 @@ pub fn black_and_white(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, dat
     transforms::apply(data, transforms::colors::black_and_white);
 }
 
+pub fn brighten(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+    transforms::apply(data, transforms::colors::brighten);
+}
+
 pub fn clear(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     transforms::apply(data, transforms::simple::clear);
 }
+
+pub fn darken(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut AppState) {}
 
 pub fn desaturate(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     transforms::apply(data, transforms::colors::desaturate);

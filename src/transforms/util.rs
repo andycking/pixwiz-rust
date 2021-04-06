@@ -61,6 +61,16 @@ pub fn desaturate(color: &druid::Color) -> druid::Color {
     druid::Color::rgba(gray, gray, gray, a)
 }
 
+/// Modify brightness of the given color. Can be positive or negative.
+pub fn brightness(color: &druid::Color, val: f64) -> druid::Color {
+    let (red, green, blue, alpha) = color.as_rgba();
+    let (hue, saturation, luminance, alpha) = rgba_to_hsla(red, green, blue, alpha);
+    let new_luminance = f64::max(f64::min(luminance + val, 1.0), 0.0);
+    let (new_red, new_green, new_blue, _) = hsla_to_rgba(hue, saturation, new_luminance, alpha);
+
+    druid::Color::rgba(new_red, new_green, new_blue, alpha)
+}
+
 /// Convert RGBA bytes to HSLA.
 pub fn rgba8_to_hsla(red: u8, green: u8, blue: u8, alpha: u8) -> (f64, f64, f64, f64) {
     rgba_to_hsla(
