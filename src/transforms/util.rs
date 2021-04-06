@@ -61,6 +61,7 @@ pub fn desaturate(color: &druid::Color) -> druid::Color {
     druid::Color::rgba(gray, gray, gray, a)
 }
 
+/// Convert RGBA bytes to HSLA.
 pub fn rgba8_to_hsla(red: u8, green: u8, blue: u8, alpha: u8) -> (f64, f64, f64, f64) {
     rgba_to_hsla(
         f64_round(red as f64 / 255.0),
@@ -70,6 +71,7 @@ pub fn rgba8_to_hsla(red: u8, green: u8, blue: u8, alpha: u8) -> (f64, f64, f64,
     )
 }
 
+/// Convert RGBA float values to HSLA.
 pub fn rgba_to_hsla(red: f64, green: f64, blue: f64, alpha: f64) -> (f64, f64, f64, f64) {
     let maxv = f64_max3(red, green, blue);
     let minv = f64_min3(red, green, blue);
@@ -108,6 +110,7 @@ pub fn rgba_to_hsla(red: f64, green: f64, blue: f64, alpha: f64) -> (f64, f64, f
     (hue, saturation, luminance, alpha)
 }
 
+/// Convert HSLA to RGBA float values.
 pub fn hsla_to_rgba(hue: f64, saturation: f64, luminance: f64, alpha: f64) -> (f64, f64, f64, f64) {
     fn hue_to_rgb(p: f64, q: f64, t: f64) -> f64 {
         let mut t2 = t;
