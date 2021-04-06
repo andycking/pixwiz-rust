@@ -35,12 +35,16 @@ pub fn unsaved(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
 
     let save = Button::new("Save", true);
 
-    let dont_save = Button::new("Don't Save", false).on_click(|ctx, _data, _env| {
+    let dont_save = Button::new("Don't Save", false).on_click(|ctx, data, _env| {
+        data.alert = false;
         ctx.submit_command(druid::commands::CLOSE_WINDOW);
         ctx.submit_command(commands::INTERNAL_CLEAR_DOCUMENT);
     });
 
-    let cancel = Button::new("Cancel", false);
+    let cancel = Button::new("Cancel", false).on_click(|ctx, data, _env| {
+        data.alert = false;
+        ctx.submit_command(druid::commands::CLOSE_WINDOW);
+    });
 
     let panel = Flex::column()
         .with_child(message)
