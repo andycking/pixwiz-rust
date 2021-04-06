@@ -60,3 +60,158 @@ pub fn desaturate(color: &druid::Color) -> druid::Color {
     let gray = r * 0.299 + g * 0.587 + b * 0.114;
     druid::Color::rgba(gray, gray, gray, a)
 }
+
+pub fn rgba8_to_hsla(red: u8, green: u8, blue: u8, alpha: u8) -> (f64, f64, f64, f64) {
+    rgba_to_hsla(
+        f64_round(red as f64 / 255.0),
+        f64_round(green as f64 / 255.0),
+        f64_round(blue as f64 / 255.0),
+        f64_round(alpha as f64 / 255.0),
+    )
+}
+
+pub fn rgba_to_hsla(red: f64, green: f64, blue: f64, alpha: f64) -> (f64, f64, f64, f64) {
+    let maxv = f64_max3(red, green, blue);
+    let minv = f64_min3(red, green, blue);
+
+    let mut hue = 0.0;
+    let mut saturation = 0.0;
+    let mut luminance = (maxv + minv) / 2.0;
+
+    if !f64_eq(maxv, minv) {
+        let d = maxv - minv;
+
+        saturation = match luminance > 0.5 {
+            true => d / (2.0 - maxv - minv),
+            _ => d / (maxv + minv),
+        };
+
+        if f64_eq(maxv, red) {
+            let weight = match green < blue {
+                true => 6.0,
+                _ => 0.0,
+            };
+            hue = (green - blue) / d + weight;
+        } else if f64_eq(maxv, green) {
+            hue = (blue - red) / d + 2.0;
+        } else if f64_eq(maxv, blue) {
+            hue = (red - green) / d + 4.0;
+        }
+
+        hue /= 6.0;
+    }
+
+    hue = f64_round(hue);
+    saturation = f64_round(saturation);
+    luminance = f64_round(luminance);
+
+    (hue, saturation, luminance, alpha)
+}
+
+pub fn hsla_to_rgba(hue: f64, saturation: f64, luminance: f64, alpha: f64) -> (f64, f64, f64, f64) {
+    fn hue_to_rgb(p: f64, q: f64, t: f64) -> f64 {
+        let mut t2 = t;
+
+        if t2 < 0.0 {
+            t2 += 1.0;
+        }
+        if t2 > 1.0 {
+            t2 -= 1.0;
+        }
+
+        if t2 < 1.0 / 6.0 {
+            return p + (q - p) * 6.0 / t2;
+        }
+        if t2 < 0.5 {
+            return q;
+        }
+        if t2 < 2.0 / 3.0 {
+            return p + (q - p) * (2.0 / 3.0 - t2) * 6.0;
+        }
+
+        p
+    }
+
+    if f64_eq(saturation, 0.0) {
+        return (luminance, luminance, luminance, alpha);
+    }
+
+    let q = match luminance < 0.5 {
+        true => luminance * (1.0 + saturation),
+        _ => (luminance + saturation) - (luminance * saturation),
+    };
+    let p = 2.0 * luminance - q;
+
+    let red = f64_floor(hue_to_rgb(p, q, hue + 1.0 / 3.0));
+    let green = f64_floor(hue_to_rgb(p, q, hue));
+    let blue = f64_floor(hue_to_rgb(p, q, hue - 1.0 / 3.0));
+
+    (red, green, blue, alpha)
+}
+
+fn f64_max3(a: f64, b: f64, c: f64) -> f64 {
+    f64::max(f64::max(a, b), c)
+}
+
+fn f64_min3(a: f64, b: f64, c: f64) -> f64 {
+    f64::min(f64::min(a, b), c)
+}
+
+fn f64_eq(a: f64, b: f64) -> bool {
+    (a - b).abs() < f64::EPSILON
+}
+
+fn f64_round(val: f64) -> f64 {
+    (val * 100.0).round() / 100.0
+}
+
+fn f64_floor(val: f64) -> f64 {
+    (val * 100.0).floor() / 100.0
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_converts_rgba8_to_hsla() {
+        let expected = (0.58, 0.47, 0.59, 1.0);
+        let got = rgba8_to_hsla(100, 150, 200, 255);
+        assert_eq!(expected, got);
+    }
+
+    #[test]
+    fn it_converts_rgba8_to_hsla_gray() {
+        let expected = (0.0, 0.0, 0.39, 1.0);
+        let got = rgba8_to_hsla(100, 100, 100, 255);
+        assert_eq!(expected, got);
+    }
+
+    #[test]
+    fn it_converts_rgba_to_hsla() {
+        let expected = (0.58, 0.47, 0.59, 1.0);
+        let got = rgba_to_hsla(0.39, 0.59, 0.78, 1.0);
+        assert_eq!(expected, got);
+    }
+
+    #[test]
+    fn it_converts_rgba_to_hsla_gray() {
+        let expected = (0.0, 0.0, 0.39, 1.0);
+        let got = rgba_to_hsla(0.39, 0.39, 0.39, 1.0);
+        assert_eq!(expected, got);
+    }
+
+    #[test]
+    fn it_converts_hsla_to_rgba() {
+        let expected = (0.39, 0.59, 0.78, 1.0);
+        let got = hsla_to_rgba(0.58, 0.47, 0.59, 1.0);
+        assert_eq!(expected, got);
+    }
+
+    #[test]
+    fn it_converts_hsla_to_rgba_gray() {
+        let expected = (0.59, 0.59, 0.59, 1.0);
+        let got = hsla_to_rgba(0.58, 0.0, 0.59, 1.0);
+        assert_eq!(expected, got);
+    }
+}
