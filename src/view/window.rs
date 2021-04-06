@@ -26,8 +26,6 @@ use crate::view::palette::Palette;
 use crate::view::tool::ToolButton;
 use crate::view::tool::ToolsController;
 
-pub const WINDOW_SIZE: druid::Size = druid::Size::new(672.0, 696.0);
-
 pub fn window() -> druid::WindowDesc<AppState> {
     let ui = build_ui();
 
@@ -37,7 +35,7 @@ pub fn window() -> druid::WindowDesc<AppState> {
     druid::WindowDesc::new(ui)
         .title("Pix Wiz")
         .menu(menu_bar)
-        .window_size(WINDOW_SIZE)
+        .window_size(theme::WINDOW_SIZE)
 }
 
 fn build_ui() -> impl druid::Widget<AppState> {

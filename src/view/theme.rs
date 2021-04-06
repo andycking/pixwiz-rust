@@ -43,3 +43,11 @@ pub const BUTTON_DEFAULT_DARK: Color = Color::rgb8(0, 92, 252);
 pub const BUTTON_DEFAULT_LIGHT: Color = Color::rgb8(0, 124, 252);
 pub const BUTTON_DARK: Color = Color::rgb8(180, 180, 180);
 pub const BUTTON_LIGHT: Color = Color::rgb8(200, 200, 200);
+
+pub const WINDOW_SIZE: druid::Size = druid::Size::new(672.0, 696.0);
+pub const UNSAVED_ALERT_SIZE: druid::Size = druid::Size::new(208.0, 212.0);
+
+pub const ALERT_MESSAGE_FONT: druid::FontDescriptor =
+    druid::FontDescriptor::new(druid::FontFamily::SYSTEM_UI);
+pub const ALERT_MESSAGE_FONT_BOLD: druid::FontDescriptor =
+    ALERT_MESSAGE_FONT.with_weight(druid::FontWeight::BOLD);
