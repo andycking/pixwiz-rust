@@ -18,8 +18,6 @@ use crate::view::alert;
 
 pub fn new_file(ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     check_for_save(ctx, data);
-
-    data.doc = Default::default();
 }
 
 pub fn open_file(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
@@ -66,6 +64,7 @@ pub fn save_file_as(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &
 fn check_for_save(ctx: &mut druid::DelegateCtx, data: &mut AppState) {
     if data.doc.pixels.dirty {
         let alert = alert::unsaved(data.window_pos);
+        data.alert = true;
         ctx.new_window(alert);
     }
 }

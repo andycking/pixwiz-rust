@@ -26,8 +26,6 @@ use crate::view::palette::Palette;
 use crate::view::tool::ToolButton;
 use crate::view::tool::ToolsController;
 
-pub const WINDOW_SIZE: druid::Size = druid::Size::new(672.0, 696.0);
-
 pub fn window() -> druid::WindowDesc<AppState> {
     let ui = build_ui();
 
@@ -37,7 +35,7 @@ pub fn window() -> druid::WindowDesc<AppState> {
     druid::WindowDesc::new(ui)
         .title("Pix Wiz")
         .menu(menu_bar)
-        .window_size(WINDOW_SIZE)
+        .window_size(theme::WINDOW_SIZE)
 }
 
 fn build_ui() -> impl druid::Widget<AppState> {
@@ -47,6 +45,7 @@ fn build_ui() -> impl druid::Widget<AppState> {
         .with_child(build_main_pane())
         .with_default_spacer()
         .background(theme::MAIN_FILL)
+        .controller(WindowController {})
 }
 
 fn build_tools_row<T: druid::Data>(
@@ -199,4 +198,33 @@ fn build_status_bar() -> impl druid::Widget<AppState> {
         .must_fill_main_axis(true)
         .with_child(build_status_label())
         .background(theme::STATUS_BAR_FILL)
+}
+
+pub struct WindowController {}
+
+impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for WindowController {
+    fn event(
+        &mut self,
+        child: &mut W,
+        ctx: &mut EventCtx<'_, '_>,
+        event: &Event,
+        data: &mut AppState,
+        env: &Env,
+    ) {
+        let block = matches!(
+            event,
+            Event::MouseUp(_)
+                | Event::MouseDown(_)
+                | Event::MouseMove(_)
+                | Event::KeyUp(_)
+                | Event::KeyDown(_)
+                | Event::Paste(_)
+                | Event::Wheel(_)
+                | Event::Zoom(_)
+        );
+
+        if !(data.alert && block) {
+            child.event(ctx, event, data, env);
+        }
+    }
 }

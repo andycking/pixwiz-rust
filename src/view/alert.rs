@@ -16,25 +16,28 @@ use druid::widget::Flex;
 use druid::WidgetExt;
 
 use super::theme;
-use super::window::WINDOW_SIZE;
+use crate::commands;
 use crate::model::app_state::AppState;
 use crate::view::button::Button;
 
-const UNSAVED_ALERT_SIZE: druid::Size = druid::Size::new(208.0, 212.0);
-
-const MESSAGE_FONT: druid::FontDescriptor =
-    druid::FontDescriptor::new(druid::FontFamily::SYSTEM_UI);
-const MESSAGE_FONT_BOLD: druid::FontDescriptor = MESSAGE_FONT.with_weight(druid::FontWeight::BOLD);
-
 pub fn unsaved(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
-    let message =
-        build_message("Do you want to save the changes you made?").with_font(MESSAGE_FONT_BOLD);
-    let sub_message =
-        build_message("Your changes will be lost if you don't save them.").with_font(MESSAGE_FONT);
+    let message = build_message("Do you want to save the changes you made?")
+        .with_font(theme::ALERT_MESSAGE_FONT_BOLD);
+    let sub_message = build_message("Your changes will be lost if you don't save them.")
+        .with_font(theme::ALERT_MESSAGE_FONT);
 
     let save = Button::new("Save", true);
-    let dont_save = Button::new("Don't Save", false);
-    let cancel = Button::new("Cancel", false);
+
+    let dont_save = Button::new("Don't Save", false).on_click(|ctx, data, _env| {
+        data.alert = false;
+        ctx.submit_command(druid::commands::CLOSE_WINDOW);
+        ctx.submit_command(commands::INTERNAL_CLEAR_DOCUMENT);
+    });
+
+    let cancel = Button::new("Cancel", false).on_click(|ctx, data, _env| {
+        data.alert = false;
+        ctx.submit_command(druid::commands::CLOSE_WINDOW);
+    });
 
     let panel = Flex::column()
         .with_child(message)
@@ -51,13 +54,13 @@ pub fn unsaved(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
         .border(theme::MAIN_FILL, druid::theme::WIDGET_PADDING_VERTICAL)
         .background(theme::MAIN_FILL);
 
-    let pos = center(parent_pos, WINDOW_SIZE, UNSAVED_ALERT_SIZE);
+    let pos = center(parent_pos, theme::WINDOW_SIZE, theme::UNSAVED_ALERT_SIZE);
 
     druid::WindowDesc::new(panel)
         .set_level(druid::WindowLevel::Modal)
         .show_titlebar(false)
         .set_position(pos)
-        .window_size(UNSAVED_ALERT_SIZE)
+        .window_size(theme::UNSAVED_ALERT_SIZE)
         .resizable(false)
 }
 

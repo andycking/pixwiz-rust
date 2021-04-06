@@ -122,6 +122,12 @@ impl druid::AppDelegate<AppState> for Delegate {
                 druid::Handled::Yes
             }
 
+            // Internal.
+            _ if cmd.is(commands::INTERNAL_CLEAR_DOCUMENT) => {
+                controller::internal::clear_document(ctx, cmd, data);
+                druid::Handled::Yes
+            }
+
             _ => druid::Handled::No,
         };
 
