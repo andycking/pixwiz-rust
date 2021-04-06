@@ -25,6 +25,7 @@ pub struct AppState {
     pub window_pos: druid::Point,
     pub tool_type: ToolType,
     pub show_grid: bool,
+    pub alert: bool,
     pub doc: Document,
 }
 
@@ -38,6 +39,7 @@ impl Default for AppState {
             window_pos: druid::Point::ZERO,
             tool_type: ToolType::Paint,
             show_grid: true,
+            alert: false,
             doc: Default::default(),
         }
     }
