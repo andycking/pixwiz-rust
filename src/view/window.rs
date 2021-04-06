@@ -212,21 +212,19 @@ impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for WindowContr
         data: &mut AppState,
         env: &Env,
     ) {
-        fn is_user_input(event: &Event) -> bool {
-            match event {
-                Event::MouseUp(_)
+        let block = matches!(
+            event,
+            Event::MouseUp(_)
                 | Event::MouseDown(_)
                 | Event::MouseMove(_)
                 | Event::KeyUp(_)
                 | Event::KeyDown(_)
                 | Event::Paste(_)
                 | Event::Wheel(_)
-                | Event::Zoom(_) => true,
-                _ => false,
-            }
-        }
+                | Event::Zoom(_)
+        );
 
-        if !is_user_input(event) || !data.alert {
+        if !(data.alert && block) {
             child.event(ctx, event, data, env);
         }
     }
