@@ -123,7 +123,7 @@ pub fn hsla_to_rgba(hue: f64, saturation: f64, luminance: f64, alpha: f64) -> (f
         }
 
         if t2 < 1.0 / 6.0 {
-            return p + (q - p) * 6.0 / t2;
+            return p + (q - p) * 6.0 * t2;
         }
         if t2 < 0.5 {
             return q;
