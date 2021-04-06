@@ -47,6 +47,7 @@ fn build_ui() -> impl druid::Widget<AppState> {
         .with_child(build_main_pane())
         .with_default_spacer()
         .background(theme::MAIN_FILL)
+        .controller(WindowController {})
 }
 
 fn build_tools_row<T: druid::Data>(
@@ -198,4 +199,35 @@ fn build_status_bar() -> impl druid::Widget<AppState> {
         .must_fill_main_axis(true)
         .with_child(build_status_label())
         .background(theme::STATUS_BAR_FILL)
+}
+
+pub struct WindowController {}
+
+impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for WindowController {
+    fn event(
+        &mut self,
+        child: &mut W,
+        ctx: &mut EventCtx<'_, '_>,
+        event: &Event,
+        data: &mut AppState,
+        env: &Env,
+    ) {
+        fn is_user_input(event: &Event) -> bool {
+            match event {
+                Event::MouseUp(_)
+                | Event::MouseDown(_)
+                | Event::MouseMove(_)
+                | Event::KeyUp(_)
+                | Event::KeyDown(_)
+                | Event::Paste(_)
+                | Event::Wheel(_)
+                | Event::Zoom(_) => true,
+                _ => false,
+            }
+        }
+
+        if !is_user_input(event) || !data.alert {
+            child.event(ctx, event, data, env);
+        }
+    }
 }
