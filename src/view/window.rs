@@ -53,11 +53,11 @@ fn build_tools_row<T: druid::Data>(
     b: impl Widget<T> + 'static,
 ) -> impl Widget<T> {
     Flex::row()
-        .with_spacer(8.0)
+        .with_spacer(theme::TOOLS_PADDING)
         .with_child(a)
-        .with_spacer(8.0)
+        .with_spacer(theme::TOOLS_PADDING)
         .with_child(b)
-        .with_spacer(8.0)
+        .with_spacer(theme::TOOLS_PADDING)
 }
 
 fn build_tools() -> impl druid::Widget<AppState> {
@@ -74,17 +74,17 @@ fn build_tools() -> impl druid::Widget<AppState> {
             ToolButton::new(ToolType::Marquee, marquee_bytes),
             ToolButton::new(ToolType::Move, move_bytes),
         ))
-        .with_spacer(8.0)
+        .with_spacer(theme::TOOLS_PADDING)
         .with_child(build_tools_row(
             ToolButton::new(ToolType::Paint, paint_bytes),
             ToolButton::new(ToolType::Eraser, eraser_bytes),
         ))
-        .with_spacer(8.0)
+        .with_spacer(theme::TOOLS_PADDING)
         .with_child(build_tools_row(
             ToolButton::new(ToolType::Fill, fill_bytes),
             ToolButton::new(ToolType::Dropper, dropper_bytes),
         ))
-        .with_spacer(8.0)
+        .with_spacer(theme::TOOLS_PADDING)
         .controller(ToolsController)
 }
 
@@ -97,7 +97,7 @@ fn build_color_well() -> impl druid::Widget<AppState> {
         };
         ctx.fill(rect, color);
     })
-    .fix_size(88.0, 30.0)
+    .fix_size(theme::COLOR_WELL_SIZE.width, theme::COLOR_WELL_SIZE.height)
     .border(theme::COLOR_WELL_STROKE, 1.0)
 }
 
@@ -137,7 +137,7 @@ fn build_preview() -> impl druid::Widget<AppState> {
             }
         }
     })
-    .fix_size(32.0, 32.0)
+    .fix_size(theme::PREVIEW_SIZE.width, theme::PREVIEW_SIZE.height)
     .border(theme::PREVIEW_STROKE, 1.0)
 }
 

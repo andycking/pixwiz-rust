@@ -19,14 +19,17 @@ pub const MAIN_STROKE: Color = Color::rgb8(208, 208, 208);
 
 pub const TOOLS_STROKE: Color = MAIN_STROKE;
 pub const TOOLS_STROKE_SELECTED: Color = Color::BLACK;
+pub const TOOLS_PADDING: f64 = 8.0;
 
 pub const STATUS_BAR_FILL: Color = MAIN_FILL;
 pub const STATUS_BAR_STROKE: Color = Color::BLACK;
 
 pub const COLOR_WELL_STROKE: Color = MAIN_STROKE;
+pub const COLOR_WELL_SIZE: druid::Size = druid::Size::new(88.0, 30.0);
 
 pub const PREVIEW_FILL: Color = CANVAS_FILL_LIGHT;
 pub const PREVIEW_STROKE: Color = MAIN_STROKE;
+pub const PREVIEW_SIZE: druid::Size = druid::Size::new(32.0, 32.0);
 
 pub const PALETTE_FILL: Color = Color::BLACK;
 pub const PALETTE_STROKE_SELECTED: Color = Color::BLACK;
