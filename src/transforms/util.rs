@@ -88,7 +88,7 @@ pub fn rgba_to_hsla(red: f64, green: f64, blue: f64, alpha: f64) -> (f64, f64, f
 
     let mut hue = 0.0;
     let mut saturation = 0.0;
-    let mut luminance = (maxv + minv) / 2.0;
+    let luminance = (maxv + minv) / 2.0;
 
     if !f64_eq(maxv, minv) {
         let d = maxv - minv;
@@ -112,10 +112,6 @@ pub fn rgba_to_hsla(red: f64, green: f64, blue: f64, alpha: f64) -> (f64, f64, f
 
         hue /= 6.0;
     }
-
-    hue = hue;
-    saturation = saturation;
-    luminance = luminance;
 
     (hue, saturation, luminance, alpha)
 }
