@@ -20,8 +20,8 @@ use std::path::Path;
 use std::result::Result;
 
 use super::error::StorageError;
-use crate::model::pixel_header::PixelHeader;
-use crate::model::pixel_state::PixelState;
+use crate::model::pixels::PixelHeader;
+use crate::model::pixels::PixelState;
 
 /// Write pixel state to the given path as a PNG.
 pub fn write_path(path_str: &str, pixels: &PixelState) -> Result<(), StorageError> {

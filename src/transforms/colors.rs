@@ -15,8 +15,8 @@
 use std::collections::VecDeque;
 
 use super::util;
-use crate::model::pixel_env::PixelEnv;
-use crate::model::pixel_header::PixelHeader;
+use crate::model::pixels::PixelEnv;
+use crate::model::pixels::PixelHeader;
 
 /// Convert pixels to black & white.
 pub fn black_and_white(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {

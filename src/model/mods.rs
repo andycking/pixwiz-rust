@@ -15,11 +15,27 @@
 use std::collections::VecDeque;
 use std::sync::Arc;
 
-use crate::model::mod_record::ModRecord;
+use crate::model::types::PixelBytes;
 
 /// Depth of the modification stack. This seems big, but remember that we're dealing
 /// with tiny little bitmaps, and we only record what's changed.
 const STACK_DEPTH: usize = 16;
+
+/// Modification record. This holds undo state.
+#[derive(Clone, druid::Data)]
+pub struct ModRecord {
+    pub area: druid::Rect,
+    pub bytes: PixelBytes,
+}
+
+impl ModRecord {
+    pub fn new(area: druid::Rect, bytes: Vec<u8>) -> Self {
+        Self {
+            area,
+            bytes: Arc::new(bytes),
+        }
+    }
+}
 
 /// Stack of modification records. Used for undo and redo.
 #[derive(Clone, druid::Data)]

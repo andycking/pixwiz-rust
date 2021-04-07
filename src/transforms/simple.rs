@@ -13,8 +13,8 @@
 // limitations under the License.
 
 use super::util;
-use crate::model::pixel_env::PixelEnv;
-use crate::model::pixel_header::PixelHeader;
+use crate::model::pixels::PixelEnv;
+use crate::model::pixels::PixelHeader;
 
 pub fn clear(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     for y in env.bounds.y0 as usize..env.bounds.y1 as usize {
