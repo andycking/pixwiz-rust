@@ -17,7 +17,7 @@ use crate::model::app_state::AppState;
 use crate::transforms;
 
 pub fn black_and_white(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    transforms::apply(data, transforms::colors::black_and_white, 0.0);
+    transforms::apply(data, transforms::colors::black_and_white, 0.5);
 }
 
 pub fn brighten(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {

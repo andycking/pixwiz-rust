@@ -23,7 +23,7 @@ pub fn black_and_white(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>
     for y in env.bounds.y0 as usize..env.bounds.y1 as usize {
         for x in env.bounds.x0 as usize..env.bounds.x1 as usize {
             let color = util::read(x, y, header, bytes);
-            let bw = util::black_and_white(&color, 0.5);
+            let bw = util::black_and_white(&color, env.param);
             util::write(x, y, header, bytes, &bw);
         }
     }
