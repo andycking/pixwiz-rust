@@ -17,10 +17,16 @@ pub struct PixelEnv {
     pub color: druid::Color,
     pub pos: druid::Point,
     pub bounds: druid::Rect,
+    pub param: f64,
 }
 
 impl PixelEnv {
-    pub fn new(color: druid::Color, pos: druid::Point, bounds: druid::Rect) -> Self {
-        Self { color, pos, bounds }
+    pub fn new(color: druid::Color, pos: druid::Point, bounds: druid::Rect, param: f64) -> Self {
+        Self {
+            color,
+            pos,
+            bounds,
+            param,
+        }
     }
 }

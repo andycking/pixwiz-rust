@@ -23,7 +23,7 @@ pub mod colors;
 pub mod simple;
 mod util;
 
-pub fn apply<F>(data: &mut AppState, f: F)
+pub fn apply<F>(data: &mut AppState, f: F, param: f64)
 where
     F: Fn(&PixelHeader, &PixelEnv, &mut Vec<u8>),
 {
@@ -32,7 +32,7 @@ where
     let bounds = data.get_bounds();
     undo::push(data, bounds);
 
-    let env = PixelEnv::new(data.brush_color.clone(), data.current_pos, bounds);
+    let env = PixelEnv::new(data.brush_color.clone(), data.current_pos, bounds, param);
     let bytes = Arc::make_mut(&mut data.doc.pixels.bytes);
 
     f(&data.doc.pixels.header, &env, bytes);

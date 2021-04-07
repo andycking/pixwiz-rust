@@ -17,19 +17,27 @@ use crate::model::app_state::AppState;
 use crate::transforms;
 
 pub fn black_and_white(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    transforms::apply(data, transforms::colors::black_and_white);
+    transforms::apply(data, transforms::colors::black_and_white, 0.0);
+}
+
+pub fn brighten(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+    transforms::apply(data, transforms::colors::brightness, 0.05);
 }
 
 pub fn clear(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    transforms::apply(data, transforms::simple::clear);
+    transforms::apply(data, transforms::simple::clear, 0.0);
+}
+
+pub fn darken(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+    transforms::apply(data, transforms::colors::brightness, -0.05);
 }
 
 pub fn desaturate(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    transforms::apply(data, transforms::colors::desaturate);
+    transforms::apply(data, transforms::colors::desaturate, 0.0);
 }
 
 pub fn dither_floyd(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    transforms::apply(data, transforms::colors::dither_floyd);
+    transforms::apply(data, transforms::colors::dither_floyd, 0.0);
 }
 
 pub fn eraser(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
@@ -40,7 +48,7 @@ pub fn eraser(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut A
 }
 
 pub fn fill(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    transforms::apply(data, transforms::colors::fill);
+    transforms::apply(data, transforms::colors::fill, 0.0);
 }
 
 pub fn marquee(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {

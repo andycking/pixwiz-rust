@@ -83,8 +83,16 @@ impl druid::AppDelegate<AppState> for Delegate {
                 controller::image::black_and_white(ctx, cmd, data);
                 druid::Handled::Yes
             }
+            _ if cmd.is(commands::IMAGE_BRIGHTEN) => {
+                controller::image::brighten(ctx, cmd, data);
+                druid::Handled::Yes
+            }
             _ if cmd.is(commands::IMAGE_CLEAR) => {
                 controller::image::clear(ctx, cmd, data);
+                druid::Handled::Yes
+            }
+            _ if cmd.is(commands::IMAGE_DARKEN) => {
+                controller::image::darken(ctx, cmd, data);
                 druid::Handled::Yes
             }
             _ if cmd.is(commands::IMAGE_DESATURATE) => {
