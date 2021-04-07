@@ -211,6 +211,9 @@ impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for WindowContr
         data: &mut AppState,
         env: &Env,
     ) {
+        // Remember where this window is, just in case we need to center an alert.
+        data.window_pos = ctx.window().get_position();
+
         let block = matches!(
             event,
             Event::MouseUp(_)
