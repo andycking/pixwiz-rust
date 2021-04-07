@@ -74,10 +74,10 @@ pub fn brightness(color: &druid::Color, val: f64) -> druid::Color {
 /// Convert RGBA bytes to HSLA.
 pub fn rgba8_to_hsla(red: u8, green: u8, blue: u8, alpha: u8) -> (f64, f64, f64, f64) {
     rgba_to_hsla(
-        f64_round(red as f64 / 255.0),
-        f64_round(green as f64 / 255.0),
-        f64_round(blue as f64 / 255.0),
-        f64_round(alpha as f64 / 255.0),
+        red as f64 / 255.0,
+        green as f64 / 255.0,
+        blue as f64 / 255.0,
+        alpha as f64 / 255.0,
     )
 }
 
@@ -113,9 +113,9 @@ pub fn rgba_to_hsla(red: f64, green: f64, blue: f64, alpha: f64) -> (f64, f64, f
         hue /= 6.0;
     }
 
-    hue = f64_round(hue);
-    saturation = f64_round(saturation);
-    luminance = f64_round(luminance);
+    hue = hue;
+    saturation = saturation;
+    luminance = luminance;
 
     (hue, saturation, luminance, alpha)
 }
@@ -155,9 +155,9 @@ pub fn hsla_to_rgba(hue: f64, saturation: f64, luminance: f64, alpha: f64) -> (f
     };
     let p = 2.0 * luminance - q;
 
-    let red = f64_floor(hue_to_rgb(p, q, hue + 1.0 / 3.0));
-    let green = f64_floor(hue_to_rgb(p, q, hue));
-    let blue = f64_floor(hue_to_rgb(p, q, hue - 1.0 / 3.0));
+    let red = hue_to_rgb(p, q, hue + 1.0 / 3.0);
+    let green = hue_to_rgb(p, q, hue);
+    let blue = hue_to_rgb(p, q, hue - 1.0 / 3.0);
 
     (red, green, blue, alpha)
 }
@@ -174,57 +174,60 @@ fn f64_eq(a: f64, b: f64) -> bool {
     (a - b).abs() < f64::EPSILON
 }
 
-fn f64_round(val: f64) -> f64 {
-    (val * 100.0).round() / 100.0
-}
-
-fn f64_floor(val: f64) -> f64 {
-    (val * 100.0).floor() / 100.0
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn assert_approx_eq(a: (f64, f64, f64, f64), b: (f64, f64, f64, f64)) {
+        fn approx_eq(a: f64, b: f64) {
+            assert!((a - b).abs() < 0.01);
+        }
+
+        approx_eq(a.0, b.0);
+        approx_eq(a.1, b.1);
+        approx_eq(a.2, b.2);
+        approx_eq(a.3, b.3);
+    }
 
     #[test]
     fn it_converts_rgba8_to_hsla() {
         let expected = (0.58, 0.47, 0.59, 1.0);
         let got = rgba8_to_hsla(100, 150, 200, 255);
-        assert_eq!(expected, got);
+        assert_approx_eq(expected, got);
     }
 
     #[test]
     fn it_converts_rgba8_to_hsla_gray() {
         let expected = (0.0, 0.0, 0.39, 1.0);
         let got = rgba8_to_hsla(100, 100, 100, 255);
-        assert_eq!(expected, got);
+        assert_approx_eq(expected, got);
     }
 
     #[test]
     fn it_converts_rgba_to_hsla() {
         let expected = (0.58, 0.47, 0.59, 1.0);
         let got = rgba_to_hsla(0.39, 0.59, 0.78, 1.0);
-        assert_eq!(expected, got);
+        assert_approx_eq(expected, got);
     }
 
     #[test]
     fn it_converts_rgba_to_hsla_gray() {
         let expected = (0.0, 0.0, 0.39, 1.0);
         let got = rgba_to_hsla(0.39, 0.39, 0.39, 1.0);
-        assert_eq!(expected, got);
+        assert_approx_eq(expected, got);
     }
 
     #[test]
     fn it_converts_hsla_to_rgba() {
         let expected = (0.39, 0.59, 0.78, 1.0);
         let got = hsla_to_rgba(0.58, 0.47, 0.59, 1.0);
-        assert_eq!(expected, got);
+        assert_approx_eq(expected, got);
     }
 
     #[test]
     fn it_converts_hsla_to_rgba_gray() {
         let expected = (0.59, 0.59, 0.59, 1.0);
         let got = hsla_to_rgba(0.58, 0.0, 0.59, 1.0);
-        assert_eq!(expected, got);
+        assert_approx_eq(expected, got);
     }
 }
