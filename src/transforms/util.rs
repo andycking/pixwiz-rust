@@ -72,7 +72,7 @@ pub fn brightness(color: &druid::Color, val: f64) -> druid::Color {
 }
 
 /// Convert RGBA bytes to HSLA.
-pub fn rgba8_to_hsla(red: u8, green: u8, blue: u8, alpha: u8) -> (f64, f64, f64, f64) {
+pub fn _rgba8_to_hsla(red: u8, green: u8, blue: u8, alpha: u8) -> (f64, f64, f64, f64) {
     rgba_to_hsla(
         red as f64 / 255.0,
         green as f64 / 255.0,
@@ -188,14 +188,14 @@ mod tests {
     #[test]
     fn it_converts_rgba8_to_hsla() {
         let expected = (0.58, 0.47, 0.59, 1.0);
-        let got = rgba8_to_hsla(100, 150, 200, 255);
+        let got = _rgba8_to_hsla(100, 150, 200, 255);
         assert_approx_eq(expected, got);
     }
 
     #[test]
     fn it_converts_rgba8_to_hsla_gray() {
         let expected = (0.0, 0.0, 0.39, 1.0);
-        let got = rgba8_to_hsla(100, 100, 100, 255);
+        let got = _rgba8_to_hsla(100, 100, 100, 255);
         assert_approx_eq(expected, got);
     }
 
