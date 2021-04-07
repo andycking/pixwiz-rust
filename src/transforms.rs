@@ -16,8 +16,8 @@ use std::sync::Arc;
 
 use crate::controller::undo;
 use crate::model::app_state::AppState;
-use crate::model::pixel_env::PixelEnv;
-use crate::model::pixel_header::PixelHeader;
+use crate::model::pixels::PixelEnv;
+use crate::model::pixels::PixelHeader;
 
 pub mod colors;
 pub mod simple;

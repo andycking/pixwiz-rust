@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::model::pixel_header::PixelHeader;
+use crate::model::pixels::PixelHeader;
 
 /// Read RGBA from bytes. The underlying storage doesn't really matter: it can be a
 /// PixelState, or a copy thereof, or something else, as long as it's bytes.

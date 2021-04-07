@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::model::app_state::AppState;
-use crate::model::mod_record::ModRecord;
+use crate::model::mods::ModRecord;
 
 /// Push a point onto the undo stack.
 pub fn push_point(data: &mut AppState, p: druid::Point) {
