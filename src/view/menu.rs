@@ -171,6 +171,20 @@ fn build_edit_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
 }
 
 fn build_image_menu<T: Data>() -> druid::MenuDesc<T> {
+    fn brighten<T: Data>() -> druid::MenuItem<T> {
+        druid::MenuItem::new(
+            druid::LocalizedString::new("menu-image-brighten").with_placeholder("Brighten"),
+            commands::IMAGE_BRIGHTEN,
+        )
+    }
+
+    fn darken<T: Data>() -> druid::MenuItem<T> {
+        druid::MenuItem::new(
+            druid::LocalizedString::new("menu-image-darken").with_placeholder("Darken"),
+            commands::IMAGE_DARKEN,
+        )
+    }
+
     fn black_and_white<T: Data>() -> druid::MenuItem<T> {
         druid::MenuItem::new(
             druid::LocalizedString::new("menu-image-black-and-white")
@@ -195,6 +209,9 @@ fn build_image_menu<T: Data>() -> druid::MenuDesc<T> {
     }
 
     druid::MenuDesc::new(druid::LocalizedString::new("menu-image-menu").with_placeholder("Image"))
+        .append(brighten())
+        .append(darken())
+        .append_separator()
         .append(black_and_white())
         .append(desaturate())
         .append(dither_floyd())
