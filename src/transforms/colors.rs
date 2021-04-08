@@ -50,8 +50,17 @@ pub fn desaturate(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     }
 }
 
-/// Fill the given pixels with a color.
+/// Fill the given pixels to the boundary.
 pub fn fill(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
+    for y in env.bounds.y0 as usize..env.bounds.y1 as usize {
+        for x in env.bounds.x0 as usize..env.bounds.x1 as usize {
+            util::write(x, y, header, bytes, &env.color);
+        }
+    }
+}
+
+/// Flood fill the given pixels starting from a seed position.
+pub fn flood_fill(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     let x = env.pos.x as usize;
     let y = env.pos.y as usize;
     let start_color = util::read(x, y, header, bytes);
