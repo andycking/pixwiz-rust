@@ -233,6 +233,7 @@ fn build_view_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
             druid::LocalizedString::new(MENU_VIEW_SHOW_GRID).with_placeholder("Show Grid"),
             commands::VIEW_SHOW_GRID,
         )
+        .hotkey(druid::SysMods::AltCmd, "'")
     }
 
     let mut grid_selected = true;
