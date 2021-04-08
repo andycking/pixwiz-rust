@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::commands;
 use crate::controller::undo;
 use crate::model::app_state::AppState;
 use crate::transforms;
@@ -47,8 +48,12 @@ pub fn eraser(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut A
     data.doc.pixels.write(idx, &druid::Color::rgba8(0, 0, 0, 0));
 }
 
-pub fn fill(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    transforms::apply(data, transforms::colors::fill, 0.0);
+pub fn fill(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+    let f = match *cmd.get_unchecked(commands::IMAGE_FILL) {
+        true => transforms::colors::flood_fill,
+        _ => transforms::colors::fill,
+    };
+    transforms::apply(data, f, 0.0);
 }
 
 pub fn marquee(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {

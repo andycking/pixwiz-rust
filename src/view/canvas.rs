@@ -193,7 +193,7 @@ impl Canvas {
             ToolType::Fill => {
                 let bounds = data.get_bounds();
                 if bounds.contains(p) {
-                    ctx.submit_command(commands::IMAGE_FILL);
+                    ctx.submit_command(commands::IMAGE_FILL.with(true));
                 }
             }
 
