@@ -171,6 +171,14 @@ fn build_edit_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
 }
 
 fn build_image_menu<T: Data>() -> druid::MenuDesc<T> {
+    fn fill<T: Data>() -> druid::MenuItem<T> {
+        druid::MenuItem::new(
+            druid::LocalizedString::new("menu-image-fill").with_placeholder("Fill"),
+            commands::IMAGE_FILL.with(false),
+        )
+        .hotkey(druid::SysMods::AltCmd, "f")
+    }
+
     fn brighten<T: Data>() -> druid::MenuItem<T> {
         druid::MenuItem::new(
             druid::LocalizedString::new("menu-image-brighten").with_placeholder("Brighten"),
@@ -209,6 +217,8 @@ fn build_image_menu<T: Data>() -> druid::MenuDesc<T> {
     }
 
     druid::MenuDesc::new(druid::LocalizedString::new("menu-image-menu").with_placeholder("Image"))
+        .append(fill())
+        .append_separator()
         .append(brighten())
         .append(darken())
         .append_separator()
