@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::model::app_state::AppState;
+use crate::model::app::AppState;
 
 pub fn show_grid(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     data.show_grid = !data.show_grid;

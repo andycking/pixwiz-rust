@@ -18,7 +18,7 @@ use druid::WidgetExt;
 
 use super::menu;
 use super::theme;
-use crate::model::app_state::AppState;
+use crate::model::app::AppState;
 use crate::model::types::ToolType;
 use crate::view::canvas::Canvas;
 use crate::view::canvas::CanvasController;

@@ -14,7 +14,7 @@
 
 use crate::commands;
 use crate::controller;
-use crate::model::app_state::AppState;
+use crate::model::app::AppState;
 use crate::view::menu;
 
 pub struct Delegate;

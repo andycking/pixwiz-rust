@@ -14,7 +14,7 @@
 
 use crate::commands;
 use crate::controller::undo;
-use crate::model::app_state::AppState;
+use crate::model::app::AppState;
 use crate::transforms;
 
 pub fn black_and_white(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {

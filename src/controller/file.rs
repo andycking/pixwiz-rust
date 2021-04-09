@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::model::app_state::AppState;
+use crate::model::app::AppState;
 use crate::storage;
 use crate::view::alert;
 

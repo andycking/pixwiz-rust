@@ -15,7 +15,7 @@
 use std::sync::Arc;
 
 use crate::controller::undo;
-use crate::model::app_state::AppState;
+use crate::model::app::AppState;
 use crate::model::pixels::PixelEnv;
 use crate::model::pixels::PixelHeader;
 

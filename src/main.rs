@@ -23,7 +23,7 @@ mod transforms;
 mod view;
 
 use controller::delegate::Delegate;
-use model::app_state::AppState;
+use model::app::AppState;
 use view::window;
 
 fn main() -> Result<(), PlatformError> {
