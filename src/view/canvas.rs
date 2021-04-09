@@ -249,7 +249,6 @@ impl druid::Widget<AppState> for Canvas {
             Event::MouseMove(e) => {
                 let cursor = match data.tool_type {
                     ToolType::Marquee => druid::Cursor::Crosshair,
-                    ToolType::Move => druid::Cursor::OpenHand,
                     _ => druid::Cursor::Arrow,
                 };
                 ctx.set_cursor(&cursor);
