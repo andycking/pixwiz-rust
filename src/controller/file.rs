@@ -62,9 +62,13 @@ pub fn save_as(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut A
 }
 
 fn check_for_save(ctx: &mut druid::DelegateCtx, data: &mut AppState) {
+    // If we managed to get here while the alert is already up then we really want to know
+    // about it right away.
+    assert!(!data.alert);
+
     if data.doc.pixels.dirty {
-        let alert = alert::unsaved(data.window_pos);
         data.alert = true;
+        let alert = alert::unsaved(data.window_pos);
         ctx.new_window(alert);
     }
 }
