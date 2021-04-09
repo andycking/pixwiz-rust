@@ -15,10 +15,10 @@
 use druid::widget::Flex;
 use druid::WidgetExt;
 
+use super::button::Button;
 use super::theme;
 use crate::commands;
 use crate::model::app_state::AppState;
-use crate::view::button::Button;
 
 pub fn unsaved(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
     let message = build_message("Do you want to save the changes you made?")
