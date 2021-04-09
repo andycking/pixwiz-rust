@@ -16,11 +16,11 @@ use crate::model::app_state::AppState;
 use crate::storage;
 use crate::view::alert;
 
-pub fn new_file(ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+pub fn new(ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     check_for_save(ctx, data);
 }
 
-pub fn open_file(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+pub fn open(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
     check_for_save(ctx, data);
 
     let file_info = cmd.get_unchecked(druid::commands::OPEN_FILE);
@@ -38,7 +38,7 @@ pub fn open_file(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut 
     }
 }
 
-pub fn save_file(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+pub fn save(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     if let Some(path) = &data.doc.path {
         match storage::png::write_path(path, &data.doc.pixels) {
             Ok(()) => {}
@@ -47,7 +47,7 @@ pub fn save_file(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mu
     }
 }
 
-pub fn save_file_as(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+pub fn save_as(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
     let file_info = cmd.get_unchecked(druid::commands::SAVE_FILE_AS);
 
     // If the file dialog passes us an invalid path then all bets are off. Just let it panic.

@@ -31,20 +31,20 @@ impl druid::AppDelegate<AppState> for Delegate {
         let handled = match cmd {
             // File.
             _ if cmd.is(druid::commands::NEW_FILE) => {
-                controller::file::new_file(ctx, cmd, data);
+                controller::file::new(ctx, cmd, data);
                 druid::Handled::Yes
             }
             _ if cmd.is(druid::commands::OPEN_FILE) => {
-                controller::file::open_file(ctx, cmd, data);
+                controller::file::open(ctx, cmd, data);
                 druid::Handled::Yes
             }
             _ if cmd.is(druid::commands::SAVE_FILE) => {
-                controller::file::save_file(ctx, cmd, data);
+                controller::file::save(ctx, cmd, data);
                 druid::Handled::Yes
             }
 
             _ if cmd.is(druid::commands::SAVE_FILE_AS) => {
-                controller::file::save_file_as(ctx, cmd, data);
+                controller::file::save_as(ctx, cmd, data);
                 druid::Handled::Yes
             }
 
