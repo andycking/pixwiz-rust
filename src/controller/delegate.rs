@@ -42,9 +42,12 @@ impl druid::AppDelegate<AppState> for Delegate {
                 controller::file::save(ctx, cmd, data);
                 druid::Handled::Yes
             }
-
             _ if cmd.is(druid::commands::SAVE_FILE_AS) => {
                 controller::file::save_as(ctx, cmd, data);
+                druid::Handled::Yes
+            }
+            _ if cmd.is(druid::commands::SAVE_PANEL_CANCELLED) => {
+                controller::file::save_cancelled(ctx, cmd, data);
                 druid::Handled::Yes
             }
 

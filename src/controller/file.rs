@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use crate::model::app::AppState;
+use crate::model::document::StateMachine;
 use crate::storage;
 use crate::view::alert;
 
@@ -48,6 +49,11 @@ pub fn save(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut App
 }
 
 pub fn save_as(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+    if data.doc.state_machine.is_alert() {
+        print!("Oh hello there!\n");
+        return;
+    }
+
     let file_info = cmd.get_unchecked(druid::commands::SAVE_FILE_AS);
 
     // If the file dialog passes us an invalid path then all bets are off. Just let it panic.
@@ -61,13 +67,18 @@ pub fn save_as(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut A
     }
 }
 
+pub fn save_cancelled(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+    print!("WHY DOES THIS NOT WORK\n");
+    data.doc.state_machine = Default::default();
+}
+
 fn check_for_save(ctx: &mut druid::DelegateCtx, data: &mut AppState) {
     // If we managed to get here while the alert is already up then we really want to know
     // about it right away.
-    assert!(!data.alert);
+    assert!(data.doc.state_machine.is_idle());
 
     if data.doc.pixels.dirty {
-        data.alert = true;
+        data.doc.state_machine = StateMachine::Unsaved;
         let alert = alert::unsaved(data.window_pos);
         ctx.new_window(alert);
     }
