@@ -34,12 +34,12 @@ impl druid::AppDelegate<AppState> for Delegate {
                 controller::file::new(ctx, cmd, data);
                 druid::Handled::Yes
             }
-            _ if cmd.is(commands::NEW_FILE_INTERNAL) => {
-                controller::file::new_internal(ctx, cmd, data);
-                druid::Handled::Yes
-            }
             _ if cmd.is(druid::commands::OPEN_FILE) => {
                 controller::file::open(ctx, cmd, data);
+                druid::Handled::Yes
+            }
+            _ if cmd.is(commands::OPEN_FILE_INTERNAL) => {
+                controller::file::open_internal(ctx, cmd, data);
                 druid::Handled::Yes
             }
             _ if cmd.is(druid::commands::SAVE_FILE) => {

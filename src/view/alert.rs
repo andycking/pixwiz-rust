@@ -44,7 +44,7 @@ pub fn unsaved(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
     let dont_save = Button::new("Don't Save", false).on_click(|ctx, data, _env| {
         data.doc.state_machine = Default::default();
         ctx.submit_command(druid::commands::CLOSE_WINDOW);
-        ctx.submit_command(commands::NEW_FILE_INTERNAL);
+        ctx.submit_command(commands::OPEN_FILE_INTERNAL);
     });
 
     let cancel = Button::new("Cancel", false).on_click(|ctx, data, _env| {

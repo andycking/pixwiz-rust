@@ -17,39 +17,56 @@ use crate::model::document::StateMachine;
 use crate::storage;
 use crate::view::alert;
 
-pub fn new(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+pub fn new(ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+    assert!(data.doc.state_machine.is_idle());
+
     if data.doc.pixels.dirty {
-        data.doc.state_machine = StateMachine::Unsaved;
+        data.doc.state_machine = StateMachine::UnsavedAlert;
         let alert = alert::unsaved(data.window_pos);
         ctx.new_window(alert);
     } else {
-        new_internal(ctx, cmd, data);
+        data.doc = Default::default();
     }
 }
 
-pub fn new_internal(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    data.doc = Default::default();
-}
-
 pub fn open(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
-    check_for_save(ctx, data);
-
-    let file_info = cmd.get_unchecked(druid::commands::OPEN_FILE);
+    assert!(data.doc.state_machine.is_idle());
 
     // If the file dialog passes us an invalid path then all bets are off. Just let it panic.
+    let file_info = cmd.get_unchecked(druid::commands::OPEN_FILE);
     let path = file_info.path().to_str().unwrap();
 
-    match storage::png::read_path(path) {
-        Ok(pixels) => {
-            data.doc = Default::default();
-            data.doc.pixels = pixels;
-            data.doc.path = Some(String::from(path));
+    data.doc.new_path = Some(String::from(path));
+
+    if data.doc.pixels.dirty {
+        data.doc.state_machine = StateMachine::UnsavedAlert;
+        let alert = alert::unsaved(data.window_pos);
+        ctx.new_window(alert);
+    } else {
+        open_internal(ctx, cmd, data);
+    }
+}
+
+pub fn open_internal(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+    assert!(data.doc.state_machine != StateMachine::UnsavedAlert);
+
+    if let Some(new_path) = data.doc.new_path.to_owned() {
+        match storage::png::read_path(&new_path) {
+            Ok(pixels) => {
+                data.doc = Default::default();
+                data.doc.pixels = pixels;
+                data.doc.path = Some(String::from(&new_path));
+            }
+            Err(_e) => {}
         }
-        Err(_e) => {}
+    } else {
+        data.doc = Default::default();
     }
 }
 
 pub fn save(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+    assert!(data.doc.state_machine.is_idle());
+
     if let Some(path) = &data.doc.path {
         match storage::png::write_path(path, &data.doc.pixels) {
             Ok(()) => {}
@@ -58,20 +75,20 @@ pub fn save(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut App
     }
 }
 
-pub fn save_as(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
-    if data.doc.state_machine.is_alert() {
-        print!("Oh hello there!\n");
-        return;
-    }
-
-    let file_info = cmd.get_unchecked(druid::commands::SAVE_FILE_AS);
+pub fn save_as(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+    assert!(data.doc.state_machine != StateMachine::UnsavedAlert);
 
     // If the file dialog passes us an invalid path then all bets are off. Just let it panic.
+    let file_info = cmd.get_unchecked(druid::commands::SAVE_FILE_AS);
     let path = file_info.path().to_str().unwrap();
 
     match storage::png::write_path(path, &data.doc.pixels) {
         Ok(()) => {
-            data.doc.path = Some(String::from(path));
+            if data.doc.state_machine == StateMachine::UnsavedSave {
+                open_internal(ctx, cmd, data);
+            } else {
+                data.doc.path = Some(String::from(path));
+            }
         }
         Err(_e) => {}
     }
@@ -79,16 +96,4 @@ pub fn save_as(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut A
 
 pub fn save_cancelled(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     data.doc.state_machine = Default::default();
-}
-
-fn check_for_save(ctx: &mut druid::DelegateCtx, data: &mut AppState) {
-    // If we managed to get here while the alert is already up then we really want to know
-    // about it right away.
-    assert!(data.doc.state_machine.is_idle());
-
-    if data.doc.pixels.dirty {
-        data.doc.state_machine = StateMachine::Unsaved;
-        let alert = alert::unsaved(data.window_pos);
-        ctx.new_window(alert);
-    }
 }

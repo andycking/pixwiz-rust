@@ -17,7 +17,7 @@ use druid::Selector;
 pub const EDIT_SELECT_ALL: Selector = Selector::new("edit-select-all");
 pub const EDIT_DESELECT: Selector = Selector::new("edit-deselect");
 
-pub const NEW_FILE_INTERNAL: Selector = Selector::new("new-file-internal");
+pub const OPEN_FILE_INTERNAL: Selector = Selector::new("open-file-internal");
 
 pub const IMAGE_BLACK_AND_WHITE: Selector = Selector::new("image-black-and-white");
 pub const IMAGE_BRIGHTEN: Selector = Selector::new("image-brighten");
@@ -32,5 +32,3 @@ pub const IMAGE_MOVE: Selector = Selector::new("image-move");
 pub const IMAGE_PAINT: Selector = Selector::new("image-paint");
 
 pub const VIEW_SHOW_GRID: Selector = Selector::new("view-show-grid");
-
-pub const INTERNAL_CLEAR_DOCUMENT: Selector = Selector::new("clear-document");

@@ -20,7 +20,7 @@ use crate::model::types::*;
 #[derive(Clone, druid::Data, PartialEq)]
 pub enum StateMachine {
     Idle,
-    Unsaved,
+    UnsavedAlert,
     UnsavedSave,
 }
 
@@ -34,13 +34,6 @@ impl StateMachine {
     pub fn is_idle(&self) -> bool {
         *self == Self::Idle
     }
-
-    pub fn is_alert(&self) -> bool {
-        match self {
-            Self::Idle => false,
-            Self::Unsaved | Self::UnsavedSave => true,
-        }
-    }
 }
 
 /// Per-document state.
@@ -50,6 +43,7 @@ pub struct Document {
     pub move_bytes: Option<PixelBytes>,
     pub pixels: PixelState,
     pub path: Option<String>,
+    pub new_path: Option<String>,
     pub undo: ModStack,
     pub redo: ModStack,
     pub state_machine: StateMachine,
@@ -62,6 +56,7 @@ impl Default for Document {
             move_bytes: None,
             pixels: Default::default(),
             path: None,
+            new_path: None,
             undo: Default::default(),
             redo: Default::default(),
             state_machine: Default::default(),

@@ -226,7 +226,7 @@ impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for WindowContr
                 | Event::Zoom(_)
         );
 
-        if !(data.doc.state_machine.is_alert() && block) {
+        if data.doc.state_machine.is_idle() || !block {
             child.event(ctx, event, data, env);
         }
     }
