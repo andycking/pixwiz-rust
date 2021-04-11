@@ -18,7 +18,7 @@ use druid::WidgetExt;
 
 use super::menu;
 use super::theme;
-use crate::model::app_state::AppState;
+use crate::model::app::AppState;
 use crate::model::types::ToolType;
 use crate::view::canvas::Canvas;
 use crate::view::canvas::CanvasController;
@@ -226,7 +226,7 @@ impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for WindowContr
                 | Event::Zoom(_)
         );
 
-        if !(data.alert && block) {
+        if data.doc.state_machine.is_idle() || !block {
             child.event(ctx, event, data, env);
         }
     }

@@ -14,7 +14,7 @@
 
 use crate::commands;
 use crate::controller;
-use crate::model::app_state::AppState;
+use crate::model::app::AppState;
 use crate::view::menu;
 
 pub struct Delegate;
@@ -31,20 +31,27 @@ impl druid::AppDelegate<AppState> for Delegate {
         let handled = match cmd {
             // File.
             _ if cmd.is(druid::commands::NEW_FILE) => {
-                controller::file::new_file(ctx, cmd, data);
+                controller::file::new(ctx, cmd, data);
                 druid::Handled::Yes
             }
             _ if cmd.is(druid::commands::OPEN_FILE) => {
-                controller::file::open_file(ctx, cmd, data);
+                controller::file::open(ctx, cmd, data);
+                druid::Handled::Yes
+            }
+            _ if cmd.is(commands::OPEN_FILE_INTERNAL) => {
+                controller::file::open_internal(ctx, cmd, data);
                 druid::Handled::Yes
             }
             _ if cmd.is(druid::commands::SAVE_FILE) => {
-                controller::file::save_file(ctx, cmd, data);
+                controller::file::save(ctx, cmd, data);
                 druid::Handled::Yes
             }
-
             _ if cmd.is(druid::commands::SAVE_FILE_AS) => {
-                controller::file::save_file_as(ctx, cmd, data);
+                controller::file::save_as(ctx, cmd, data);
+                druid::Handled::Yes
+            }
+            _ if cmd.is(druid::commands::SAVE_PANEL_CANCELLED) => {
+                controller::file::save_cancelled(ctx, cmd, data);
                 druid::Handled::Yes
             }
 
@@ -127,12 +134,6 @@ impl druid::AppDelegate<AppState> for Delegate {
             // View.
             _ if cmd.is(commands::VIEW_SHOW_GRID) => {
                 controller::view::show_grid(ctx, cmd, data);
-                druid::Handled::Yes
-            }
-
-            // Internal.
-            _ if cmd.is(commands::INTERNAL_CLEAR_DOCUMENT) => {
-                controller::internal::clear_document(ctx, cmd, data);
                 druid::Handled::Yes
             }
 

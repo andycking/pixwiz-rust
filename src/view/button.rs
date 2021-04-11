@@ -16,7 +16,7 @@
 use druid::widget::prelude::*;
 
 use super::theme;
-use crate::model::app_state::AppState;
+use crate::model::app::AppState;
 
 const LABEL_INSETS: druid::Insets = druid::Insets::uniform_xy(8., 2.);
 

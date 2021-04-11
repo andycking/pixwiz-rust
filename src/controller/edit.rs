@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::controller::undo;
-use crate::model::app_state::AppState;
+use crate::model::app::AppState;
 
 pub fn undo(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     undo::pop(data);

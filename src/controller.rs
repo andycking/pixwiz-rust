@@ -16,6 +16,5 @@ pub mod delegate;
 pub mod edit;
 pub mod file;
 pub mod image;
-mod internal;
 pub mod undo;
 pub mod view;

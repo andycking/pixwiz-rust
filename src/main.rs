@@ -16,19 +16,20 @@ use druid::PlatformError;
 
 mod commands;
 mod controller;
+mod global;
 mod model;
 mod storage;
 mod transforms;
 mod view;
 
 use controller::delegate::Delegate;
-use model::app_state::AppState;
+use model::app::AppState;
 use view::window;
 
 fn main() -> Result<(), PlatformError> {
     let window = window::window();
 
-    let data: AppState = Default::default();
+    let data = AppState::new(window.id);
 
     druid::AppLauncher::with_window(window)
         .delegate(Delegate)

@@ -15,10 +15,12 @@
 use druid::widget::Flex;
 use druid::WidgetExt;
 
+use super::button::Button;
 use super::theme;
 use crate::commands;
-use crate::model::app_state::AppState;
-use crate::view::button::Button;
+use crate::global;
+use crate::model::app::AppState;
+use crate::model::document::StateMachine;
 
 pub fn unsaved(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
     let message = build_message("Do you want to save the changes you made?")
@@ -26,16 +28,27 @@ pub fn unsaved(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
     let sub_message = build_message("Your changes will be lost if you don't save them.")
         .with_font(theme::ALERT_MESSAGE_FONT);
 
-    let save = Button::new("Save", true);
+    let save = Button::new("Save", true).on_click(|ctx, data, _env| {
+        data.doc.state_machine = StateMachine::UnsavedSave;
+        ctx.submit_command(druid::commands::CLOSE_WINDOW);
+
+        // Note that we send it to the app window here. The alert will already be gone by the time
+        // the command is delivered to the delegate.
+        ctx.submit_command(
+            druid::commands::SHOW_SAVE_PANEL
+                .with(global::file_dialog_opts())
+                .to(data.id),
+        );
+    });
 
     let dont_save = Button::new("Don't Save", false).on_click(|ctx, data, _env| {
-        data.alert = false;
+        data.doc.state_machine = Default::default();
         ctx.submit_command(druid::commands::CLOSE_WINDOW);
-        ctx.submit_command(commands::INTERNAL_CLEAR_DOCUMENT);
+        ctx.submit_command(commands::OPEN_FILE_INTERNAL);
     });
 
     let cancel = Button::new("Cancel", false).on_click(|ctx, data, _env| {
-        data.alert = false;
+        data.doc.state_machine = Default::default();
         ctx.submit_command(druid::commands::CLOSE_WINDOW);
     });
 

@@ -17,6 +17,7 @@ use std::collections::HashMap;
 use druid::widget::prelude::*;
 
 use crate::commands;
+use crate::global;
 
 pub const COMMON_MENU_FILE_SAVE: &str = "common-menu-file-save";
 pub const COMMON_MENU_CUT: &str = "common-menu-cut";
@@ -83,23 +84,17 @@ pub fn menu_bar<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
 
 fn build_file_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
     fn open_file<T: Data>() -> druid::MenuItem<T> {
-        let file_dialog_options =
-            druid::FileDialogOptions::default().allowed_types(vec![druid::FileSpec::PNG]);
-
         druid::MenuItem::new(
             druid::LocalizedString::new("common-menu-file-open"),
-            druid::commands::SHOW_OPEN_PANEL.with(file_dialog_options),
+            druid::commands::SHOW_OPEN_PANEL.with(global::file_dialog_opts()),
         )
         .hotkey(druid::SysMods::Cmd, "o")
     }
 
     fn save_as<T: Data>() -> druid::MenuItem<T> {
-        let file_dialog_options =
-            druid::FileDialogOptions::default().allowed_types(vec![druid::FileSpec::PNG]);
-
         druid::MenuItem::new(
             druid::LocalizedString::new("common-menu-file-save-as"),
-            druid::commands::SHOW_SAVE_PANEL.with(file_dialog_options),
+            druid::commands::SHOW_SAVE_PANEL.with(global::file_dialog_opts()),
         )
         .hotkey(druid::SysMods::CmdShift, "S")
     }

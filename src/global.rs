@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::model::app_state::AppState;
-
-pub fn clear_document(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    data.doc = Default::default();
+pub fn file_dialog_opts() -> druid::FileDialogOptions {
+    druid::FileDialogOptions::default().allowed_types(vec![druid::FileSpec::PNG])
 }

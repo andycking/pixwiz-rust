@@ -16,6 +16,26 @@ use crate::model::mods::ModStack;
 use crate::model::pixels::PixelState;
 use crate::model::types::*;
 
+/// Application state machine.
+#[derive(Clone, druid::Data, PartialEq)]
+pub enum StateMachine {
+    Idle,
+    UnsavedAlert,
+    UnsavedSave,
+}
+
+impl Default for StateMachine {
+    fn default() -> Self {
+        Self::Idle
+    }
+}
+
+impl StateMachine {
+    pub fn is_idle(&self) -> bool {
+        *self == Self::Idle
+    }
+}
+
 /// Per-document state.
 #[derive(Clone, druid::Data)]
 pub struct Document {
@@ -23,8 +43,10 @@ pub struct Document {
     pub move_bytes: Option<PixelBytes>,
     pub pixels: PixelState,
     pub path: Option<String>,
+    pub new_path: Option<String>,
     pub undo: ModStack,
     pub redo: ModStack,
+    pub state_machine: StateMachine,
 }
 
 impl Default for Document {
@@ -34,8 +56,10 @@ impl Default for Document {
             move_bytes: None,
             pixels: Default::default(),
             path: None,
+            new_path: None,
             undo: Default::default(),
             redo: Default::default(),
+            state_machine: Default::default(),
         }
     }
 }
