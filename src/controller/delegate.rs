@@ -34,6 +34,10 @@ impl druid::AppDelegate<AppState> for Delegate {
                 controller::file::new(ctx, cmd, data);
                 druid::Handled::Yes
             }
+            _ if cmd.is(commands::NEW_FILE_INTERNAL) => {
+                controller::file::new_internal(ctx, cmd, data);
+                druid::Handled::Yes
+            }
             _ if cmd.is(druid::commands::OPEN_FILE) => {
                 controller::file::open(ctx, cmd, data);
                 druid::Handled::Yes
@@ -130,12 +134,6 @@ impl druid::AppDelegate<AppState> for Delegate {
             // View.
             _ if cmd.is(commands::VIEW_SHOW_GRID) => {
                 controller::view::show_grid(ctx, cmd, data);
-                druid::Handled::Yes
-            }
-
-            // Internal.
-            _ if cmd.is(commands::INTERNAL_CLEAR_DOCUMENT) => {
-                controller::internal::clear_document(ctx, cmd, data);
                 druid::Handled::Yes
             }
 

@@ -17,8 +17,18 @@ use crate::model::document::StateMachine;
 use crate::storage;
 use crate::view::alert;
 
-pub fn new(ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    check_for_save(ctx, data);
+pub fn new(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+    if data.doc.pixels.dirty {
+        data.doc.state_machine = StateMachine::Unsaved;
+        let alert = alert::unsaved(data.window_pos);
+        ctx.new_window(alert);
+    } else {
+        new_internal(ctx, cmd, data);
+    }
+}
+
+pub fn new_internal(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+    data.doc = Default::default();
 }
 
 pub fn open(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
@@ -68,7 +78,6 @@ pub fn save_as(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut A
 }
 
 pub fn save_cancelled(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    print!("WHY DOES THIS NOT WORK\n");
     data.doc.state_machine = Default::default();
 }
 
