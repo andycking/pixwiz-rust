@@ -26,10 +26,8 @@ use crate::model::document::StateMachine;
 /// of save, don't save, and cancel. The alert is modal; the doc window will block input until the
 /// alert is dismissed.
 pub fn unsaved(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
-    let message = build_message("Do you want to save the changes you made?")
-        .with_font(theme::ALERT_MESSAGE_FONT_BOLD);
-    let sub_message = build_message("Your changes will be lost if you don't save them.")
-        .with_font(theme::ALERT_MESSAGE_FONT);
+    let message = build_message("Do you want to save the changes you made?", true);
+    let sub_message = build_message("Your changes will be lost if you don't save them.", false);
 
     let save = Button::new("Save", true).on_click(|ctx, data, _env| {
         // Transition to the next state. Just do this directly in the handler.
@@ -69,25 +67,41 @@ pub fn unsaved(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
         .with_child(dont_save.expand_width())
         .with_default_spacer()
         .with_default_spacer()
-        .with_child(cancel.expand_width())
+        .with_child(cancel.expand_width());
+
+    build_alert(parent_pos, theme::UNSAVED_ALERT_SIZE, panel)
+}
+
+fn build_alert(
+    parent_pos: druid::Point,
+    size: druid::Size,
+    panel: impl druid::Widget<AppState> + 'static,
+) -> druid::WindowDesc<AppState> {
+    let themed = panel
         .border(theme::MAIN_FILL, druid::theme::WIDGET_PADDING_VERTICAL)
         .background(theme::MAIN_FILL);
 
-    let pos = center(parent_pos, theme::WINDOW_SIZE, theme::UNSAVED_ALERT_SIZE);
+    let pos = center(parent_pos, theme::WINDOW_SIZE, size);
 
-    druid::WindowDesc::new(panel)
+    druid::WindowDesc::new(themed)
         .set_level(druid::WindowLevel::Modal)
         .show_titlebar(false)
         .set_position(pos)
-        .window_size(theme::UNSAVED_ALERT_SIZE)
+        .window_size(size)
         .resizable(false)
 }
 
-fn build_message(message: &'static str) -> druid::widget::Label<AppState> {
+fn build_message(message: &'static str, bold: bool) -> druid::widget::Label<AppState> {
+    let font = match bold {
+        true => theme::ALERT_MESSAGE_FONT_BOLD,
+        _ => theme::ALERT_MESSAGE_FONT,
+    };
+
     druid::widget::Label::new(message)
         .with_text_color(druid::Color::BLACK)
         .with_line_break_mode(druid::widget::LineBreaking::WordWrap)
         .with_text_alignment(druid::TextAlignment::Center)
+        .with_font(font)
 }
 
 fn center(parent_pos: druid::Point, parent_size: druid::Size, size: druid::Size) -> druid::Point {

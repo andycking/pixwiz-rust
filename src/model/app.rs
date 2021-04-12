@@ -46,23 +46,3 @@ impl AppState {
         }
     }
 }
-
-impl AppState {
-    /// Get the current boundary. If a selection exists, then that's the boundary.
-    /// Otherwise, it's the entire canvas. The result is in canvas coords.
-    pub fn get_bounds(&self) -> druid::Rect {
-        let mut bounds = match self.doc.selection {
-            Some(rect) => rect,
-            _ => druid::Rect::new(
-                1.0,
-                1.0,
-                self.doc.pixels.header.width as f64,
-                self.doc.pixels.header.height as f64,
-            ),
-        };
-        bounds.x1 += 1.0;
-        bounds.y1 += 1.0;
-
-        bounds
-    }
-}
