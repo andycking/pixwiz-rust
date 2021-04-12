@@ -14,6 +14,7 @@
 
 use std::sync::Arc;
 
+/// Shared reference to pixel bytes. We use this type a lot.
 pub type PixelBytes = Arc<Vec<u8>>;
 
 /// Supported tool types.
