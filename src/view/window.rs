@@ -16,15 +16,15 @@ use druid::widget::prelude::*;
 use druid::widget::Flex;
 use druid::WidgetExt;
 
+use super::canvas::Canvas;
+use super::canvas::CanvasController;
 use super::menu;
+use super::palette::Palette;
 use super::theme;
+use super::tool::ToolButton;
+use super::tool::ToolsController;
 use crate::model::app::AppState;
 use crate::model::types::ToolType;
-use crate::view::canvas::Canvas;
-use crate::view::canvas::CanvasController;
-use crate::view::palette::Palette;
-use crate::view::tool::ToolButton;
-use crate::view::tool::ToolsController;
 
 pub fn window() -> druid::WindowDesc<AppState> {
     let ui = build_ui();
