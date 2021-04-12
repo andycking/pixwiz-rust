@@ -94,10 +94,12 @@ impl Canvas {
         if a != 255 {
             let y = idx / Self::COLS;
             let x = idx % Self::ROWS;
-            match (x + y) % 2 {
-                0 => ctx.fill(rect, &theme::CANVAS_FILL_DARK),
-                _ => ctx.fill(rect, &theme::CANVAS_FILL_LIGHT),
+
+            let fill_color = match (x + y) % 2 {
+                0 => theme::CANVAS_FILL_DARK,
+                _ => theme::CANVAS_FILL_LIGHT,
             };
+            ctx.fill(rect, &fill_color);
         }
 
         ctx.fill(rect, color);
