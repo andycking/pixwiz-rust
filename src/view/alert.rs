@@ -22,6 +22,9 @@ use crate::global;
 use crate::model::app::AppState;
 use crate::model::document::StateMachine;
 
+/// Build an unsaved changes alert window. This will present the usual (on Mac OS) three options
+/// of save, don't save, and cancel. The alert is modal; the doc window will block input until the
+/// alert is dismissed.
 pub fn unsaved(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
     let message = build_message("Do you want to save the changes you made?")
         .with_font(theme::ALERT_MESSAGE_FONT_BOLD);
@@ -29,7 +32,10 @@ pub fn unsaved(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
         .with_font(theme::ALERT_MESSAGE_FONT);
 
     let save = Button::new("Save", true).on_click(|ctx, data, _env| {
+        // Transition to the next state. Just do this directly in the handler.
         data.doc.state_machine = StateMachine::UnsavedSave;
+
+        // Close the alert, because we're going to show the save panel.
         ctx.submit_command(druid::commands::CLOSE_WINDOW);
 
         // Note that we send it to the app window here. The alert will already be gone by the time
