@@ -24,7 +24,7 @@ use super::theme;
 use super::tool::ToolButton;
 use super::tool::ToolsController;
 use crate::model::app::AppState;
-use crate::model::types::ToolType;
+use crate::model::types::*;
 
 pub fn window() -> druid::WindowDesc<AppState> {
     let ui = build_ui();
@@ -226,7 +226,7 @@ impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for WindowContr
                 | Event::Zoom(_)
         );
 
-        if data.doc.state_machine.is_idle() || !block {
+        if data.window_state == WindowState::Normal || !block {
             child.event(ctx, event, data, env);
         }
     }

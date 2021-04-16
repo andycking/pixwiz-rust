@@ -27,3 +27,17 @@ pub enum ToolType {
     Move,
     Paint,
 }
+
+/// Window state.
+#[derive(Clone, druid::Data, PartialEq)]
+pub enum WindowState {
+    Normal,
+    UnsavedAlert,
+    UnsavedSave,
+}
+
+impl Default for WindowState {
+    fn default() -> Self {
+        Self::Normal
+    }
+}

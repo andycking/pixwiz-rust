@@ -29,7 +29,7 @@ where
 {
     // We have all the information we need for a mod record, so just create it here.
     // That way the caller, and the f() we're applying, don't need to worry about it.
-    let bounds = data.doc.get_bounds();
+    let bounds = data.doc.bounds();
     undo::push(data, bounds);
 
     let env = PixelEnv::new(data.brush_color.clone(), data.current_pos, bounds, param);

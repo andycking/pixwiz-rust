@@ -44,6 +44,11 @@ impl PixelHeader {
             bytes_per_pixel,
         }
     }
+
+    /// Get bounding box for pixels.
+    pub fn bounds(&self) -> druid::Rect {
+        druid::Rect::new(1.0, 1.0, self.width as f64, self.height as f64)
+    }
 }
 
 impl Default for PixelHeader {
@@ -122,6 +127,7 @@ impl PixelState {
     #[inline]
     pub fn read(&self, idx: usize) -> druid::Color {
         let byte_idx = idx * self.header.bytes_per_pixel;
+
         druid::Color::rgba8(
             self.bytes[byte_idx],
             self.bytes[byte_idx + 1],

@@ -186,14 +186,14 @@ impl Canvas {
             }
 
             ToolType::Eraser => {
-                let bounds = data.doc.get_bounds();
+                let bounds = data.doc.bounds();
                 if bounds.contains(p) {
                     ctx.submit_command(commands::IMAGE_ERASER);
                 }
             }
 
             ToolType::Fill => {
-                let bounds = data.doc.get_bounds();
+                let bounds = data.doc.bounds();
                 if bounds.contains(p) {
                     ctx.submit_command(commands::IMAGE_FILL.with(true));
                 }
@@ -208,7 +208,7 @@ impl Canvas {
             }
 
             ToolType::Paint => {
-                let bounds = data.doc.get_bounds();
+                let bounds = data.doc.bounds();
                 if bounds.contains(p) {
                     ctx.submit_command(commands::IMAGE_PAINT);
                 }

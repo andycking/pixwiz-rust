@@ -20,7 +20,7 @@ use super::theme;
 use crate::commands;
 use crate::global;
 use crate::model::app::AppState;
-use crate::model::document::StateMachine;
+use crate::model::types::*;
 
 /// Build an unsaved changes alert window. This will present the usual (on Mac OS) three options
 /// of save, don't save, and cancel. The alert is modal; the doc window will block input until the
@@ -31,7 +31,7 @@ pub fn unsaved(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
 
     let save = Button::new("Save", true).on_click(|ctx, data, _env| {
         // Transition to the next state. Just do this directly in the handler.
-        data.doc.state_machine = StateMachine::UnsavedSave;
+        data.window_state = WindowState::UnsavedSave;
 
         // Close the alert, because we're going to show the save panel.
         ctx.submit_command(druid::commands::CLOSE_WINDOW);
@@ -46,13 +46,13 @@ pub fn unsaved(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
     });
 
     let dont_save = Button::new("Don't Save", false).on_click(|ctx, data, _env| {
-        data.doc.state_machine = Default::default();
+        data.window_state = Default::default();
         ctx.submit_command(druid::commands::CLOSE_WINDOW);
         ctx.submit_command(commands::OPEN_FILE_INTERNAL);
     });
 
     let cancel = Button::new("Cancel", false).on_click(|ctx, data, _env| {
-        data.doc.state_machine = Default::default();
+        data.window_state = Default::default();
         ctx.submit_command(druid::commands::CLOSE_WINDOW);
     });
 
