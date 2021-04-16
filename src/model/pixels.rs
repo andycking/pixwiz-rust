@@ -127,6 +127,7 @@ impl PixelState {
     #[inline]
     pub fn read(&self, idx: usize) -> druid::Color {
         let byte_idx = idx * self.header.bytes_per_pixel;
+
         druid::Color::rgba8(
             self.bytes[byte_idx],
             self.bytes[byte_idx + 1],

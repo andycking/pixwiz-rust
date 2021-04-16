@@ -20,12 +20,12 @@ pub fn read(x: usize, y: usize, header: &PixelHeader, bytes: &[u8]) -> druid::Co
     let idx = (y - 1) * header.width + (x - 1);
     let byte_idx = idx * header.bytes_per_pixel;
 
-    let red = bytes[byte_idx];
-    let green = bytes[byte_idx + 1];
-    let blue = bytes[byte_idx + 2];
-    let alpha = bytes[byte_idx + 3];
-
-    druid::Color::rgba8(red, green, blue, alpha)
+    druid::Color::rgba8(
+        bytes[byte_idx],
+        bytes[byte_idx + 1],
+        bytes[byte_idx + 2],
+        bytes[byte_idx + 3],
+    )
 }
 
 /// Write RGBA to bytes. The underlying storage doesn't really matter; it can be a
@@ -33,7 +33,6 @@ pub fn read(x: usize, y: usize, header: &PixelHeader, bytes: &[u8]) -> druid::Co
 pub fn write(x: usize, y: usize, header: &PixelHeader, bytes: &mut Vec<u8>, color: &druid::Color) {
     let idx = (y - 1) * header.width + (x - 1);
     let byte_idx = idx * header.bytes_per_pixel;
-
     let (red, green, blue, alpha) = color.as_rgba8();
 
     bytes[byte_idx] = red;
