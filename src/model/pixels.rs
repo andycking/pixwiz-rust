@@ -44,6 +44,11 @@ impl PixelHeader {
             bytes_per_pixel,
         }
     }
+
+    /// Get bounding box for pixels.
+    pub fn bounds(&self) -> druid::Rect {
+        druid::Rect::new(1.0, 1.0, self.width as f64, self.height as f64)
+    }
 }
 
 impl Default for PixelHeader {

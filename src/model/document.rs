@@ -31,19 +31,8 @@ pub struct Document {
 impl Document {
     /// Get the current boundary. If a selection exists, then that's the boundary.
     /// Otherwise, it's the entire canvas. The result is in canvas coords.
-    pub fn get_bounds(&self) -> druid::Rect {
-        let mut bounds = match self.selection {
-            Some(rect) => rect,
-            _ => druid::Rect::new(
-                1.0,
-                1.0,
-                self.pixels.header.width as f64,
-                self.pixels.header.height as f64,
-            ),
-        };
-        bounds.x1 += 1.0;
-        bounds.y1 += 1.0;
-
-        bounds
+    pub fn bounds(&self) -> druid::Rect {
+        let b = self.selection.unwrap_or_else(|| self.pixels.header.bounds());
+        druid::Rect::new(b.x0, b.y0, b.x1 + 1.0, b.y1 + 1.0)
     }
 }
