@@ -146,10 +146,7 @@ impl PixelState {
                 let idx = (y - 1) * self.header.width + (x - 1);
                 let src_idx = idx * self.header.bytes_per_pixel;
 
-                dst_bytes.push(self.bytes[src_idx]);
-                dst_bytes.push(self.bytes[src_idx + 1]);
-                dst_bytes.push(self.bytes[src_idx + 2]);
-                dst_bytes.push(self.bytes[src_idx + 3]);
+                dst_bytes.extend_from_slice(&self.bytes[src_idx..src_idx + 4]);
             }
         }
 
