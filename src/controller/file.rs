@@ -13,15 +13,15 @@
 // limitations under the License.
 
 use crate::model::app::AppState;
-use crate::model::document::StateMachine;
+use crate::model::types::*;
 use crate::storage;
 use crate::view::alert;
 
 pub fn new(ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    assert!(data.doc.state_machine.is_idle());
+    assert!(data.window_state == WindowState::Normal);
 
     if data.doc.pixels.dirty {
-        data.doc.state_machine = StateMachine::UnsavedAlert;
+        data.window_state = WindowState::UnsavedAlert;
         let alert = alert::unsaved(data.window_pos);
         ctx.new_window(alert);
     } else {
@@ -30,7 +30,7 @@ pub fn new(ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppSt
 }
 
 pub fn open(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
-    assert!(data.doc.state_machine.is_idle());
+    assert!(data.window_state == WindowState::Normal);
 
     // If the file dialog passes us an invalid path then all bets are off. Just let it panic.
     let file_info = cmd.get_unchecked(druid::commands::OPEN_FILE);
@@ -39,7 +39,7 @@ pub fn open(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppSt
     data.doc.new_path = Some(String::from(path));
 
     if data.doc.pixels.dirty {
-        data.doc.state_machine = StateMachine::UnsavedAlert;
+        data.window_state = WindowState::UnsavedAlert;
         let alert = alert::unsaved(data.window_pos);
         ctx.new_window(alert);
     } else {
@@ -48,7 +48,7 @@ pub fn open(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppSt
 }
 
 pub fn open_internal(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    assert!(data.doc.state_machine != StateMachine::UnsavedAlert);
+    assert!(data.window_state != WindowState::UnsavedAlert);
 
     if let Some(new_path) = data.doc.new_path.to_owned() {
         match storage::png::read_path(&new_path) {
@@ -65,7 +65,7 @@ pub fn open_internal(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data:
 }
 
 pub fn save(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    assert!(data.doc.state_machine.is_idle());
+    assert!(data.window_state == WindowState::Normal);
 
     if let Some(path) = &data.doc.path {
         match storage::png::write_path(path, &data.doc.pixels) {
@@ -76,7 +76,7 @@ pub fn save(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut App
 }
 
 pub fn save_as(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
-    assert!(data.doc.state_machine != StateMachine::UnsavedAlert);
+    assert!(data.window_state != WindowState::UnsavedAlert);
 
     // If the file dialog passes us an invalid path then all bets are off. Just let it panic.
     let file_info = cmd.get_unchecked(druid::commands::SAVE_FILE_AS);
@@ -84,7 +84,7 @@ pub fn save_as(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut Ap
 
     match storage::png::write_path(path, &data.doc.pixels) {
         Ok(()) => {
-            if data.doc.state_machine == StateMachine::UnsavedSave {
+            if data.window_state == WindowState::UnsavedSave {
                 open_internal(ctx, cmd, data);
             } else {
                 data.doc.path = Some(String::from(path));
@@ -95,5 +95,5 @@ pub fn save_as(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut Ap
 }
 
 pub fn save_cancelled(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    data.doc.state_machine = Default::default();
+    data.window_state = Default::default();
 }

@@ -16,26 +16,6 @@ use crate::model::mods::ModStack;
 use crate::model::pixels::PixelState;
 use crate::model::types::*;
 
-/// Application state machine.
-#[derive(Clone, druid::Data, PartialEq)]
-pub enum StateMachine {
-    Idle,
-    UnsavedAlert,
-    UnsavedSave,
-}
-
-impl Default for StateMachine {
-    fn default() -> Self {
-        Self::Idle
-    }
-}
-
-impl StateMachine {
-    pub fn is_idle(&self) -> bool {
-        *self == Self::Idle
-    }
-}
-
 /// Per-document state.
 #[derive(Clone, druid::Data, Default)]
 pub struct Document {
@@ -46,7 +26,6 @@ pub struct Document {
     pub new_path: Option<String>,
     pub undo: ModStack,
     pub redo: ModStack,
-    pub state_machine: StateMachine,
 }
 
 impl Document {
