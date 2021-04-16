@@ -37,7 +37,7 @@ impl StateMachine {
 }
 
 /// Per-document state.
-#[derive(Clone, druid::Data)]
+#[derive(Clone, druid::Data, Default)]
 pub struct Document {
     pub selection: Option<druid::Rect>,
     pub move_bytes: Option<PixelBytes>,
@@ -47,21 +47,6 @@ pub struct Document {
     pub undo: ModStack,
     pub redo: ModStack,
     pub state_machine: StateMachine,
-}
-
-impl Default for Document {
-    fn default() -> Self {
-        Self {
-            selection: None,
-            move_bytes: None,
-            pixels: Default::default(),
-            path: None,
-            new_path: None,
-            undo: Default::default(),
-            redo: Default::default(),
-            state_machine: Default::default(),
-        }
-    }
 }
 
 impl Document {
