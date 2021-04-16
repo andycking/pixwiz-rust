@@ -36,9 +36,9 @@ impl AppState {
         Self {
             brush_color: druid::Color::BLACK,
             pos_color: druid::Color::rgba8(0, 0, 0, 0),
-            start_pos: druid::Point::ZERO,
-            current_pos: druid::Point::ZERO,
-            window_pos: druid::Point::ZERO,
+            start_pos: Default::default(),
+            current_pos: Default::default(),
+            window_pos: Default::default(),
             tool_type: ToolType::Paint,
             show_grid: true,
             doc: Default::default(),
