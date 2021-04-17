@@ -18,7 +18,7 @@ use crate::model::pixels::PixelHeader;
 /// PixelState, or a copy thereof, or something else, as long as it's bytes.
 pub fn read(x: usize, y: usize, header: &PixelHeader, bytes: &[u8]) -> druid::Color {
     let idx = (y - 1) * header.width + (x - 1);
-    let byte_idx = idx * header.bytes_per_pixel;
+    let byte_idx = idx * header.bytes_per_pixel as usize;
 
     druid::Color::rgba8(
         bytes[byte_idx],
@@ -32,7 +32,7 @@ pub fn read(x: usize, y: usize, header: &PixelHeader, bytes: &[u8]) -> druid::Co
 /// PixelState, or a copy thereof, or something else, as long as it's bytes.
 pub fn write(x: usize, y: usize, header: &PixelHeader, bytes: &mut Vec<u8>, color: &druid::Color) {
     let idx = (y - 1) * header.width + (x - 1);
-    let byte_idx = idx * header.bytes_per_pixel;
+    let byte_idx = idx * header.bytes_per_pixel as usize;
     let (red, green, blue, alpha) = color.as_rgba8();
 
     bytes[byte_idx] = red;
