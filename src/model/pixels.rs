@@ -22,16 +22,16 @@ pub struct PixelHeader {
     pub width: usize,
     pub height: usize,
     pub depth: u8,
-    pub bytes_per_pixel: usize,
+    pub bytes_per_pixel: u8,
 }
 
 impl PixelHeader {
     const DEFAULT_WIDTH: usize = 32;
     const DEFAULT_HEIGHT: usize = 32;
     const DEFAULT_DEPTH: u8 = 8;
-    const DEFAULT_BYTES_PER_PIXEL: usize = 4;
+    const DEFAULT_BYTES_PER_PIXEL: u8 = 4;
 
-    pub fn new(width: usize, height: usize, depth: u8, bytes_per_pixel: usize) -> Self {
+    pub fn new(width: usize, height: usize, depth: u8, bytes_per_pixel: u8) -> Self {
         assert!(width == Self::DEFAULT_WIDTH);
         assert!(height == Self::DEFAULT_HEIGHT);
         assert!(depth == Self::DEFAULT_DEPTH);
@@ -93,7 +93,9 @@ pub struct PixelState {
 impl PixelState {
     /// Create new pixel state with given bytes.
     pub fn new(header: PixelHeader, bytes: Vec<u8>) -> Self {
-        assert!(bytes.len() == header.width * header.height * header.bytes_per_pixel);
+        let dim = header.width * header.height;
+        let len = dim * header.bytes_per_pixel as usize;
+        assert!(bytes.len() == len);
 
         Self {
             header,
@@ -108,7 +110,7 @@ impl PixelState {
         // We always want len and capacity to be the same. The entire vector must have been
         // initialized so that later on we don't access an invalid pixel.
         assert!(self.bytes.len() == self.bytes.capacity());
-        self.bytes.len() / self.header.bytes_per_pixel
+        self.bytes.len() / self.header.bytes_per_pixel as usize
     }
 
     /// Convert coordinates to an index within storage.
@@ -126,7 +128,7 @@ impl PixelState {
     /// Read a value from an index in storage.
     #[inline]
     pub fn read(&self, idx: usize) -> druid::Color {
-        let byte_idx = idx * self.header.bytes_per_pixel;
+        let byte_idx = idx * self.header.bytes_per_pixel as usize;
 
         druid::Color::rgba8(
             self.bytes[byte_idx],
@@ -138,13 +140,14 @@ impl PixelState {
 
     /// Read an area of storage.
     pub fn read_area(&self, area: druid::Rect) -> Vec<u8> {
-        let dst_size = (area.width() * area.height()) as usize * self.header.bytes_per_pixel;
-        let mut dst_bytes = Vec::with_capacity(dst_size);
+        let dim = (area.width() * area.height()) as usize;
+        let len = dim * self.header.bytes_per_pixel as usize;
+        let mut dst_bytes = Vec::with_capacity(len);
 
         for y in area.y0 as usize..area.y1 as usize {
             for x in area.x0 as usize..area.x1 as usize {
                 let idx = (y - 1) * self.header.width + (x - 1);
-                let src_idx = idx * self.header.bytes_per_pixel;
+                let src_idx = idx * self.header.bytes_per_pixel as usize;
 
                 dst_bytes.extend_from_slice(&self.bytes[src_idx..src_idx + 4]);
             }
@@ -157,7 +160,7 @@ impl PixelState {
     /// because we want to control the dirty flag.
     #[inline]
     pub fn write(&mut self, idx: usize, color: &druid::Color) {
-        let byte_idx = idx * self.header.bytes_per_pixel;
+        let byte_idx = idx * self.header.bytes_per_pixel as usize;
         let (red, green, blue, alpha) = color.as_rgba8();
 
         let pixels = Arc::make_mut(&mut self.bytes);
@@ -178,7 +181,7 @@ impl PixelState {
         for y in area.y0 as usize..area.y1 as usize {
             for x in area.x0 as usize..area.x1 as usize {
                 let idx = (y - 1) * self.header.width + (x - 1);
-                let dst_idx = idx * self.header.bytes_per_pixel;
+                let dst_idx = idx * self.header.bytes_per_pixel as usize;
 
                 dst_bytes[dst_idx] = src_bytes[src_idx];
                 dst_bytes[dst_idx + 1] = src_bytes[src_idx + 1];
@@ -197,7 +200,8 @@ impl Default for PixelState {
     fn default() -> Self {
         let header: PixelHeader = Default::default();
 
-        let size: usize = header.width * header.height * header.bytes_per_pixel;
+        let dim = header.width * header.height;
+        let size = dim * header.bytes_per_pixel as usize;
 
         Self {
             header,
