@@ -31,43 +31,57 @@ pub const MENU_VIEW_SHOW_GRID: &str = "menu-view-show-grid";
 /// reconstruct the menu bar from scratch. Use a map to make it easier to tell the menu
 /// builder which items to disable (gray out) or select (check mark).
 pub struct MenuOpts {
-    pub disabled: HashMap<String, bool>,
-    pub selected: HashMap<String, bool>,
+    disabled: HashMap<&'static str, bool>,
+    selected: HashMap<&'static str, bool>,
 }
 
 impl MenuOpts {
-    pub fn disable(&mut self, key: String, value: bool) {
+    pub fn disable(&mut self, key: &'static str, value: bool) {
         self.disabled.insert(key, value);
     }
 
-    pub fn select(&mut self, key: String, value: bool) {
+    pub fn disabled_or(&self, key: &'static str, default: bool) -> bool {
+        match self.disabled.contains_key(key) {
+            true => self.disabled[key],
+            _ => default,
+        }
+    }
+
+    pub fn select(&mut self, key: &'static str, value: bool) {
         self.selected.insert(key, value);
+    }
+
+    pub fn selected_or(&self, key: &'static str, default: bool) -> bool {
+        match self.selected.contains_key(key) {
+            true => self.selected[key],
+            _ => default,
+        }
     }
 }
 
 impl Default for MenuOpts {
     fn default() -> Self {
-        let mut disabled: HashMap<String, bool> = HashMap::new();
-        let mut selected: HashMap<String, bool> = HashMap::new();
+        let mut disabled: HashMap<&'static str, bool> = HashMap::new();
+        let mut selected: HashMap<&'static str, bool> = HashMap::new();
 
         // We typically start with an untitled document (no path), so the save menu item
         // is disabled by default. It will get enabled when the user performs a save-as,
         // or opens an existing document.
-        disabled.insert(COMMON_MENU_FILE_SAVE.to_string(), true);
+        disabled.insert(COMMON_MENU_FILE_SAVE, true);
 
         // Cut/copy are disabled until there's a selection.
-        disabled.insert(COMMON_MENU_CUT.to_string(), true);
-        disabled.insert(COMMON_MENU_COPY.to_string(), true);
+        disabled.insert(COMMON_MENU_CUT, true);
+        disabled.insert(COMMON_MENU_COPY, true);
 
         // Undo/redo are disabled until you actually make a change.
-        disabled.insert(COMMON_MENU_UNDO.to_string(), true);
-        disabled.insert(COMMON_MENU_REDO.to_string(), true);
+        disabled.insert(COMMON_MENU_UNDO, true);
+        disabled.insert(COMMON_MENU_REDO, true);
 
         // Deselect is disabled until there's a selection.
-        disabled.insert(EDIT_MENU_DESELECT.to_string(), true);
+        disabled.insert(EDIT_MENU_DESELECT, true);
 
         // We show the canvas grid by default.
-        selected.insert(MENU_VIEW_SHOW_GRID.to_string(), true);
+        selected.insert(MENU_VIEW_SHOW_GRID, true);
 
         Self { disabled, selected }
     }
@@ -99,10 +113,7 @@ fn build_file_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
         .hotkey(druid::SysMods::CmdShift, "S")
     }
 
-    let mut save_disabled = false;
-    if menu_opts.disabled.contains_key(COMMON_MENU_FILE_SAVE) {
-        save_disabled = menu_opts.disabled[COMMON_MENU_FILE_SAVE];
-    }
+    let save_disabled = menu_opts.disabled_or(COMMON_MENU_FILE_SAVE, false);
 
     druid::MenuDesc::new(druid::LocalizedString::new("common-menu-file-menu"))
         .append(druid::platform_menus::mac::file::new_file())
@@ -128,30 +139,11 @@ fn build_edit_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
         )
     }
 
-    let mut undo_disabled = false;
-    if menu_opts.disabled.contains_key(COMMON_MENU_UNDO) {
-        undo_disabled = menu_opts.disabled[COMMON_MENU_UNDO];
-    }
-
-    let mut redo_disabled = false;
-    if menu_opts.disabled.contains_key(COMMON_MENU_REDO) {
-        redo_disabled = menu_opts.disabled[COMMON_MENU_REDO];
-    }
-
-    let mut cut_disabled = false;
-    if menu_opts.disabled.contains_key(COMMON_MENU_CUT) {
-        cut_disabled = menu_opts.disabled[COMMON_MENU_CUT];
-    }
-
-    let mut copy_disabled = false;
-    if menu_opts.disabled.contains_key(COMMON_MENU_COPY) {
-        copy_disabled = menu_opts.disabled[COMMON_MENU_COPY];
-    }
-
-    let mut deselect = false;
-    if menu_opts.disabled.contains_key(EDIT_MENU_DESELECT) {
-        deselect = menu_opts.disabled[EDIT_MENU_DESELECT];
-    }
+    let undo_disabled = menu_opts.disabled_or(COMMON_MENU_UNDO, false);
+    let redo_disabled = menu_opts.disabled_or(COMMON_MENU_REDO, false);
+    let cut_disabled = menu_opts.disabled_or(COMMON_MENU_CUT, false);
+    let copy_disabled = menu_opts.disabled_or(COMMON_MENU_COPY, false);
+    let deselect = menu_opts.disabled_or(EDIT_MENU_DESELECT, false);
 
     druid::MenuDesc::new(druid::LocalizedString::new("common-menu-edit-menu"))
         .append(druid::platform_menus::common::undo().disabled_if(|| undo_disabled))
@@ -231,10 +223,7 @@ fn build_view_menu<T: Data>(menu_opts: &MenuOpts) -> druid::MenuDesc<T> {
         .hotkey(druid::SysMods::AltCmd, "'")
     }
 
-    let mut grid_selected = true;
-    if menu_opts.selected.contains_key(MENU_VIEW_SHOW_GRID) {
-        grid_selected = menu_opts.selected[MENU_VIEW_SHOW_GRID];
-    }
+    let grid_selected = menu_opts.selected_or(MENU_VIEW_SHOW_GRID, true);
 
     druid::MenuDesc::new(druid::LocalizedString::new("menu-view-menu").with_placeholder("View"))
         .append(toggle_grid().selected_if(|| grid_selected))
