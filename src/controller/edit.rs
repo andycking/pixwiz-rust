@@ -30,12 +30,7 @@ pub fn copy(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut Ap
 pub fn paste(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut AppState) {}
 
 pub fn select_all(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    data.doc.selection = Some(druid::Rect::new(
-        1.0,
-        1.0,
-        data.doc.pixels.header.width as f64,
-        data.doc.pixels.header.height as f64,
-    ));
+    data.doc.selection = Some(data.doc.pixels.header().bounds());
 }
 
 pub fn deselect(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {

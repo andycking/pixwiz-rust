@@ -37,8 +37,8 @@ pub fn write_path(path_str: &str, pixels: &PixelState) -> Result<(), StorageErro
 pub fn write<W: Write>(writer: W, pixels: &PixelState) -> Result<(), StorageError> {
     let mut encoder = png::Encoder::new(
         writer,
-        pixels.header.width as u32,
-        pixels.header.height as u32,
+        pixels.header().width() as u32,
+        pixels.header().height() as u32,
     );
     encoder.set_color(png::ColorType::RGBA);
     encoder.set_depth(png::BitDepth::Eight);

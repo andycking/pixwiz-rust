@@ -19,10 +19,10 @@ use crate::model::types::PixelBytes;
 /// Generic pixel header.
 #[derive(Clone, druid::Data)]
 pub struct PixelHeader {
-    pub width: usize,
-    pub height: usize,
-    pub depth: u8,
-    pub bytes_per_pixel: u8,
+    width: usize,
+    height: usize,
+    depth: u8,
+    bytes_per_pixel: u8,
 }
 
 impl PixelHeader {
@@ -45,6 +45,18 @@ impl PixelHeader {
         }
     }
 
+    pub fn width(&self) -> usize {
+        self.width
+    }
+
+    pub fn height(&self) -> usize {
+        self.height
+    }
+
+    pub fn bytes_per_pixel(&self) -> u8 {
+        self.bytes_per_pixel
+    }
+
     /// Get bounding box for pixels.
     pub fn bounds(&self) -> druid::Rect {
         druid::Rect::new(1.0, 1.0, self.width as f64, self.height as f64)
@@ -64,10 +76,10 @@ impl Default for PixelHeader {
 
 /// Capture environment.
 pub struct PixelEnv {
-    pub color: druid::Color,
-    pub pos: druid::Point,
-    pub bounds: druid::Rect,
-    pub param: f64,
+    color: druid::Color,
+    pos: druid::Point,
+    bounds: druid::Rect,
+    param: f64,
 }
 
 impl PixelEnv {
@@ -79,21 +91,37 @@ impl PixelEnv {
             param,
         }
     }
+
+    pub fn color(&self) -> &druid::Color {
+        &self.color
+    }
+
+    pub fn pos(&self) -> &druid::Point {
+        &self.pos
+    }
+
+    pub fn bounds(&self) -> &druid::Rect {
+        &self.bounds
+    }
+
+    pub fn param(&self) -> f64 {
+        self.param
+    }
 }
 
 /// Pixel storage. Each value is stored as four contiguous bytes representing RGBA,
 /// respectively. We hold the values in an ARC, to avoid copying them.
 #[derive(Clone, druid::Data)]
 pub struct PixelState {
-    pub header: PixelHeader,
-    pub dirty: bool,
+    header: PixelHeader,
+    dirty: bool,
     pub bytes: PixelBytes,
 }
 
 impl PixelState {
     /// Create new pixel state with given bytes.
     pub fn new(header: PixelHeader, bytes: Vec<u8>) -> Self {
-        let dim = header.width * header.height;
+        let dim = header.width() * header.height();
         let len = dim * header.bytes_per_pixel as usize;
         assert!(bytes.len() == len);
 
@@ -102,6 +130,18 @@ impl PixelState {
             dirty: false,
             bytes: Arc::new(bytes),
         }
+    }
+
+    pub fn dirty(&self) -> bool {
+        self.dirty
+    }
+
+    pub fn set_dirty(&mut self) {
+        self.dirty = true;
+    }
+
+    pub fn header(&self) -> &PixelHeader {
+        &self.header
     }
 
     /// Get the length of the pixel state in bytes.
@@ -116,7 +156,7 @@ impl PixelState {
     /// Convert coordinates to an index within storage.
     #[inline]
     pub fn xy_to_idx(&self, x: usize, y: usize) -> usize {
-        (y - 1) * self.header.width + (x - 1)
+        (y - 1) * self.header.width() + (x - 1)
     }
 
     /// Convert point coordinates to an index within storage.
@@ -146,7 +186,7 @@ impl PixelState {
 
         for y in area.y0 as usize..area.y1 as usize {
             for x in area.x0 as usize..area.x1 as usize {
-                let idx = (y - 1) * self.header.width + (x - 1);
+                let idx = (y - 1) * self.header.width() + (x - 1);
                 let src_idx = idx * self.header.bytes_per_pixel as usize;
 
                 dst_bytes.extend_from_slice(&self.bytes[src_idx..src_idx + 4]);
@@ -180,7 +220,7 @@ impl PixelState {
 
         for y in area.y0 as usize..area.y1 as usize {
             for x in area.x0 as usize..area.x1 as usize {
-                let idx = (y - 1) * self.header.width + (x - 1);
+                let idx = (y - 1) * self.header.width() + (x - 1);
                 let dst_idx = idx * self.header.bytes_per_pixel as usize;
 
                 dst_bytes[dst_idx] = src_bytes[src_idx];
@@ -200,7 +240,7 @@ impl Default for PixelState {
     fn default() -> Self {
         let header: PixelHeader = Default::default();
 
-        let dim = header.width * header.height;
+        let dim = header.width() * header.height();
         let size = dim * header.bytes_per_pixel as usize;
 
         Self {

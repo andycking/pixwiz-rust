@@ -20,7 +20,7 @@ use crate::view::alert;
 pub fn new(ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     assert!(data.window_state == WindowState::Normal);
 
-    if data.doc.pixels.dirty {
+    if data.doc.pixels.dirty() {
         data.window_state = WindowState::UnsavedAlert;
         let alert = alert::unsaved(data.window_pos);
         ctx.new_window(alert);
@@ -38,7 +38,7 @@ pub fn open(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppSt
 
     data.doc.new_path = Some(String::from(path));
 
-    if data.doc.pixels.dirty {
+    if data.doc.pixels.dirty() {
         data.window_state = WindowState::UnsavedAlert;
         let alert = alert::unsaved(data.window_pos);
         ctx.new_window(alert);
