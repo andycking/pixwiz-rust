@@ -34,7 +34,7 @@ impl Document {
     pub fn bounds(&self) -> druid::Rect {
         let b = self
             .selection
-            .unwrap_or_else(|| self.pixels.header.bounds());
+            .unwrap_or_else(|| self.pixels.header().bounds());
         druid::Rect::new(b.x0, b.y0, b.x1 + 1.0, b.y1 + 1.0)
     }
 }

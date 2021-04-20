@@ -155,7 +155,7 @@ fn rebuild_menu_bar(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &m
 
     menu_opts.disable(
         menu::COMMON_MENU_FILE_SAVE,
-        data.doc.path.is_none() || !data.doc.pixels.dirty,
+        data.doc.path.is_none() || !data.doc.pixels.dirty(),
     );
 
     let empty_selection = data.doc.selection.is_none();

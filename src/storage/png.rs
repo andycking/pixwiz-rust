@@ -37,8 +37,8 @@ pub fn write_path(path_str: &str, pixels: &PixelState) -> Result<(), StorageErro
 pub fn write<W: Write>(writer: W, pixels: &PixelState) -> Result<(), StorageError> {
     let mut encoder = png::Encoder::new(
         writer,
-        pixels.header.width as u32,
-        pixels.header.height as u32,
+        pixels.header().width() as u32,
+        pixels.header().height() as u32,
     );
     encoder.set_color(png::ColorType::RGBA);
     encoder.set_depth(png::BitDepth::Eight);
@@ -76,8 +76,8 @@ pub fn read<R: Read>(reader: R) -> Result<PixelState, StorageError> {
     decode_reader.next_frame(&mut bytes)?;
 
     let header = PixelHeader::new(
-        info.width as usize,
-        info.height as usize,
+        info.width,
+        info.height,
         8, // But why you lying tho?
         4, // Ditto.
     );

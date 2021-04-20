@@ -20,20 +20,22 @@ use crate::model::pixels::PixelHeader;
 
 /// Convert pixels to black & white.
 pub fn black_and_white(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
-    for y in env.bounds.y0 as usize..env.bounds.y1 as usize {
-        for x in env.bounds.x0 as usize..env.bounds.x1 as usize {
+    let bounds = env.bounds();
+    for y in bounds.y0 as usize..bounds.y1 as usize {
+        for x in bounds.x0 as usize..bounds.x1 as usize {
             let color = util::read(x, y, header, bytes);
-            let bw = util::black_and_white(&color, env.param);
+            let bw = util::black_and_white(&color, env.param());
             util::write(x, y, header, bytes, &bw);
         }
     }
 }
 
 pub fn brightness(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
-    for y in env.bounds.y0 as usize..env.bounds.y1 as usize {
-        for x in env.bounds.x0 as usize..env.bounds.x1 as usize {
+    let bounds = env.bounds();
+    for y in bounds.y0 as usize..bounds.y1 as usize {
+        for x in bounds.x0 as usize..bounds.x1 as usize {
             let color = util::read(x, y, header, bytes);
-            let new_color = util::brightness(&color, env.param);
+            let new_color = util::brightness(&color, env.param());
             util::write(x, y, header, bytes, &new_color);
         }
     }
@@ -41,8 +43,9 @@ pub fn brightness(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
 
 /// Desaturate pixels (make them grayscale).
 pub fn desaturate(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
-    for y in env.bounds.y0 as usize..env.bounds.y1 as usize {
-        for x in env.bounds.x0 as usize..env.bounds.x1 as usize {
+    let bounds = env.bounds();
+    for y in bounds.y0 as usize..bounds.y1 as usize {
+        for x in bounds.x0 as usize..bounds.x1 as usize {
             let color = util::read(x, y, header, bytes);
             let gray = util::desaturate(&color);
             util::write(x, y, header, bytes, &gray);
@@ -52,45 +55,48 @@ pub fn desaturate(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
 
 /// Fill the given pixels to the boundary.
 pub fn fill(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
-    for y in env.bounds.y0 as usize..env.bounds.y1 as usize {
-        for x in env.bounds.x0 as usize..env.bounds.x1 as usize {
-            util::write(x, y, header, bytes, &env.color);
+    let bounds = env.bounds();
+    for y in bounds.y0 as usize..bounds.y1 as usize {
+        for x in bounds.x0 as usize..bounds.x1 as usize {
+            util::write(x, y, header, bytes, env.color());
         }
     }
 }
 
 /// Flood fill the given pixels starting from a seed position.
 pub fn flood_fill(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
-    let x = env.pos.x as usize;
-    let y = env.pos.y as usize;
+    let x = env.pos().x as usize;
+    let y = env.pos().y as usize;
     let start_color = util::read(x, y, header, bytes);
-    if start_color == env.color {
+    if start_color == *env.color() {
         return;
     }
 
     let mut q: VecDeque<druid::Point> = VecDeque::new();
-    q.push_back(env.pos);
+    q.push_back(*env.pos());
     while !q.is_empty() {
         let node = q.pop_front().unwrap();
         let x = node.x as usize;
         let y = node.y as usize;
         if util::read(x, y, header, bytes) == start_color {
-            util::write(x, y, header, bytes, &env.color);
+            util::write(x, y, header, bytes, env.color());
+
+            let bounds = env.bounds();
 
             let left = node - (1.0, 0.0);
-            if env.bounds.contains(left) {
+            if bounds.contains(left) {
                 q.push_back(left);
             }
             let right = node + (1.0, 0.0);
-            if env.bounds.contains(right) {
+            if bounds.contains(right) {
                 q.push_back(right);
             }
             let up = node - (0.0, 1.0);
-            if env.bounds.contains(up) {
+            if bounds.contains(up) {
                 q.push_back(up);
             }
             let down = node + (0.0, 1.0);
-            if env.bounds.contains(down) {
+            if bounds.contains(down) {
                 q.push_back(down);
             }
         }
@@ -128,15 +134,16 @@ pub fn dither_floyd(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
         bytes: &mut Vec<u8>,
     ) {
         let p = druid::Point::new(x as f64, y as f64);
-        if env.bounds.contains(p) {
+        if env.bounds().contains(p) {
             let oldpixel = util::read(x, y, header, bytes);
             let newpixel = apply_error(&oldpixel, quant_error, weight);
             util::write(x, y, header, bytes, &newpixel);
         }
     }
 
-    for y in env.bounds.y0 as usize..env.bounds.y1 as usize {
-        for x in env.bounds.x0 as usize..env.bounds.x1 as usize {
+    let bounds = env.bounds();
+    for y in bounds.y0 as usize..bounds.y1 as usize {
+        for x in bounds.x0 as usize..bounds.x1 as usize {
             let oldpixel = util::read(x, y, header, bytes);
             let newpixel = util::black_and_white(&oldpixel, 0.5);
             util::write(x, y, header, bytes, &newpixel);

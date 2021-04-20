@@ -32,10 +32,11 @@ where
     let bounds = data.doc.bounds();
     undo::push(data, bounds);
 
+    let header = data.doc.pixels.header().clone();
     let env = PixelEnv::new(data.brush_color.clone(), data.current_pos, bounds, param);
     let bytes = Arc::make_mut(&mut data.doc.pixels.bytes);
 
-    f(&data.doc.pixels.header, &env, bytes);
+    f(&header, &env, bytes);
 
-    data.doc.pixels.dirty = true;
+    data.doc.pixels.set_dirty();
 }
