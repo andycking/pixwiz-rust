@@ -158,10 +158,10 @@ fn rebuild_menu_bar(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &m
         data.doc.path.is_none() || !data.doc.pixels.dirty(),
     );
 
-    let empty_selection = data.doc.selection.is_none();
+    let empty_selection = data.doc.selection().is_none();
 
-    menu_opts.disable(menu::COMMON_MENU_UNDO, data.doc.undo.is_empty());
-    menu_opts.disable(menu::COMMON_MENU_REDO, data.doc.redo.is_empty());
+    menu_opts.disable(menu::COMMON_MENU_UNDO, data.doc.undo().is_empty());
+    menu_opts.disable(menu::COMMON_MENU_REDO, data.doc.redo().is_empty());
     menu_opts.disable(menu::COMMON_MENU_CUT, empty_selection);
     menu_opts.disable(menu::COMMON_MENU_COPY, empty_selection);
     menu_opts.disable(menu::EDIT_MENU_DESELECT, empty_selection);

@@ -19,16 +19,36 @@ use crate::model::types::*;
 /// Per-document state.
 #[derive(Clone, druid::Data, Default)]
 pub struct Document {
-    pub selection: Option<druid::Rect>,
+    selection: Option<druid::Rect>,
     pub move_bytes: Option<PixelBytes>,
     pub pixels: PixelState,
     pub path: Option<String>,
     pub new_path: Option<String>,
-    pub undo: ModStack,
-    pub redo: ModStack,
+    undo: ModStack,
+    redo: ModStack,
 }
 
 impl Document {
+    pub fn selection(&self) -> Option<druid::Rect> {
+        self.selection
+    }
+
+    pub fn clear_selection(&mut self) {
+        self.selection = None
+    }
+
+    pub fn set_selection(&mut self, selection: druid::Rect) {
+        self.selection = Some(selection);
+    }
+
+    pub fn undo(&mut self) -> &mut ModStack {
+        &mut self.undo
+    }
+
+    pub fn redo(&mut self) -> &mut ModStack {
+        &mut self.redo
+    }
+
     /// Get the current boundary. If a selection exists, then that's the boundary.
     /// Otherwise, it's the entire canvas. The result is in canvas coords.
     pub fn bounds(&self) -> druid::Rect {
