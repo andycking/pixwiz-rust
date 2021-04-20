@@ -20,7 +20,7 @@ use crate::model::types::*;
 #[derive(Clone, druid::Data, Default)]
 pub struct Document {
     selection: Option<druid::Rect>,
-    pub move_bytes: Option<PixelBytes>,
+    move_bytes: Option<PixelBytes>,
     pub pixels: PixelState,
     path: Option<String>,
     new_path: Option<String>,
@@ -42,11 +42,19 @@ impl Document {
     }
 
     pub fn clear_selection(&mut self) {
-        self.selection = None
+        self.selection = None;
     }
 
     pub fn set_selection(&mut self, selection: druid::Rect) {
         self.selection = Some(selection);
+    }
+
+    pub fn move_bytes(&self) -> &Option<PixelBytes> {
+        &self.move_bytes
+    }
+
+    pub fn clear_move_bytes(&mut self) {
+        self.move_bytes = None;
     }
 
     pub fn path(&self) -> Option<String> {
