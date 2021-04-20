@@ -24,8 +24,8 @@ const STACK_DEPTH: usize = 16;
 /// Modification record. This holds undo state.
 #[derive(Clone, druid::Data)]
 pub struct ModRecord {
-    pub area: druid::Rect,
-    pub bytes: PixelBytes,
+    area: druid::Rect,
+    bytes: PixelBytes,
 }
 
 impl ModRecord {
@@ -34,6 +34,14 @@ impl ModRecord {
             area,
             bytes: Arc::new(bytes),
         }
+    }
+
+    pub fn area(&self) -> druid::Rect {
+        self.area
+    }
+
+    pub fn bytes(&self) -> &Vec<u8> {
+        &*self.bytes
     }
 }
 

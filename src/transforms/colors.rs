@@ -80,7 +80,7 @@ pub fn flood_fill(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
         let y = node.y as usize;
         if util::read(x, y, header, bytes) == start_color {
             util::write(x, y, header, bytes, env.color());
-        
+
             let bounds = env.bounds();
 
             let left = node - (1.0, 0.0);
