@@ -22,13 +22,21 @@ pub struct Document {
     selection: Option<druid::Rect>,
     pub move_bytes: Option<PixelBytes>,
     pub pixels: PixelState,
-    pub path: Option<String>,
-    pub new_path: Option<String>,
+    path: Option<String>,
+    new_path: Option<String>,
     undo: ModStack,
     redo: ModStack,
 }
 
 impl Document {
+    pub fn new(pixels: PixelState, path: String) -> Self {
+        Self {
+            pixels,
+            path: Some(path),
+            ..Default::default()
+        }
+    }
+
     pub fn selection(&self) -> Option<druid::Rect> {
         self.selection
     }
@@ -39,6 +47,22 @@ impl Document {
 
     pub fn set_selection(&mut self, selection: druid::Rect) {
         self.selection = Some(selection);
+    }
+
+    pub fn path(&self) -> Option<String> {
+        self.path.clone()
+    }
+
+    pub fn set_path(&mut self, path: String) {
+        self.path = Some(path);
+    }
+
+    pub fn new_path(&self) -> Option<String> {
+        self.new_path.clone()
+    }
+
+    pub fn set_new_path(&mut self, new_path: String) {
+        self.new_path = Some(new_path);
     }
 
     pub fn undo(&mut self) -> &mut ModStack {

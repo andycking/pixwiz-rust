@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use crate::model::app::AppState;
+use crate::model::document::Document;
 use crate::model::types::*;
 use crate::storage;
 use crate::view::alert;
@@ -36,7 +37,7 @@ pub fn open(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppSt
     let file_info = cmd.get_unchecked(druid::commands::OPEN_FILE);
     let path = file_info.path().to_str().unwrap();
 
-    data.doc.new_path = Some(String::from(path));
+    data.doc.set_new_path(String::from(path));
 
     if data.doc.pixels.dirty() {
         data.window_state = WindowState::UnsavedAlert;
@@ -50,13 +51,9 @@ pub fn open(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppSt
 pub fn open_internal(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     assert!(data.window_state != WindowState::UnsavedAlert);
 
-    if let Some(new_path) = data.doc.new_path.to_owned() {
+    if let Some(new_path) = data.doc.new_path() {
         match storage::png::read_path(&new_path) {
-            Ok(pixels) => {
-                data.doc = Default::default();
-                data.doc.pixels = pixels;
-                data.doc.path = Some(String::from(&new_path));
-            }
+            Ok(pixels) => data.doc = Document::new(pixels, new_path),
             Err(_e) => {}
         }
     } else {
@@ -67,8 +64,8 @@ pub fn open_internal(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data:
 pub fn save(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     assert!(data.window_state == WindowState::Normal);
 
-    if let Some(path) = &data.doc.path {
-        match storage::png::write_path(path, &data.doc.pixels) {
+    if let Some(path) = data.doc.path() {
+        match storage::png::write_path(&path, &data.doc.pixels) {
             Ok(()) => {}
             Err(_e) => {}
         };
@@ -87,7 +84,7 @@ pub fn save_as(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut Ap
             if data.window_state == WindowState::UnsavedSave {
                 open_internal(ctx, cmd, data);
             } else {
-                data.doc.path = Some(String::from(path));
+                data.doc.set_path(String::from(path));
             }
         }
         Err(_e) => {}
