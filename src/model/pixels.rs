@@ -19,19 +19,19 @@ use crate::model::types::PixelBytes;
 /// Generic pixel header.
 #[derive(Clone, druid::Data)]
 pub struct PixelHeader {
-    width: usize,
-    height: usize,
+    width: u32,
+    height: u32,
     depth: u8,
     bytes_per_pixel: u8,
 }
 
 impl PixelHeader {
-    const DEFAULT_WIDTH: usize = 32;
-    const DEFAULT_HEIGHT: usize = 32;
+    const DEFAULT_WIDTH: u32 = 32;
+    const DEFAULT_HEIGHT: u32 = 32;
     const DEFAULT_DEPTH: u8 = 8;
     const DEFAULT_BYTES_PER_PIXEL: u8 = 4;
 
-    pub fn new(width: usize, height: usize, depth: u8, bytes_per_pixel: u8) -> Self {
+    pub fn new(width: u32, height: u32, depth: u8, bytes_per_pixel: u8) -> Self {
         assert!(width == Self::DEFAULT_WIDTH);
         assert!(height == Self::DEFAULT_HEIGHT);
         assert!(depth == Self::DEFAULT_DEPTH);
@@ -46,11 +46,11 @@ impl PixelHeader {
     }
 
     pub fn width(&self) -> usize {
-        self.width
+        self.width as usize
     }
 
     pub fn height(&self) -> usize {
-        self.height
+        self.height as usize
     }
 
     pub fn bytes_per_pixel(&self) -> u8 {

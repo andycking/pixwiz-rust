@@ -76,8 +76,8 @@ pub fn read<R: Read>(reader: R) -> Result<PixelState, StorageError> {
     decode_reader.next_frame(&mut bytes)?;
 
     let header = PixelHeader::new(
-        info.width as usize,
-        info.height as usize,
+        info.width,
+        info.height,
         8, // But why you lying tho?
         4, // Ditto.
     );
