@@ -19,16 +19,68 @@ use crate::model::types::*;
 /// Per-document state.
 #[derive(Clone, druid::Data, Default)]
 pub struct Document {
-    pub selection: Option<druid::Rect>,
-    pub move_bytes: Option<PixelBytes>,
+    selection: Option<druid::Rect>,
+    move_bytes: Option<PixelBytes>,
     pub pixels: PixelState,
-    pub path: Option<String>,
-    pub new_path: Option<String>,
-    pub undo: ModStack,
-    pub redo: ModStack,
+    path: Option<String>,
+    new_path: Option<String>,
+    undo: ModStack,
+    redo: ModStack,
 }
 
 impl Document {
+    pub fn new(pixels: PixelState, path: String) -> Self {
+        Self {
+            pixels,
+            path: Some(path),
+            ..Default::default()
+        }
+    }
+
+    pub fn selection(&self) -> Option<druid::Rect> {
+        self.selection
+    }
+
+    pub fn clear_selection(&mut self) {
+        self.selection = None;
+    }
+
+    pub fn set_selection(&mut self, selection: druid::Rect) {
+        self.selection = Some(selection);
+    }
+
+    pub fn move_bytes(&self) -> &Option<PixelBytes> {
+        &self.move_bytes
+    }
+
+    pub fn clear_move_bytes(&mut self) {
+        self.move_bytes = None;
+    }
+
+    pub fn path(&self) -> Option<String> {
+        self.path.clone()
+    }
+
+    pub fn set_path(&mut self, path: String) {
+        self.path = Some(path);
+    }
+
+    pub fn new_path(&self) -> Option<String> {
+        self.new_path.clone()
+    }
+
+    pub fn set_new_path(&mut self, new_path: String) {
+        self.new_path = Some(new_path);
+    }
+
+    pub fn undo(&mut self) -> &mut ModStack {
+        &mut self.undo
+    }
+
+    pub fn redo(&mut self) -> &mut ModStack {
+        &mut self.redo
+    }
+
     /// Get the current boundary. If a selection exists, then that's the boundary.
     /// Otherwise, it's the entire canvas. The result is in canvas coords.
     pub fn bounds(&self) -> druid::Rect {

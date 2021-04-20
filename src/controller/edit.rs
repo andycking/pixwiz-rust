@@ -30,10 +30,10 @@ pub fn copy(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut Ap
 pub fn paste(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut AppState) {}
 
 pub fn select_all(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    data.doc.selection = Some(data.doc.pixels.header().bounds());
+    data.doc.set_selection(data.doc.pixels.header().bounds());
 }
 
 pub fn deselect(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    data.doc.selection = None;
-    data.doc.move_bytes = None;
+    data.doc.clear_selection();
+    data.doc.clear_move_bytes();
 }

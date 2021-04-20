@@ -154,7 +154,7 @@ impl Canvas {
 
     /// Paint the currently selected area onto the given render context.
     fn paint_selection(&self, ctx: &mut PaintCtx, data: &AppState) {
-        if let Some(s) = data.doc.selection {
+        if let Some(s) = data.doc.selection() {
             let tl = Self::canvas_coords_to_screen_coords_f64(s.x0, s.y0);
             let br = Self::canvas_coords_to_screen_coords_f64(s.x1, s.y1);
 
