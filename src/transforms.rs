@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::sync::Arc;
-
 use crate::controller::undo;
 use crate::model::app::AppState;
 use crate::model::pixels::PixelEnv;
@@ -32,11 +30,14 @@ where
     let bounds = data.doc.bounds();
     undo::push(data, bounds);
 
+    // The transform function gets copies of the header and the bytes. We don't want
+    // it mucking directly with our pixels.
     let header = data.doc.pixels.header().clone();
     let env = PixelEnv::new(data.brush_color.clone(), data.current_pos, bounds, param);
-    let bytes = Arc::make_mut(&mut data.doc.pixels.bytes);
+    let mut bytes = data.doc.pixels.bytes().to_vec();
 
-    f(&header, &env, bytes);
+    f(&header, &env, &mut bytes);
 
-    data.doc.pixels.set_dirty();
+    // Write back the modified pixels.
+    data.doc.pixels.write_area(bounds, &bytes);
 }
