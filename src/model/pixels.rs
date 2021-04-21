@@ -115,7 +115,7 @@ impl PixelEnv {
 pub struct PixelState {
     header: PixelHeader,
     dirty: bool,
-    pub bytes: PixelBytes,
+    bytes: PixelBytes,
 }
 
 impl PixelState {
@@ -136,12 +136,12 @@ impl PixelState {
         self.dirty
     }
 
-    pub fn set_dirty(&mut self) {
-        self.dirty = true;
-    }
-
     pub fn header(&self) -> &PixelHeader {
         &self.header
+    }
+
+    pub fn bytes(&self) -> &Vec<u8> {
+        &self.bytes
     }
 
     /// Get the length of the pixel state in bytes.
