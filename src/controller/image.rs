@@ -44,8 +44,8 @@ pub fn dither_floyd(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: 
 pub fn eraser(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     undo::push_point(data, data.current_pos);
 
-    let idx = data.doc.pixels.point_to_idx(data.current_pos);
-    data.doc.pixels.write(idx, &druid::Color::rgba8(0, 0, 0, 0));
+    let idx = data.doc.pixels().point_to_idx(data.current_pos);
+    data.doc.pixels_mut().write(idx, &druid::Color::rgba8(0, 0, 0, 0));
 }
 
 pub fn fill(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
@@ -76,6 +76,6 @@ pub fn move_(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut A
 pub fn paint(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     undo::push_point(data, data.current_pos);
 
-    let idx = data.doc.pixels.point_to_idx(data.current_pos);
-    data.doc.pixels.write(idx, &data.brush_color);
+    let idx = data.doc.pixels().point_to_idx(data.current_pos);
+    data.doc.pixels_mut().write(idx, &data.brush_color);
 }

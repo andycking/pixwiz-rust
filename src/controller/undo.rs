@@ -32,7 +32,7 @@ pub fn push(data: &mut AppState, area: druid::Rect) {
 }
 
 fn push_inner(data: &mut AppState, area: druid::Rect) {
-    let bytes = data.doc.pixels.read_area(area);
+    let bytes = data.doc.pixels().read_area(area);
     let record = ModRecord::new(area, bytes);
 
     data.doc.undo().push(record);
@@ -44,12 +44,12 @@ pub fn pop(data: &mut AppState) {
         // Before we undo, record what we just did, so that we can redo it again.
         push_redo(data, record.area());
 
-        data.doc.pixels.write_area(record.area(), record.bytes());
+        data.doc.pixels_mut().write_area(record.area(), record.bytes());
     }
 }
 
 fn push_redo(data: &mut AppState, area: druid::Rect) {
-    let bytes = data.doc.pixels.read_area(area);
+    let bytes = data.doc.pixels().read_area(area);
     let record = ModRecord::new(area, bytes);
 
     data.doc.redo().push(record);
@@ -62,6 +62,6 @@ pub fn pop_redo(data: &mut AppState) {
         // But call the inner function, so that we don't reset the redo stack!
         push_inner(data, record.area());
 
-        data.doc.pixels.write_area(record.area(), record.bytes());
+        data.doc.pixels_mut().write_area(record.area(), record.bytes());
     }
 }

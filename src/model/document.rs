@@ -21,7 +21,7 @@ use crate::model::types::*;
 pub struct Document {
     selection: Option<druid::Rect>,
     move_bytes: Option<PixelBytes>,
-    pub pixels: PixelState,
+    pixels: PixelState,
     path: Option<String>,
     new_path: Option<String>,
     undo: ModStack,
@@ -55,6 +55,14 @@ impl Document {
 
     pub fn clear_move_bytes(&mut self) {
         self.move_bytes = None;
+    }
+
+    pub fn pixels(&self) -> &PixelState {
+        &self.pixels
+    }
+
+    pub fn pixels_mut(&mut self) -> &mut PixelState {
+        &mut self.pixels
     }
 
     pub fn path(&self) -> Option<String> {

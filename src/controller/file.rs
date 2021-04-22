@@ -21,7 +21,7 @@ use crate::view::alert;
 pub fn new(ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     assert!(data.window_state == WindowState::Normal);
 
-    if data.doc.pixels.dirty() {
+    if data.doc.pixels().dirty() {
         data.window_state = WindowState::UnsavedAlert;
         let alert = alert::unsaved(data.window_pos);
         ctx.new_window(alert);
@@ -39,7 +39,7 @@ pub fn open(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppSt
 
     data.doc.set_new_path(String::from(path));
 
-    if data.doc.pixels.dirty() {
+    if data.doc.pixels().dirty() {
         data.window_state = WindowState::UnsavedAlert;
         let alert = alert::unsaved(data.window_pos);
         ctx.new_window(alert);
@@ -65,7 +65,7 @@ pub fn save(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut App
     assert!(data.window_state == WindowState::Normal);
 
     if let Some(path) = data.doc.path() {
-        match storage::png::write_path(&path, &data.doc.pixels) {
+        match storage::png::write_path(&path, data.doc.pixels()) {
             Ok(()) => {}
             Err(_e) => {}
         };
@@ -79,7 +79,7 @@ pub fn save_as(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut Ap
     let file_info = cmd.get_unchecked(druid::commands::SAVE_FILE_AS);
     let path = file_info.path().to_str().unwrap();
 
-    match storage::png::write_path(path, &data.doc.pixels) {
+    match storage::png::write_path(path, data.doc.pixels()) {
         Ok(()) => {
             if data.window_state == WindowState::UnsavedSave {
                 open_internal(ctx, cmd, data);
