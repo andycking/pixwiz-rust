@@ -119,7 +119,7 @@ fn build_palette() -> impl druid::Widget<AppState> {
 
 fn build_preview() -> impl druid::Widget<AppState> {
     druid::widget::Painter::new(|ctx, data: &AppState, _env| {
-        let pixels = &data.doc.pixels;
+        let pixels = data.doc.pixels();
         let header = pixels.header();
         let mut i = 0;
         for y in 0..header.height() {
