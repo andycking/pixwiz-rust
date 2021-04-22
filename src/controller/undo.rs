@@ -44,7 +44,9 @@ pub fn pop(data: &mut AppState) {
         // Before we undo, record what we just did, so that we can redo it again.
         push_redo(data, record.area());
 
-        data.doc.pixels_mut().write_area(record.area(), record.bytes());
+        data.doc
+            .pixels_mut()
+            .write_area(record.area(), record.bytes());
     }
 }
 
@@ -62,6 +64,8 @@ pub fn pop_redo(data: &mut AppState) {
         // But call the inner function, so that we don't reset the redo stack!
         push_inner(data, record.area());
 
-        data.doc.pixels_mut().write_area(record.area(), record.bytes());
+        data.doc
+            .pixels_mut()
+            .write_area(record.area(), record.bytes());
     }
 }
