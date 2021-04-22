@@ -144,6 +144,11 @@ impl PixelState {
         &self.bytes
     }
 
+    pub fn set_bytes(&mut self, bytes: Vec<u8>) {
+        self.bytes = Arc::new(bytes);
+        self.dirty = true;
+    }
+
     /// Get the length of the pixel state in bytes.
     #[inline]
     pub fn len(&self) -> usize {
