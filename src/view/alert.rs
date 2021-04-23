@@ -31,7 +31,7 @@ pub fn unsaved(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
 
     let save = Button::new("Save", true).on_click(|ctx, data, _env| {
         // Transition to the next state. Just do this directly in the handler.
-        data.window_state = WindowState::UnsavedSave;
+        data.set_window_state(WindowState::UnsavedSave);
 
         // Close the alert, because we're going to show the save panel.
         ctx.submit_command(druid::commands::CLOSE_WINDOW);
@@ -46,13 +46,13 @@ pub fn unsaved(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
     });
 
     let dont_save = Button::new("Don't Save", false).on_click(|ctx, data, _env| {
-        data.window_state = Default::default();
+        data.reset_window_state();
         ctx.submit_command(druid::commands::CLOSE_WINDOW);
         ctx.submit_command(commands::OPEN_FILE_INTERNAL);
     });
 
     let cancel = Button::new("Cancel", false).on_click(|ctx, data, _env| {
-        data.window_state = Default::default();
+        data.reset_window_state();
         ctx.submit_command(druid::commands::CLOSE_WINDOW);
     });
 

@@ -229,7 +229,7 @@ impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for WindowContr
                 | Event::Zoom(_)
         );
 
-        if data.window_state == WindowState::Normal || !block {
+        if data.window_state() == WindowState::Normal || !block {
             child.event(ctx, event, data, env);
         }
     }

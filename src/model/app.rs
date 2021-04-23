@@ -23,7 +23,7 @@ pub struct AppState {
     start_pos: druid::Point,
     current_pos: druid::Point,
     window_pos: druid::Point,
-    pub window_state: WindowState,
+    window_state: WindowState,
     tool_type: ToolType,
     show_grid: bool,
     pub doc: Document,
@@ -86,6 +86,18 @@ impl AppState {
 
     pub fn set_window_pos(&mut self, window_pos: druid::Point) {
         self.window_pos = window_pos;
+    }
+
+    pub fn window_state(&self) -> WindowState {
+        self.window_state
+    }
+
+    pub fn set_window_state(&mut self, window_state: WindowState) {
+        self.window_state = window_state;
+    }
+
+    pub fn reset_window_state(&mut self) {
+        self.window_state = Default::default();
     }
 
     pub fn tool_type(&self) -> ToolType {

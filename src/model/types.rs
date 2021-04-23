@@ -29,7 +29,7 @@ pub enum ToolType {
 }
 
 /// Window state.
-#[derive(Clone, druid::Data, PartialEq)]
+#[derive(Clone, Copy, druid::Data, PartialEq)]
 pub enum WindowState {
     Normal,
     UnsavedAlert,
