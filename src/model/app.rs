@@ -20,9 +20,9 @@ use crate::model::types::*;
 pub struct AppState {
     pub brush_color: druid::Color,
     pub pos_color: druid::Color,
-    pub start_pos: druid::Point,
-    pub current_pos: druid::Point,
-    pub window_pos: druid::Point,
+    start_pos: druid::Point,
+    current_pos: druid::Point,
+    window_pos: druid::Point,
     pub window_state: WindowState,
     pub tool_type: ToolType,
     pub show_grid: bool,
@@ -46,5 +46,29 @@ impl AppState {
             doc: Default::default(),
             id,
         }
+    }
+
+    pub fn start_pos(&self) -> druid::Point {
+        self.start_pos
+    }
+
+    pub fn set_start_pos(&mut self, start_pos: druid::Point) {
+        self.start_pos = start_pos;
+    }
+
+    pub fn current_pos(&self) -> druid::Point {
+        self.current_pos
+    }
+
+    pub fn set_current_pos(&mut self, current_pos: druid::Point) {
+        self.current_pos = current_pos;
+    }
+
+    pub fn window_pos(&self) -> druid::Point {
+        self.window_pos
+    }
+
+    pub fn set_window_pos(&mut self, window_pos: druid::Point) {
+        self.window_pos = window_pos;
     }
 }

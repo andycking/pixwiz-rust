@@ -58,7 +58,7 @@ pub fn fill(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     let bounds = env.bounds();
     for y in bounds.y0 as usize..bounds.y1 as usize {
         for x in bounds.x0 as usize..bounds.x1 as usize {
-            util::write(x, y, header, bytes, env.color());
+            util::write(x, y, header, bytes, &env.color());
         }
     }
 }
@@ -73,7 +73,7 @@ pub fn flood_fill(header: &PixelHeader, env: &PixelEnv, bytes: &mut Vec<u8>) {
     }
 
     let mut q: VecDeque<druid::Point> = VecDeque::new();
-    q.push_back(*env.pos());
+    q.push_back(env.pos());
     while !q.is_empty() {
         let node = q.pop_front().unwrap();
         let x = node.x as usize;

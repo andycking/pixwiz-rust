@@ -23,7 +23,7 @@ pub fn new(ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppSt
 
     if data.doc.pixels().dirty() {
         data.window_state = WindowState::UnsavedAlert;
-        let alert = alert::unsaved(data.window_pos);
+        let alert = alert::unsaved(data.window_pos());
         ctx.new_window(alert);
     } else {
         data.doc = Default::default();
@@ -41,7 +41,7 @@ pub fn open(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppSt
 
     if data.doc.pixels().dirty() {
         data.window_state = WindowState::UnsavedAlert;
-        let alert = alert::unsaved(data.window_pos);
+        let alert = alert::unsaved(data.window_pos());
         ctx.new_window(alert);
     } else {
         open_internal(ctx, cmd, data);

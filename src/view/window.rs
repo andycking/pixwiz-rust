@@ -175,6 +175,8 @@ fn build_status_label() -> impl druid::Widget<AppState> {
     druid::widget::Label::new(|data: &AppState, _env: &_| {
         let (r, g, b, a) = data.pos_color.as_rgba8();
         let selection = data.doc.selection().unwrap_or(druid::Rect::ZERO);
+        let current_pos = data.current_pos();
+
         format!(
             "r:{:3} g:{:3} b:{:3} a:{:3}  {:02}:{:02}-{:02}:{:02}  {:02}:{:02}",
             r,
@@ -185,8 +187,8 @@ fn build_status_label() -> impl druid::Widget<AppState> {
             selection.y0,
             selection.x1,
             selection.y1,
-            data.current_pos.x,
-            data.current_pos.y
+            current_pos.x,
+            current_pos.y
         )
     })
     .with_font(druid::FontDescriptor::new(druid::FontFamily::MONOSPACE))
@@ -213,7 +215,7 @@ impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for WindowContr
         env: &Env,
     ) {
         // Remember where this window is, just in case we need to center an alert.
-        data.window_pos = ctx.window().get_position();
+        data.set_window_pos(ctx.window().get_position());
 
         let block = matches!(
             event,

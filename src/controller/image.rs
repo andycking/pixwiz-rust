@@ -42,9 +42,10 @@ pub fn dither_floyd(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: 
 }
 
 pub fn eraser(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    undo::push_point(data, data.current_pos);
+    let current_pos = data.current_pos();
+    undo::push_point(data, current_pos);
 
-    let idx = data.doc.pixels().point_to_idx(data.current_pos);
+    let idx = data.doc.pixels().point_to_idx(current_pos);
     data.doc
         .pixels_mut()
         .write(idx, &druid::Color::rgba8(0, 0, 0, 0));
@@ -59,10 +60,13 @@ pub fn fill(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppS
 }
 
 pub fn marquee(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    let x0 = data.start_pos.x.min(data.current_pos.x);
-    let y0 = data.start_pos.y.min(data.current_pos.y);
-    let x1 = data.start_pos.x.max(data.current_pos.x);
-    let y1 = data.start_pos.y.max(data.current_pos.y);
+    let start_pos = data.start_pos();
+    let current_pos = data.current_pos();
+
+    let x0 = start_pos.x.min(current_pos.x);
+    let y0 = start_pos.y.min(current_pos.y);
+    let x1 = start_pos.x.max(current_pos.x);
+    let y1 = start_pos.y.max(current_pos.y);
 
     let new_selection = druid::Rect::new(x0, y0, x1, y1);
 
@@ -76,8 +80,10 @@ pub fn marquee(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut 
 pub fn move_(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut AppState) {}
 
 pub fn paint(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    undo::push_point(data, data.current_pos);
+    let current_pos = data.current_pos();
 
-    let idx = data.doc.pixels().point_to_idx(data.current_pos);
+    undo::push_point(data, current_pos);
+
+    let idx = data.doc.pixels().point_to_idx(current_pos);
     data.doc.pixels_mut().write(idx, &data.brush_color);
 }

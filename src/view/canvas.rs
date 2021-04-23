@@ -237,13 +237,13 @@ impl druid::Widget<AppState> for Canvas {
                 if !e.focus {
                     match Self::screen_coords_to_canvas_coords(e.pos) {
                         Some(p) => {
-                            data.start_pos = p;
-                            data.current_pos = p;
+                            data.set_start_pos(p);
+                            data.set_current_pos(p);
                             self.tool(ctx, data, p);
                         }
                         _ => {
-                            data.start_pos = druid::Point::ZERO;
-                            data.current_pos = druid::Point::ZERO;
+                            data.set_start_pos(druid::Point::ZERO);
+                            data.set_current_pos(druid::Point::ZERO);
                         }
                     }
                     ctx.set_active(true);
@@ -262,12 +262,12 @@ impl druid::Widget<AppState> for Canvas {
                         // The screen coords might have changed, but that doesn't mean the
                         // canvas coords have changed (because of how big our pixels are).
                         // Avoid doing any work if we're still in the same place.
-                        if p != data.current_pos {
-                            let pixels = data.doc.pixels();
-                            let idx = pixels.point_to_idx(p);
+                        if p != data.current_pos() {
+                            let idx = data.doc.pixels().point_to_idx(p);
+                            let color = data.doc.pixels().read(idx);
 
-                            data.current_pos = p;
-                            data.pos_color = pixels.read(idx);
+                            data.pos_color = color;
+                            data.set_current_pos(p);
 
                             if ctx.is_active() {
                                 self.tool(ctx, data, p);
@@ -275,9 +275,9 @@ impl druid::Widget<AppState> for Canvas {
                         }
                     }
                     None => {
-                        if !ctx.is_active() && data.current_pos != druid::Point::ZERO {
-                            data.current_pos = druid::Point::ZERO;
+                        if !ctx.is_active() && data.current_pos() != druid::Point::ZERO {
                             data.pos_color = data.brush_color.clone();
+                            data.set_current_pos(druid::Point::ZERO);
                         }
                     }
                 }
