@@ -144,7 +144,7 @@ impl Canvas {
 
     /// Paint the grid onto the given render context.
     fn paint_grid(&self, ctx: &mut PaintCtx, data: &AppState) {
-        if data.show_grid {
+        if data.show_grid() {
             for i in 1..4 {
                 let offset = 1 + i * 8;
                 self.paint_grid_line(ctx, offset, 1, offset, Self::ROWS + 1);
@@ -179,7 +179,7 @@ impl Canvas {
     /// Execute a tool at the given point on the canvas. The point is in
     /// canvas coordinates.
     fn tool(&mut self, ctx: &mut EventCtx, data: &mut AppState, p: druid::Point) {
-        match data.tool_type {
+        match data.tool_type() {
             ToolType::Dropper => {
                 let idx = data.doc.pixels().point_to_idx(p);
                 let color = data.doc.pixels().read(idx);
@@ -250,7 +250,7 @@ impl druid::Widget<AppState> for Canvas {
             }
 
             Event::MouseMove(e) => {
-                let cursor = match data.tool_type {
+                let cursor = match data.tool_type() {
                     ToolType::Marquee => druid::Cursor::Crosshair,
                     _ => druid::Cursor::Arrow,
                 };

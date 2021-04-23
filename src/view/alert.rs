@@ -41,7 +41,7 @@ pub fn unsaved(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
         ctx.submit_command(
             druid::commands::SHOW_SAVE_PANEL
                 .with(global::file_dialog_opts())
-                .to(data.id),
+                .to(data.window_id()),
         );
     });
 

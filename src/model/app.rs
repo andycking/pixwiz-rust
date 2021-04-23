@@ -24,16 +24,16 @@ pub struct AppState {
     current_pos: druid::Point,
     window_pos: druid::Point,
     pub window_state: WindowState,
-    pub tool_type: ToolType,
-    pub show_grid: bool,
+    tool_type: ToolType,
+    show_grid: bool,
     pub doc: Document,
 
     #[data(same_fn = "PartialEq::eq")]
-    pub id: druid::WindowId,
+    window_id: druid::WindowId,
 }
 
 impl AppState {
-    pub fn new(id: druid::WindowId) -> Self {
+    pub fn new(window_id: druid::WindowId) -> Self {
         Self {
             brush_color: druid::Color::BLACK,
             pos_color: druid::Color::rgba8(0, 0, 0, 0),
@@ -44,7 +44,7 @@ impl AppState {
             tool_type: ToolType::Paint,
             show_grid: true,
             doc: Default::default(),
-            id,
+            window_id,
         }
     }
 
@@ -86,5 +86,25 @@ impl AppState {
 
     pub fn set_window_pos(&mut self, window_pos: druid::Point) {
         self.window_pos = window_pos;
+    }
+
+    pub fn tool_type(&self) -> ToolType {
+        self.tool_type
+    }
+
+    pub fn set_tool_type(&mut self, tool_type: ToolType) {
+        self.tool_type = tool_type;
+    }
+
+    pub fn show_grid(&self) -> bool {
+        self.show_grid
+    }
+
+    pub fn flip_grid(&mut self) {
+        self.show_grid = !self.show_grid
+    }
+
+    pub fn window_id(&self) -> druid::WindowId {
+        self.window_id
     }
 }

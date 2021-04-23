@@ -166,7 +166,7 @@ fn rebuild_menu_bar(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &m
     menu_opts.disable(menu::COMMON_MENU_COPY, empty_selection);
     menu_opts.disable(menu::EDIT_MENU_DESELECT, empty_selection);
 
-    menu_opts.select(menu::MENU_VIEW_SHOW_GRID, data.show_grid);
+    menu_opts.select(menu::MENU_VIEW_SHOW_GRID, data.show_grid());
 
     if let druid::Target::Window(id) = cmd.target() {
         let menu_bar: druid::MenuDesc<AppState> = menu::menu_bar(&menu_opts);

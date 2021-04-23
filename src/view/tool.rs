@@ -51,11 +51,11 @@ impl druid::Widget<AppState> for ToolButton {
 
             Event::MouseUp(_e) if ctx.is_active() => {
                 if ctx.is_hot() {
-                    data.tool_type = self.tool_type;
+                    data.set_tool_type(self.tool_type);
 
                     // Don't forget to clear out the move bytes. There has to be a better
                     // place to put this.
-                    if data.tool_type != ToolType::Move && data.doc.move_bytes().is_some() {
+                    if data.tool_type() != ToolType::Move && data.doc.move_bytes().is_some() {
                         data.doc.clear_move_bytes();
                     }
                 }
@@ -101,7 +101,7 @@ impl druid::Widget<AppState> for ToolButton {
         let image = image_buf.to_image(ctx.render_ctx);
         ctx.draw_image(&image, rect, druid::piet::InterpolationMode::Bilinear);
 
-        let selected = data.tool_type == self.tool_type;
+        let selected = data.tool_type() == self.tool_type;
         if selected {
             ctx.stroke(rect, &theme::TOOLS_STROKE_SELECTED, 2.0);
         } else {
@@ -123,7 +123,7 @@ impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for ToolsContro
         data: &AppState,
         env: &Env,
     ) {
-        if old_data.tool_type != data.tool_type {
+        if old_data.tool_type() != data.tool_type() {
             ctx.request_paint();
         }
 
