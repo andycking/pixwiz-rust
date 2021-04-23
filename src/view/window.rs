@@ -92,8 +92,8 @@ fn build_color_well() -> impl druid::Widget<AppState> {
     druid::widget::Painter::new(|ctx, data: &AppState, _env| {
         let rect = ctx.size().to_rect();
         let color = match data.tool_type {
-            ToolType::Dropper => &data.pos_color,
-            _ => &data.brush_color,
+            ToolType::Dropper => data.pos_color(),
+            _ => data.brush_color(),
         };
         ctx.fill(rect, color);
     })
@@ -173,9 +173,9 @@ fn build_main_pane() -> impl druid::Widget<AppState> {
 
 fn build_status_label() -> impl druid::Widget<AppState> {
     druid::widget::Label::new(|data: &AppState, _env: &_| {
-        let (r, g, b, a) = data.pos_color.as_rgba8();
-        let selection = data.doc.selection().unwrap_or(druid::Rect::ZERO);
+        let (r, g, b, a) = data.pos_color().as_rgba8();
         let current_pos = data.current_pos();
+        let selection = data.doc.selection().unwrap_or(druid::Rect::ZERO);
 
         format!(
             "r:{:3} g:{:3} b:{:3} a:{:3}  {:02}:{:02}-{:02}:{:02}  {:02}:{:02}",

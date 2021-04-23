@@ -81,9 +81,9 @@ pub fn move_(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut A
 
 pub fn paint(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     let current_pos = data.current_pos();
-
     undo::push_point(data, current_pos);
 
     let idx = data.doc.pixels().point_to_idx(current_pos);
-    data.doc.pixels_mut().write(idx, &data.brush_color);
+    let color = data.brush_color().clone();
+    data.doc.pixels_mut().write(idx, &color);
 }

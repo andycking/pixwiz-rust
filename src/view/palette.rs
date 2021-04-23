@@ -121,13 +121,13 @@ impl druid::Widget<AppState> for Palette {
                     let idx = Self::palette_coords_to_idx(p);
                     let val = self.values[idx];
                     let color = druid::Color::from_rgba32_u32(val);
-                    if color != data.pos_color {
-                        data.pos_color = color;
+                    if color != *data.pos_color() {
+                        data.set_pos_color(color);
                     }
                 }
                 None => {
-                    if data.pos_color != data.brush_color {
-                        data.pos_color = data.brush_color.clone();
+                    if data.pos_color() != data.brush_color() {
+                        data.set_pos_color(data.brush_color().clone());
                     }
                 }
             },
@@ -136,7 +136,7 @@ impl druid::Widget<AppState> for Palette {
                 if let Some(p) = Self::screen_coords_to_palette_coords(e.pos) {
                     self.current_idx = Self::palette_coords_to_idx(p);
                     self.current_val = self.values[self.current_idx];
-                    data.brush_color = druid::Color::from_rgba32_u32(self.current_val);
+                    data.set_brush_color(druid::Color::from_rgba32_u32(self.current_val));
                     ctx.request_paint();
                 }
                 ctx.set_active(false);
@@ -156,8 +156,8 @@ impl druid::Widget<AppState> for Palette {
     }
 
     fn update(&mut self, ctx: &mut UpdateCtx, old_data: &AppState, data: &AppState, _env: &Env) {
-        if old_data.brush_color != data.brush_color {
-            self.current_val = data.brush_color.as_rgba_u32();
+        if old_data.brush_color() != data.brush_color() {
+            self.current_val = data.brush_color().as_rgba_u32();
             ctx.request_paint();
         }
     }

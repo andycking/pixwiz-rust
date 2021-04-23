@@ -33,7 +33,9 @@ where
     // The transform function gets copies of the header and the bytes. We don't want
     // it mucking directly with our pixels.
     let header = data.doc.pixels().header().clone();
-    let env = PixelEnv::new(data.brush_color.clone(), data.current_pos(), bounds, param);
+    let brush_color = data.brush_color().clone();
+    let current_pos = data.current_pos();
+    let env = PixelEnv::new(brush_color, current_pos, bounds, param);
     let mut bytes = data.doc.pixels().bytes().to_vec();
 
     f(&header, &env, &mut bytes);

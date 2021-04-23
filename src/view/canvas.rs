@@ -179,12 +179,11 @@ impl Canvas {
     /// Execute a tool at the given point on the canvas. The point is in
     /// canvas coordinates.
     fn tool(&mut self, ctx: &mut EventCtx, data: &mut AppState, p: druid::Point) {
-        let pixels = data.doc.pixels();
-        let idx = pixels.point_to_idx(p);
-
         match data.tool_type {
             ToolType::Dropper => {
-                data.brush_color = pixels.read(idx);
+                let idx = data.doc.pixels().point_to_idx(p);
+                let color = data.doc.pixels().read(idx);
+                data.set_brush_color(color);
             }
 
             ToolType::Eraser => {
@@ -266,7 +265,7 @@ impl druid::Widget<AppState> for Canvas {
                             let idx = data.doc.pixels().point_to_idx(p);
                             let color = data.doc.pixels().read(idx);
 
-                            data.pos_color = color;
+                            data.set_pos_color(color);
                             data.set_current_pos(p);
 
                             if ctx.is_active() {
@@ -276,7 +275,7 @@ impl druid::Widget<AppState> for Canvas {
                     }
                     None => {
                         if !ctx.is_active() && data.current_pos() != druid::Point::ZERO {
-                            data.pos_color = data.brush_color.clone();
+                            data.set_pos_color(data.brush_color().clone());
                             data.set_current_pos(druid::Point::ZERO);
                         }
                     }

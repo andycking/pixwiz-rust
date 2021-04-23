@@ -18,8 +18,8 @@ use crate::model::types::*;
 /// Application state.
 #[derive(Clone, druid::Data)]
 pub struct AppState {
-    pub brush_color: druid::Color,
-    pub pos_color: druid::Color,
+    brush_color: druid::Color,
+    pos_color: druid::Color,
     start_pos: druid::Point,
     current_pos: druid::Point,
     window_pos: druid::Point,
@@ -46,6 +46,22 @@ impl AppState {
             doc: Default::default(),
             id,
         }
+    }
+
+    pub fn brush_color(&self) -> &druid::Color {
+        &self.brush_color
+    }
+
+    pub fn set_brush_color(&mut self, brush_color: druid::Color) {
+        self.brush_color = brush_color;
+    }
+
+    pub fn pos_color(&self) -> &druid::Color {
+        &self.pos_color
+    }
+
+    pub fn set_pos_color(&mut self, pos_color: druid::Color) {
+        self.pos_color = pos_color;
     }
 
     pub fn start_pos(&self) -> druid::Point {
