@@ -119,7 +119,7 @@ fn build_palette() -> impl druid::Widget<AppState> {
 
 fn build_preview() -> impl druid::Widget<AppState> {
     druid::widget::Painter::new(|ctx, data: &AppState, _env| {
-        let pixels = data.doc.pixels();
+        let pixels = data.doc().pixels();
         let header = pixels.header();
         let mut i = 0;
         for y in 0..header.height() {
@@ -175,7 +175,7 @@ fn build_status_label() -> impl druid::Widget<AppState> {
     druid::widget::Label::new(|data: &AppState, _env: &_| {
         let (r, g, b, a) = data.pos_color().as_rgba8();
         let current_pos = data.current_pos();
-        let selection = data.doc.selection().unwrap_or(druid::Rect::ZERO);
+        let selection = data.doc().selection().unwrap_or(druid::Rect::ZERO);
 
         format!(
             "r:{:3} g:{:3} b:{:3} a:{:3}  {:02}:{:02}-{:02}:{:02}  {:02}:{:02}",

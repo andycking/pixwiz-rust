@@ -117,7 +117,7 @@ impl Canvas {
     /// Paint pixels from storage onto the given render context. This will paint
     /// on top of the checkboard. Pixel transparency is via alpha value.
     fn paint_pixels(&self, ctx: &mut PaintCtx, data: &AppState) {
-        let pixels = data.doc.pixels();
+        let pixels = data.doc().pixels();
         for i in 0..pixels.len() {
             Self::paint_idx(ctx, i, &pixels.read(i));
         }
@@ -155,7 +155,7 @@ impl Canvas {
 
     /// Paint the currently selected area onto the given render context.
     fn paint_selection(&self, ctx: &mut PaintCtx, data: &AppState) {
-        if let Some(s) = data.doc.selection() {
+        if let Some(s) = data.doc().selection() {
             let tl = Self::canvas_coords_to_screen_coords_f64(s.x0, s.y0);
             let br = Self::canvas_coords_to_screen_coords_f64(s.x1, s.y1);
 
@@ -181,20 +181,20 @@ impl Canvas {
     fn tool(&mut self, ctx: &mut EventCtx, data: &mut AppState, p: druid::Point) {
         match data.tool_type() {
             ToolType::Dropper => {
-                let idx = data.doc.pixels().point_to_idx(p);
-                let color = data.doc.pixels().read(idx);
+                let idx = data.doc().pixels().point_to_idx(p);
+                let color = data.doc().pixels().read(idx);
                 data.set_brush_color(color);
             }
 
             ToolType::Eraser => {
-                let bounds = data.doc.bounds();
+                let bounds = data.doc().bounds();
                 if bounds.contains(p) {
                     ctx.submit_command(commands::IMAGE_ERASER);
                 }
             }
 
             ToolType::Fill => {
-                let bounds = data.doc.bounds();
+                let bounds = data.doc().bounds();
                 if bounds.contains(p) {
                     ctx.submit_command(commands::IMAGE_FILL.with(true));
                 }
@@ -209,7 +209,7 @@ impl Canvas {
             }
 
             ToolType::Paint => {
-                let bounds = data.doc.bounds();
+                let bounds = data.doc().bounds();
                 if bounds.contains(p) {
                     ctx.submit_command(commands::IMAGE_PAINT);
                 }
@@ -262,8 +262,8 @@ impl druid::Widget<AppState> for Canvas {
                         // canvas coords have changed (because of how big our pixels are).
                         // Avoid doing any work if we're still in the same place.
                         if p != data.current_pos() {
-                            let idx = data.doc.pixels().point_to_idx(p);
-                            let color = data.doc.pixels().read(idx);
+                            let idx = data.doc().pixels().point_to_idx(p);
+                            let color = data.doc().pixels().read(idx);
 
                             data.set_pos_color(color);
                             data.set_current_pos(p);
@@ -312,7 +312,7 @@ impl druid::Widget<AppState> for Canvas {
         data: &AppState,
         _env: &Env,
     ) -> Size {
-        let rect = Self::idx_to_screen_rect(data.doc.pixels().len() - 1);
+        let rect = Self::idx_to_screen_rect(data.doc().pixels().len() - 1);
         let size = Size::new(rect.x1 + 1.0, rect.y1 + 1.0);
         bc.constrain(size)
     }

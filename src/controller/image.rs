@@ -45,7 +45,7 @@ pub fn eraser(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut A
     let current_pos = data.current_pos();
     undo::push_point(data, current_pos);
 
-    let idx = data.doc.pixels().point_to_idx(current_pos);
+    let idx = data.doc().pixels().point_to_idx(current_pos);
     data.doc
         .pixels_mut()
         .write(idx, &druid::Color::rgba8(0, 0, 0, 0));
@@ -70,7 +70,7 @@ pub fn marquee(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut 
 
     let new_selection = druid::Rect::new(x0, y0, x1, y1);
 
-    let old_selection = data.doc.selection().unwrap_or(druid::Rect::ZERO);
+    let old_selection = data.doc().selection().unwrap_or(druid::Rect::ZERO);
 
     if old_selection != new_selection {
         data.doc.set_selection(new_selection);
@@ -83,7 +83,7 @@ pub fn paint(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut Ap
     let current_pos = data.current_pos();
     undo::push_point(data, current_pos);
 
-    let idx = data.doc.pixels().point_to_idx(current_pos);
+    let idx = data.doc().pixels().point_to_idx(current_pos);
     let color = data.brush_color().clone();
     data.doc.pixels_mut().write(idx, &color);
 }

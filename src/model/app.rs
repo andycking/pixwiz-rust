@@ -119,4 +119,8 @@ impl AppState {
     pub fn window_id(&self) -> druid::WindowId {
         self.window_id
     }
+
+    pub fn doc(&self) -> &Document {
+        &self.doc
+    }
 }
