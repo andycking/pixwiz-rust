@@ -46,9 +46,8 @@ pub fn eraser(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut A
     undo::push_point(data, current_pos);
 
     let idx = data.doc().pixels().point_to_idx(current_pos);
-    data.doc
-        .pixels_mut()
-        .write(idx, &druid::Color::rgba8(0, 0, 0, 0));
+    let color = druid::Color::rgba8(0, 0, 0, 0);
+    data.doc.pixels_mut().write(idx, &color);
 }
 
 pub fn fill(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
