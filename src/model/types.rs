@@ -32,8 +32,11 @@ pub enum ToolType {
 #[derive(Clone, Copy, druid::Data, PartialEq)]
 pub enum WindowState {
     Normal,
+
     UnsavedAlert,
     UnsavedSave,
+
+    OpenFailed,
 }
 
 impl Default for WindowState {
