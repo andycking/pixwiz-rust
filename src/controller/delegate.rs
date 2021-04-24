@@ -155,10 +155,10 @@ fn rebuild_menu_bar(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &m
 
     menu_opts.disable(
         menu::COMMON_MENU_FILE_SAVE,
-        data.doc.path().is_none() || !data.doc.pixels().dirty(),
+        data.doc().path().is_none() || !data.doc().pixels().dirty(),
     );
 
-    let empty_selection = data.doc.selection().is_none();
+    let empty_selection = data.doc().selection().is_none();
 
     menu_opts.disable(menu::COMMON_MENU_UNDO, data.doc.undo().is_empty());
     menu_opts.disable(menu::COMMON_MENU_REDO, data.doc.redo().is_empty());
@@ -166,7 +166,7 @@ fn rebuild_menu_bar(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &m
     menu_opts.disable(menu::COMMON_MENU_COPY, empty_selection);
     menu_opts.disable(menu::EDIT_MENU_DESELECT, empty_selection);
 
-    menu_opts.select(menu::MENU_VIEW_SHOW_GRID, data.show_grid);
+    menu_opts.select(menu::MENU_VIEW_SHOW_GRID, data.show_grid());
 
     if let druid::Target::Window(id) = cmd.target() {
         let menu_bar: druid::MenuDesc<AppState> = menu::menu_bar(&menu_opts);

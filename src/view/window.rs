@@ -91,9 +91,9 @@ fn build_tools() -> impl druid::Widget<AppState> {
 fn build_color_well() -> impl druid::Widget<AppState> {
     druid::widget::Painter::new(|ctx, data: &AppState, _env| {
         let rect = ctx.size().to_rect();
-        let color = match data.tool_type {
-            ToolType::Dropper => &data.pos_color,
-            _ => &data.brush_color,
+        let color = match data.tool_type() {
+            ToolType::Dropper => data.pos_color(),
+            _ => data.brush_color(),
         };
         ctx.fill(rect, color);
     })
@@ -119,7 +119,7 @@ fn build_palette() -> impl druid::Widget<AppState> {
 
 fn build_preview() -> impl druid::Widget<AppState> {
     druid::widget::Painter::new(|ctx, data: &AppState, _env| {
-        let pixels = data.doc.pixels();
+        let pixels = data.doc().pixels();
         let header = pixels.header();
         let mut i = 0;
         for y in 0..header.height() {
@@ -173,8 +173,10 @@ fn build_main_pane() -> impl druid::Widget<AppState> {
 
 fn build_status_label() -> impl druid::Widget<AppState> {
     druid::widget::Label::new(|data: &AppState, _env: &_| {
-        let (r, g, b, a) = data.pos_color.as_rgba8();
-        let selection = data.doc.selection().unwrap_or(druid::Rect::ZERO);
+        let (r, g, b, a) = data.pos_color().as_rgba8();
+        let current_pos = data.current_pos();
+        let selection = data.doc().selection().unwrap_or(druid::Rect::ZERO);
+
         format!(
             "r:{:3} g:{:3} b:{:3} a:{:3}  {:02}:{:02}-{:02}:{:02}  {:02}:{:02}",
             r,
@@ -185,8 +187,8 @@ fn build_status_label() -> impl druid::Widget<AppState> {
             selection.y0,
             selection.x1,
             selection.y1,
-            data.current_pos.x,
-            data.current_pos.y
+            current_pos.x,
+            current_pos.y
         )
     })
     .with_font(druid::FontDescriptor::new(druid::FontFamily::MONOSPACE))
@@ -213,7 +215,7 @@ impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for WindowContr
         env: &Env,
     ) {
         // Remember where this window is, just in case we need to center an alert.
-        data.window_pos = ctx.window().get_position();
+        data.set_window_pos(ctx.window().get_position());
 
         let block = matches!(
             event,
@@ -227,7 +229,7 @@ impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for WindowContr
                 | Event::Zoom(_)
         );
 
-        if data.window_state == WindowState::Normal || !block {
+        if data.window_state() == WindowState::Normal || !block {
             child.event(ctx, event, data, env);
         }
     }

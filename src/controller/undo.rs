@@ -32,7 +32,7 @@ pub fn push(data: &mut AppState, area: druid::Rect) {
 }
 
 fn push_inner(data: &mut AppState, area: druid::Rect) {
-    let bytes = data.doc.pixels().read_area(area);
+    let bytes = data.doc().pixels().read_area(area);
     let record = ModRecord::new(area, bytes);
 
     data.doc.undo().push(record);
@@ -51,7 +51,7 @@ pub fn pop(data: &mut AppState) {
 }
 
 fn push_redo(data: &mut AppState, area: druid::Rect) {
-    let bytes = data.doc.pixels().read_area(area);
+    let bytes = data.doc().pixels().read_area(area);
     let record = ModRecord::new(area, bytes);
 
     data.doc.redo().push(record);

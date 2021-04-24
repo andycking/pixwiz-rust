@@ -96,12 +96,12 @@ impl PixelEnv {
         &self.color
     }
 
-    pub fn pos(&self) -> &druid::Point {
-        &self.pos
+    pub fn pos(&self) -> druid::Point {
+        self.pos
     }
 
-    pub fn bounds(&self) -> &druid::Rect {
-        &self.bounds
+    pub fn bounds(&self) -> druid::Rect {
+        self.bounds
     }
 
     pub fn param(&self) -> f64 {
