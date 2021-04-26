@@ -35,14 +35,17 @@ impl PixelHeader {
         }
     }
 
+    /// Get the width, in pixels.
     pub fn width(&self) -> usize {
         self.width as usize
     }
 
+    /// Get the height, in pixels.
     pub fn height(&self) -> usize {
         self.height as usize
     }
 
+    /// Get the number of bytes per pixel.
     pub fn bytes_per_pixel(&self) -> u8 {
         self.bytes_per_pixel
     }
@@ -82,18 +85,22 @@ impl PixelEnv {
         }
     }
 
+    /// Get the current color.
     pub fn color(&self) -> &druid::Color {
         &self.color
     }
 
+    /// Get the current mouse position.
     pub fn pos(&self) -> druid::Point {
         self.pos
     }
 
+    /// Get the bounds. Can be selection or entire image.
     pub fn bounds(&self) -> druid::Rect {
         self.bounds
     }
 
+    /// Get the parameter that was passed.
     pub fn param(&self) -> f64 {
         self.param
     }
@@ -122,28 +129,34 @@ impl PixelState {
         }
     }
 
+    /// Are pixels dirty?
     pub fn dirty(&self) -> bool {
         self.dirty
     }
 
+    /// Get the pixel header.
     pub fn header(&self) -> &PixelHeader {
         &self.header
     }
 
+    /// Get pixel bytes.
     pub fn bytes(&self) -> &Vec<u8> {
         &self.bytes
     }
 
+    /// Set the pixel bytes.
     pub fn set_bytes(&mut self, bytes: Vec<u8>) {
         self.bytes = Arc::new(bytes);
         self.dirty = true;
     }
 
+    /// Determine if the given point is contained within the pixel bounds.
     #[inline]
     pub fn contains(&self, p: druid::Point) -> bool {
         self.contains_xy(p.x as usize, p.y as usize)
     }
 
+    /// Determine if the given point is contained with the pixel bounds.
     #[inline]
     pub fn contains_xy(&self, x: usize, y: usize) -> bool {
         x > 0 && y > 0 && x <= self.header.width() && y <= self.header.height()
