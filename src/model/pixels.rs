@@ -56,8 +56,8 @@ impl PixelHeader {
 impl Default for PixelHeader {
     fn default() -> Self {
         Self {
-            width: 32,
-            height: 32,
+            width: 48,
+            height: 48,
             depth: 8,
             bytes_per_pixel: 4,
         }
