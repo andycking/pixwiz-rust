@@ -150,10 +150,21 @@ impl PixelState {
     }
 
     #[inline]
+    pub fn contains(&self, p: druid::Point) -> bool {
+        self.contains_xy(p.x as usize, p.y as usize)
+    }
+
+    #[inline]
+    pub fn contains_xy(&self, x: usize, y: usize) -> bool {
+        x > 0 && y > 0 && x <= self.header.width() && y <= self.header.height()
+    }
+
+    #[inline]
     fn xy_to_idx(&self, x: usize, y: usize) -> usize {
+        assert!(x > 0);
+        assert!(y > 0);
         let stride = self.header.width();
-        let idx = (y - 1) * stride + (x - 1);
-        idx * self.header.bytes_per_pixel as usize
+        (y - 1) * stride + (x - 1)
     }
 
     #[inline]
@@ -162,7 +173,6 @@ impl PixelState {
     }
 
     /// Read from an xy point in pixel storage.
-    #[inline]
     pub fn read_xy(&self, x: usize, y: usize) -> druid::Color {
         let byte_idx = self.xy_to_byte_idx(x, y);
 
@@ -199,7 +209,6 @@ impl PixelState {
     }
 
     /// Write to a point in pixel storage.
-    #[inline]
     pub fn write(&mut self, p: druid::Point, color: &druid::Color) {
         let byte_idx = self.xy_to_byte_idx(p.x as usize, p.y as usize);
         let (red, green, blue, alpha) = color.as_rgba8();

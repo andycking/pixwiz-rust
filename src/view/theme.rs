@@ -14,6 +14,11 @@
 
 use druid::Color;
 
+pub const ROWS: usize = 48;
+pub const COLS: usize = 48;
+
+pub const PIXEL_SIZE: f64 = 16.0;
+
 pub const MAIN_FILL: Color = Color::rgb8(240, 240, 240);
 pub const MAIN_STROKE: Color = Color::rgb8(208, 208, 208);
 
@@ -29,7 +34,7 @@ pub const COLOR_WELL_SIZE: druid::Size = druid::Size::new(88.0, 30.0);
 
 pub const PREVIEW_FILL: Color = CANVAS_FILL_LIGHT;
 pub const PREVIEW_STROKE: Color = MAIN_STROKE;
-pub const PREVIEW_SIZE: druid::Size = druid::Size::new(32.0, 32.0);
+pub const PREVIEW_SIZE: druid::Size = druid::Size::new(ROWS as f64, COLS as f64);
 
 pub const PALETTE_FILL: Color = Color::BLACK;
 pub const PALETTE_STROKE_SELECTED: Color = Color::BLACK;
