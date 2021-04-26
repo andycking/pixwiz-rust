@@ -23,7 +23,7 @@ pub fn new(ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppSt
 
     if data.doc().pixels().dirty() {
         data.set_window_state(WindowState::UnsavedAlert);
-        let alert = alert::unsaved(data.window_pos());
+        let alert = alert::unsaved_file(data.window_pos());
         ctx.new_window(alert);
     } else {
         data.doc = Default::default();
@@ -41,20 +41,24 @@ pub fn open(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppSt
 
     if data.doc().pixels().dirty() {
         data.set_window_state(WindowState::UnsavedAlert);
-        let alert = alert::unsaved(data.window_pos());
+        let alert = alert::unsaved_file(data.window_pos());
         ctx.new_window(alert);
     } else {
         open_internal(ctx, cmd, data);
     }
 }
 
-pub fn open_internal(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+pub fn open_internal(ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     assert!(data.window_state() != WindowState::UnsavedAlert);
 
     if let Some(new_path) = data.doc().new_path() {
         match storage::png::read_path(&new_path) {
             Ok(pixels) => data.doc = Document::new(pixels, new_path),
-            Err(_e) => {}
+            Err(_e) => {
+                data.set_window_state(WindowState::OpenFailed);
+                let alert = alert::open_failed(data.window_pos());
+                ctx.new_window(alert);
+            }
         }
     } else {
         data.doc = Default::default();
