@@ -25,7 +25,7 @@ pub const STATUS_BAR_FILL: Color = MAIN_FILL;
 pub const STATUS_BAR_STROKE: Color = Color::BLACK;
 
 pub const COLOR_WELL_STROKE: Color = MAIN_STROKE;
-pub const COLOR_WELL_SIZE: druid::Size = druid::Size::new(88.0, 30.0);
+pub const COLOR_WELL_SIZE: druid::Size = druid::Size::new(70.0, 30.0);
 
 pub const PREVIEW_FILL: Color = CANVAS_FILL_LIGHT;
 pub const PREVIEW_STROKE: Color = MAIN_STROKE;
@@ -53,7 +53,7 @@ pub const BUTTON_DEFAULT_LIGHT: Color = Color::rgb8(0, 124, 252);
 pub const BUTTON_DARK: Color = Color::rgb8(180, 180, 180);
 pub const BUTTON_LIGHT: Color = Color::rgb8(200, 200, 200);
 
-pub const WINDOW_SIZE: druid::Size = druid::Size::new(672.0, 696.0);
+pub const WINDOW_SIZE: druid::Size = druid::Size::new(980.0, 824.0);
 pub const UNSAVED_FILE_ALERT_SIZE: druid::Size = druid::Size::new(208.0, 212.0);
 pub const WARNING_ALERT_SIZE: druid::Size = druid::Size::new(208.0, 108.0);
 

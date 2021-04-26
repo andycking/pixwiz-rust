@@ -103,10 +103,12 @@ fn build_color_well() -> impl druid::Widget<AppState> {
 
 fn build_left_pane() -> impl druid::Widget<AppState> {
     Flex::column()
-        .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
+        .cross_axis_alignment(druid::widget::CrossAxisAlignment::Center)
         .with_child(build_tools())
         .with_default_spacer()
         .with_child(build_color_well())
+        .with_default_spacer()
+        .with_child(build_palette())
 }
 
 fn build_canvas() -> impl druid::Widget<AppState> {
@@ -150,8 +152,6 @@ fn build_center_pane() -> impl druid::Widget<AppState> {
     Flex::column()
         .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
         .with_child(build_canvas())
-        .with_default_spacer()
-        .with_child(build_palette())
         .with_default_spacer()
         .with_child(build_status_bar())
         .with_default_spacer()
