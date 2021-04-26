@@ -27,10 +27,6 @@ pub struct Palette {
 }
 
 impl Palette {
-    const COLS: usize = 32;
-    const ROWS: usize = 8;
-    const PIXELS: f64 = 15.0;
-
     /// Create a new palette with the given raw byte values.
     pub fn new(bytes: &[u8]) -> Self {
         Self {
@@ -63,9 +59,9 @@ impl Palette {
             return None;
         }
 
-        let x = pos.x as usize / ((Self::PIXELS as usize) + 1) + 1;
-        let y = pos.y as usize / ((Self::PIXELS as usize) + 1) + 1;
-        if x > Self::COLS || y > Self::ROWS {
+        let x = pos.x as usize / ((theme::PALETTE_PIXEL_SIZE as usize) + 1) + 1;
+        let y = pos.y as usize / ((theme::PALETTE_PIXEL_SIZE as usize) + 1) + 1;
+        if x > theme::PALETTE_COLS || y > theme::PALETTE_ROWS {
             return None;
         }
 
@@ -74,23 +70,28 @@ impl Palette {
 
     /// Convert coordinates to an index within the palette storage.
     fn palette_coords_to_idx(p: druid::Point) -> usize {
-        ((p.y - 1.0) * (Self::COLS as f64) + (p.x - 1.0)) as usize
+        ((p.y - 1.0) * (theme::PALETTE_COLS as f64) + (p.x - 1.0)) as usize
     }
 
     /// Convert an index within the palette storage to screen coordinates.
     fn idx_to_screen_coords(idx: usize) -> druid::Point {
-        let y = (idx / Self::COLS) as f64;
-        let x = (idx % Self::COLS) as f64;
+        let y = (idx / theme::PALETTE_COLS) as f64;
+        let x = (idx % theme::PALETTE_COLS) as f64;
+
         druid::Point::new(
-            1.0 + (x * (Self::PIXELS + 1.0)),
-            1.0 + (y * (Self::PIXELS + 1.0)),
+            1.0 + (x * (theme::PALETTE_PIXEL_SIZE + 1.0)),
+            1.0 + (y * (theme::PALETTE_PIXEL_SIZE + 1.0)),
         )
     }
 
     /// Convert an index within the palette storage to a rectanble in screen coordinates.
     fn idx_to_screen_rect(idx: usize) -> druid::Rect {
         let origin = Self::idx_to_screen_coords(idx);
-        druid::Rect::from_origin_size(origin, (Self::PIXELS, Self::PIXELS))
+
+        druid::Rect::from_origin_size(
+            origin,
+            (theme::PALETTE_PIXEL_SIZE, theme::PALETTE_PIXEL_SIZE),
+        )
     }
 
     /// Paint an index into palette storage into the given render context.

@@ -33,6 +33,9 @@ pub const PREVIEW_SIZE: druid::Size = druid::Size::new(CANVAS_ROWS as f64, CANVA
 
 pub const PALETTE_FILL: Color = Color::BLACK;
 pub const PALETTE_STROKE_SELECTED: Color = Color::BLACK;
+pub const PALETTE_COLS: usize = 8;
+pub const PALETTE_ROWS: usize = 32;
+pub const PALETTE_PIXEL_SIZE: f64 = 15.0;
 
 pub const CANVAS_FILL_DARK: Color = Color::rgb8(80, 80, 80);
 pub const CANVAS_FILL_LIGHT: Color = Color::rgb8(96, 96, 96);
