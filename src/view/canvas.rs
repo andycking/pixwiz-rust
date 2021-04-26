@@ -78,14 +78,6 @@ impl Canvas {
         druid::Rect::from_origin_size(origin, (theme::CANVAS_PIXEL_SIZE, theme::CANVAS_PIXEL_SIZE))
     }
 
-    fn read_safe(data: &AppState, p: druid::Point) -> druid::Color {
-        if data.doc().pixels().contains(p) {
-            data.doc().pixels().read(p)
-        } else {
-            druid::Color::rgba8(0, 0, 0, 0)
-        }
-    }
-
     /// Paint border. The canvas does this internally instead of via border() because the
     /// pixels are already inset within the canvas (so that we can detect when the mouse
     /// leaves the area).
@@ -119,7 +111,7 @@ impl Canvas {
 
         for y in 1..height + 1 {
             for x in 1..width + 1 {
-                let color = data.doc().pixels().read_xy(x, y);
+                let color = data.doc().pixels().read_xy_unchecked(x, y);
                 Self::paint_pixel(ctx, x, y, &color);
             }
         }
@@ -188,7 +180,7 @@ impl Canvas {
     fn tool(&mut self, ctx: &mut EventCtx, data: &mut AppState, p: druid::Point) {
         match data.tool_type() {
             ToolType::Dropper => {
-                let color = Self::read_safe(data, p);
+                let color = data.doc().pixels().read(p);
                 data.set_brush_color(color);
             }
 
@@ -268,7 +260,7 @@ impl druid::Widget<AppState> for Canvas {
                         // canvas coords have changed (because of how big our pixels are).
                         // Avoid doing any work if we're still in the same place.
                         if p != data.current_pos() {
-                            let color = Self::read_safe(data, p);
+                            let color = data.doc().pixels().read(p);
 
                             data.set_pos_color(color);
                             data.set_current_pos(p);

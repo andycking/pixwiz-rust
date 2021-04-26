@@ -132,7 +132,7 @@ fn build_preview() -> impl druid::Widget<AppState> {
                 let fy = y as f64;
                 let rect = druid::Rect::new(fx, fy, fx + 1.0, fy + 1.0);
 
-                let color = pixels.read_xy(x + 1, y + 1);
+                let color = pixels.read_xy_unchecked(x + 1, y + 1);
                 let (_, _, _, a) = color.as_rgba8();
                 if a != 255 {
                     ctx.fill(rect, &theme::PREVIEW_FILL);
