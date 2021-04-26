@@ -128,7 +128,9 @@ fn build_preview() -> impl druid::Widget<AppState> {
 
         for y in 0..height {
             for x in 0..width {
-                let rect = druid::Rect::new(x as f64, y as f64, (x as f64) + 1.0, (y as f64) + 1.0);
+                let fx = x as f64;
+                let fy = y as f64;
+                let rect = druid::Rect::new(fx, fy, fx + 1.0, fy + 1.0);
 
                 let color = pixels.read_xy(x + 1, y + 1);
                 let (_, _, _, a) = color.as_rgba8();
