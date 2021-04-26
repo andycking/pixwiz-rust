@@ -27,8 +27,8 @@ pub struct Canvas {
 }
 
 impl Canvas {
-    const COLS: usize = 32;
-    const ROWS: usize = 32;
+    const COLS: usize = 48;
+    const ROWS: usize = 48;
     const PIXELS: f64 = 16.0;
 
     /// Create an empty canvas.
@@ -117,10 +117,10 @@ impl Canvas {
     /// Paint pixels from storage onto the given render context. This will paint
     /// on top of the checkboard. Pixel transparency is via alpha value.
     fn paint_pixels(&self, ctx: &mut PaintCtx, data: &AppState) {
-        let pixels = data.doc().pixels();
-        for i in 0..pixels.len() {
-            Self::paint_idx(ctx, i, &pixels.read(i));
-        }
+        //let pixels = data.doc().pixels();
+        //for i in 0..pixels.len() {
+        //    Self::paint_idx(ctx, i, &pixels.read(i));
+        //}
     }
 
     /// Paint a grid line onto the given render context.
@@ -145,7 +145,8 @@ impl Canvas {
     /// Paint the grid onto the given render context.
     fn paint_grid(&self, ctx: &mut PaintCtx, data: &AppState) {
         if data.show_grid() {
-            for i in 1..4 {
+            let num_lines = Self::COLS / 8 + 1;
+            for i in 1..num_lines {
                 let offset = 1 + i * 8;
                 self.paint_grid_line(ctx, offset, 1, offset, Self::ROWS + 1);
                 self.paint_grid_line(ctx, 1, offset, Self::COLS + 1, offset);
@@ -181,8 +182,7 @@ impl Canvas {
     fn tool(&mut self, ctx: &mut EventCtx, data: &mut AppState, p: druid::Point) {
         match data.tool_type() {
             ToolType::Dropper => {
-                let idx = data.doc().pixels().point_to_idx(p);
-                let color = data.doc().pixels().read(idx);
+                let color = data.doc().pixels().read(p);
                 data.set_brush_color(color);
             }
 
@@ -262,8 +262,7 @@ impl druid::Widget<AppState> for Canvas {
                         // canvas coords have changed (because of how big our pixels are).
                         // Avoid doing any work if we're still in the same place.
                         if p != data.current_pos() {
-                            let idx = data.doc().pixels().point_to_idx(p);
-                            let color = data.doc().pixels().read(idx);
+                            let color = data.doc().pixels().read(p);
 
                             data.set_pos_color(color);
                             data.set_current_pos(p);
@@ -309,10 +308,10 @@ impl druid::Widget<AppState> for Canvas {
         &mut self,
         _layout_ctx: &mut LayoutCtx,
         bc: &BoxConstraints,
-        data: &AppState,
+        _data: &AppState,
         _env: &Env,
     ) -> Size {
-        let rect = Self::idx_to_screen_rect(data.doc().pixels().len() - 1);
+        let rect = Self::idx_to_screen_rect(Self::ROWS * Self::COLS - 1);
         let size = Size::new(rect.x1 + 1.0, rect.y1 + 1.0);
         bc.constrain(size)
     }

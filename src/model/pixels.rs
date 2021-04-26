@@ -149,31 +149,22 @@ impl PixelState {
         self.dirty = true;
     }
 
-    /// Get the length of the pixel state in bytes.
     #[inline]
-    pub fn len(&self) -> usize {
-        // We always want len and capacity to be the same. The entire vector must have been
-        // initialized so that later on we don't access an invalid pixel.
-        assert!(self.bytes.len() == self.bytes.capacity());
-        self.bytes.len() / self.header.bytes_per_pixel as usize
+    fn xy_to_idx(&self, x: usize, y: usize) -> usize {
+        let stride = self.header.width();
+        let idx = (y - 1) * stride + (x - 1);
+        idx * self.header.bytes_per_pixel as usize
     }
 
-    /// Convert coordinates to an index within storage.
     #[inline]
-    pub fn xy_to_idx(&self, x: usize, y: usize) -> usize {
-        (y - 1) * self.header.width() + (x - 1)
+    fn xy_to_byte_idx(&self, x: usize, y: usize) -> usize {
+        self.xy_to_idx(x, y) * self.header.bytes_per_pixel as usize
     }
 
-    /// Convert point coordinates to an index within storage.
+    /// Read from an xy point in pixel storage.
     #[inline]
-    pub fn point_to_idx(&self, p: druid::Point) -> usize {
-        self.xy_to_idx(p.x as usize, p.y as usize)
-    }
-
-    /// Read a value from an index in storage.
-    #[inline]
-    pub fn read(&self, idx: usize) -> druid::Color {
-        let byte_idx = idx * self.header.bytes_per_pixel as usize;
+    pub fn read_xy(&self, x: usize, y: usize) -> druid::Color {
+        let byte_idx = self.xy_to_byte_idx(x, y);
 
         druid::Color::rgba8(
             self.bytes[byte_idx],
@@ -181,6 +172,12 @@ impl PixelState {
             self.bytes[byte_idx + 2],
             self.bytes[byte_idx + 3],
         )
+    }
+
+    /// Read from a point in pixel storage.
+    #[inline]
+    pub fn read(&self, p: druid::Point) -> druid::Color {
+        self.read_xy(p.x as usize, p.y as usize)
     }
 
     /// Read an area of storage.
@@ -201,11 +198,10 @@ impl PixelState {
         dst_bytes
     }
 
-    /// Write a value to an index in storage. This is a function and not an IndexMut
-    /// because we want to control the dirty flag.
+    /// Write to a point in pixel storage.
     #[inline]
-    pub fn write(&mut self, idx: usize, color: &druid::Color) {
-        let byte_idx = idx * self.header.bytes_per_pixel as usize;
+    pub fn write(&mut self, p: druid::Point, color: &druid::Color) {
+        let byte_idx = self.xy_to_byte_idx(p.x as usize, p.y as usize);
         let (red, green, blue, alpha) = color.as_rgba8();
 
         let pixels = Arc::make_mut(&mut self.bytes);
