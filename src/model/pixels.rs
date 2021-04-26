@@ -134,6 +134,11 @@ impl PixelState {
         self.dirty
     }
 
+    /// Clear dirty flag.
+    pub fn clear_dirty(&mut self) {
+        self.dirty = false;
+    }
+
     /// Get the pixel header.
     pub fn header(&self) -> &PixelHeader {
         &self.header
