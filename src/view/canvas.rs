@@ -47,9 +47,9 @@ impl Canvas {
             return None;
         }
 
-        let x = pos.x as usize / (theme::PIXEL_SIZE as usize) + 1;
-        let y = pos.y as usize / (theme::PIXEL_SIZE as usize) + 1;
-        if x > theme::COLS || y > theme::ROWS {
+        let x = pos.x as usize / (theme::CANVAS_PIXEL_SIZE as usize) + 1;
+        let y = pos.y as usize / (theme::CANVAS_PIXEL_SIZE as usize) + 1;
+        if x > theme::CANVAS_COLS || y > theme::CANVAS_ROWS {
             return None;
         }
 
@@ -64,22 +64,18 @@ impl Canvas {
     fn canvas_coords_to_screen_coords_f64(x: f64, y: f64) -> druid::Point {
         assert!(x > 0.0 && y > 0.0);
         druid::Point::new(
-            1.0 + ((x - 1.0) * theme::PIXEL_SIZE),
-            1.0 + ((y - 1.0) * theme::PIXEL_SIZE),
+            1.0 + ((x - 1.0) * theme::CANVAS_PIXEL_SIZE),
+            1.0 + ((y - 1.0) * theme::CANVAS_PIXEL_SIZE),
         )
     }
 
     /// Convert an index within the canvas storage to a rectanble in screen coordinates.
     fn screen_rect(x: usize, y: usize) -> druid::Rect {
-        let fx = (x - 1) as f64;
-        let fy = (y - 1) as f64;
+        let fx = x as f64;
+        let fy = y as f64;
+        let origin = Self::canvas_coords_to_screen_coords_f64(fx, fy);
 
-        let origin = druid::Point::new(
-            1.0 + (fx * theme::PIXEL_SIZE),
-            1.0 + (fy * theme::PIXEL_SIZE),
-        );
-
-        druid::Rect::from_origin_size(origin, (theme::PIXEL_SIZE, theme::PIXEL_SIZE))
+        druid::Rect::from_origin_size(origin, (theme::CANVAS_PIXEL_SIZE, theme::CANVAS_PIXEL_SIZE))
     }
 
     fn read_safe(data: &AppState, p: druid::Point) -> druid::Color {
@@ -319,7 +315,7 @@ impl druid::Widget<AppState> for Canvas {
         _data: &AppState,
         _env: &Env,
     ) -> Size {
-        let rect = Self::screen_rect(theme::ROWS, theme::COLS);
+        let rect = Self::screen_rect(theme::CANVAS_ROWS, theme::CANVAS_COLS);
         let size = Size::new(rect.x1 + 1.0, rect.y1 + 1.0);
         bc.constrain(size)
     }
