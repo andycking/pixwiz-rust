@@ -26,17 +26,7 @@ pub struct PixelHeader {
 }
 
 impl PixelHeader {
-    const DEFAULT_WIDTH: u32 = 32;
-    const DEFAULT_HEIGHT: u32 = 32;
-    const DEFAULT_DEPTH: u8 = 8;
-    const DEFAULT_BYTES_PER_PIXEL: u8 = 4;
-
     pub fn new(width: u32, height: u32, depth: u8, bytes_per_pixel: u8) -> Self {
-        assert!(width == Self::DEFAULT_WIDTH);
-        assert!(height == Self::DEFAULT_HEIGHT);
-        assert!(depth == Self::DEFAULT_DEPTH);
-        assert!(bytes_per_pixel == Self::DEFAULT_BYTES_PER_PIXEL);
-
         Self {
             width,
             height,
@@ -66,10 +56,10 @@ impl PixelHeader {
 impl Default for PixelHeader {
     fn default() -> Self {
         Self {
-            width: Self::DEFAULT_WIDTH,
-            height: Self::DEFAULT_HEIGHT,
-            depth: Self::DEFAULT_DEPTH,
-            bytes_per_pixel: Self::DEFAULT_BYTES_PER_PIXEL,
+            width: 32,
+            height: 32,
+            depth: 8,
+            bytes_per_pixel: 4,
         }
     }
 }
