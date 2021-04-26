@@ -25,14 +25,17 @@ pub const STATUS_BAR_FILL: Color = MAIN_FILL;
 pub const STATUS_BAR_STROKE: Color = Color::BLACK;
 
 pub const COLOR_WELL_STROKE: Color = MAIN_STROKE;
-pub const COLOR_WELL_SIZE: druid::Size = druid::Size::new(88.0, 30.0);
+pub const COLOR_WELL_SIZE: druid::Size = druid::Size::new(70.0, 30.0);
 
 pub const PREVIEW_FILL: Color = CANVAS_FILL_LIGHT;
 pub const PREVIEW_STROKE: Color = MAIN_STROKE;
-pub const PREVIEW_SIZE: druid::Size = druid::Size::new(32.0, 32.0);
+pub const PREVIEW_SIZE: druid::Size = druid::Size::new(CANVAS_ROWS as f64, CANVAS_COLS as f64);
 
 pub const PALETTE_FILL: Color = Color::BLACK;
 pub const PALETTE_STROKE_SELECTED: Color = Color::BLACK;
+pub const PALETTE_COLS: usize = 8;
+pub const PALETTE_ROWS: usize = 32;
+pub const PALETTE_PIXEL_SIZE: f64 = 12.0;
 
 pub const CANVAS_FILL_DARK: Color = Color::rgb8(80, 80, 80);
 pub const CANVAS_FILL_LIGHT: Color = Color::rgb8(96, 96, 96);
@@ -41,13 +44,16 @@ pub const CANVAS_STROKE_SELECTED_DARK: Color = Color::BLACK;
 pub const CANVAS_STROKE_SELECTED_LIGHT: Color = Color::WHITE;
 pub const CANVAS_STROKE_GRID_DARK: Color = Color::BLACK;
 pub const CANVAS_STROKE_GRID_LIGHT: Color = MAIN_STROKE;
+pub const CANVAS_ROWS: usize = 48;
+pub const CANVAS_COLS: usize = 48;
+pub const CANVAS_PIXEL_SIZE: f64 = 16.0;
 
 pub const BUTTON_DEFAULT_DARK: Color = Color::rgb8(0, 92, 252);
 pub const BUTTON_DEFAULT_LIGHT: Color = Color::rgb8(0, 124, 252);
 pub const BUTTON_DARK: Color = Color::rgb8(180, 180, 180);
 pub const BUTTON_LIGHT: Color = Color::rgb8(200, 200, 200);
 
-pub const WINDOW_SIZE: druid::Size = druid::Size::new(672.0, 696.0);
+pub const WINDOW_SIZE: druid::Size = druid::Size::new(960.0, 816.0);
 pub const UNSAVED_FILE_ALERT_SIZE: druid::Size = druid::Size::new(208.0, 212.0);
 pub const WARNING_ALERT_SIZE: druid::Size = druid::Size::new(208.0, 108.0);
 

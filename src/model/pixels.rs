@@ -26,17 +26,7 @@ pub struct PixelHeader {
 }
 
 impl PixelHeader {
-    const DEFAULT_WIDTH: u32 = 32;
-    const DEFAULT_HEIGHT: u32 = 32;
-    const DEFAULT_DEPTH: u8 = 8;
-    const DEFAULT_BYTES_PER_PIXEL: u8 = 4;
-
     pub fn new(width: u32, height: u32, depth: u8, bytes_per_pixel: u8) -> Self {
-        assert!(width == Self::DEFAULT_WIDTH);
-        assert!(height == Self::DEFAULT_HEIGHT);
-        assert!(depth == Self::DEFAULT_DEPTH);
-        assert!(bytes_per_pixel == Self::DEFAULT_BYTES_PER_PIXEL);
-
         Self {
             width,
             height,
@@ -45,14 +35,17 @@ impl PixelHeader {
         }
     }
 
+    /// Get the width, in pixels.
     pub fn width(&self) -> usize {
         self.width as usize
     }
 
+    /// Get the height, in pixels.
     pub fn height(&self) -> usize {
         self.height as usize
     }
 
+    /// Get the number of bytes per pixel.
     pub fn bytes_per_pixel(&self) -> u8 {
         self.bytes_per_pixel
     }
@@ -66,10 +59,10 @@ impl PixelHeader {
 impl Default for PixelHeader {
     fn default() -> Self {
         Self {
-            width: Self::DEFAULT_WIDTH,
-            height: Self::DEFAULT_HEIGHT,
-            depth: Self::DEFAULT_DEPTH,
-            bytes_per_pixel: Self::DEFAULT_BYTES_PER_PIXEL,
+            width: 48,
+            height: 48,
+            depth: 8,
+            bytes_per_pixel: 4,
         }
     }
 }
@@ -92,18 +85,22 @@ impl PixelEnv {
         }
     }
 
+    /// Get the current color.
     pub fn color(&self) -> &druid::Color {
         &self.color
     }
 
+    /// Get the current mouse position.
     pub fn pos(&self) -> druid::Point {
         self.pos
     }
 
+    /// Get the bounds. Can be selection or entire image.
     pub fn bounds(&self) -> druid::Rect {
         self.bounds
     }
 
+    /// Get the parameter that was passed.
     pub fn param(&self) -> f64 {
         self.param
     }
@@ -132,48 +129,60 @@ impl PixelState {
         }
     }
 
+    /// Are pixels dirty?
     pub fn dirty(&self) -> bool {
         self.dirty
     }
 
+    /// Clear dirty flag.
+    pub fn clear_dirty(&mut self) {
+        self.dirty = false;
+    }
+
+    /// Get the pixel header.
     pub fn header(&self) -> &PixelHeader {
         &self.header
     }
 
+    /// Get pixel bytes.
     pub fn bytes(&self) -> &Vec<u8> {
         &self.bytes
     }
 
+    /// Set the pixel bytes.
     pub fn set_bytes(&mut self, bytes: Vec<u8>) {
         self.bytes = Arc::new(bytes);
         self.dirty = true;
     }
 
-    /// Get the length of the pixel state in bytes.
+    /// Determine if the given point is contained within the pixel bounds.
     #[inline]
-    pub fn len(&self) -> usize {
-        // We always want len and capacity to be the same. The entire vector must have been
-        // initialized so that later on we don't access an invalid pixel.
-        assert!(self.bytes.len() == self.bytes.capacity());
-        self.bytes.len() / self.header.bytes_per_pixel as usize
+    pub fn contains(&self, p: druid::Point) -> bool {
+        self.contains_xy(p.x as usize, p.y as usize)
     }
 
-    /// Convert coordinates to an index within storage.
+    /// Determine if the given point is contained with the pixel bounds.
     #[inline]
-    pub fn xy_to_idx(&self, x: usize, y: usize) -> usize {
-        (y - 1) * self.header.width() + (x - 1)
+    pub fn contains_xy(&self, x: usize, y: usize) -> bool {
+        x > 0 && y > 0 && x <= self.header.width() && y <= self.header.height()
     }
 
-    /// Convert point coordinates to an index within storage.
     #[inline]
-    pub fn point_to_idx(&self, p: druid::Point) -> usize {
-        self.xy_to_idx(p.x as usize, p.y as usize)
+    fn xy_to_idx(&self, x: usize, y: usize) -> usize {
+        assert!(x > 0);
+        assert!(y > 0);
+        let stride = self.header.width();
+        (y - 1) * stride + (x - 1)
     }
 
-    /// Read a value from an index in storage.
     #[inline]
-    pub fn read(&self, idx: usize) -> druid::Color {
-        let byte_idx = idx * self.header.bytes_per_pixel as usize;
+    fn xy_to_byte_idx(&self, x: usize, y: usize) -> usize {
+        self.xy_to_idx(x, y) * self.header.bytes_per_pixel as usize
+    }
+
+    /// Read from an xy point in pixel storage.
+    pub fn read_xy(&self, x: usize, y: usize) -> druid::Color {
+        let byte_idx = self.xy_to_byte_idx(x, y);
 
         druid::Color::rgba8(
             self.bytes[byte_idx],
@@ -181,6 +190,12 @@ impl PixelState {
             self.bytes[byte_idx + 2],
             self.bytes[byte_idx + 3],
         )
+    }
+
+    /// Read from a point in pixel storage.
+    #[inline]
+    pub fn read(&self, p: druid::Point) -> druid::Color {
+        self.read_xy(p.x as usize, p.y as usize)
     }
 
     /// Read an area of storage.
@@ -201,11 +216,9 @@ impl PixelState {
         dst_bytes
     }
 
-    /// Write a value to an index in storage. This is a function and not an IndexMut
-    /// because we want to control the dirty flag.
-    #[inline]
-    pub fn write(&mut self, idx: usize, color: &druid::Color) {
-        let byte_idx = idx * self.header.bytes_per_pixel as usize;
+    /// Write to a point in pixel storage.
+    pub fn write(&mut self, p: druid::Point, color: &druid::Color) {
+        let byte_idx = self.xy_to_byte_idx(p.x as usize, p.y as usize);
         let (red, green, blue, alpha) = color.as_rgba8();
 
         let pixels = Arc::make_mut(&mut self.bytes);

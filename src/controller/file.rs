@@ -70,7 +70,9 @@ pub fn save(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut App
 
     if let Some(path) = data.doc().path() {
         match storage::png::write_path(&path, data.doc().pixels()) {
-            Ok(()) => {}
+            Ok(()) => {
+                data.doc.pixels_mut().clear_dirty();
+            }
             Err(_e) => {}
         };
     }
@@ -88,6 +90,7 @@ pub fn save_as(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut Ap
             if data.window_state() == WindowState::UnsavedSave {
                 open_internal(ctx, cmd, data);
             } else {
+                data.doc.pixels_mut().clear_dirty();
                 data.doc.set_path(String::from(path));
             }
         }

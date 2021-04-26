@@ -27,10 +27,6 @@ pub struct Canvas {
 }
 
 impl Canvas {
-    const COLS: usize = 32;
-    const ROWS: usize = 32;
-    const PIXELS: f64 = 16.0;
-
     /// Create an empty canvas.
     pub fn new() -> Self {
         Self {
@@ -51,9 +47,9 @@ impl Canvas {
             return None;
         }
 
-        let x = pos.x as usize / (Self::PIXELS as usize) + 1;
-        let y = pos.y as usize / (Self::PIXELS as usize) + 1;
-        if x > Self::COLS || y > Self::ROWS {
+        let x = pos.x as usize / (theme::CANVAS_PIXEL_SIZE as usize) + 1;
+        let y = pos.y as usize / (theme::CANVAS_PIXEL_SIZE as usize) + 1;
+        if x > theme::CANVAS_COLS || y > theme::CANVAS_ROWS {
             return None;
         }
 
@@ -68,41 +64,26 @@ impl Canvas {
     fn canvas_coords_to_screen_coords_f64(x: f64, y: f64) -> druid::Point {
         assert!(x > 0.0 && y > 0.0);
         druid::Point::new(
-            1.0 + ((x - 1.0) * Self::PIXELS),
-            1.0 + ((y - 1.0) * Self::PIXELS),
+            1.0 + ((x - 1.0) * theme::CANVAS_PIXEL_SIZE),
+            1.0 + ((y - 1.0) * theme::CANVAS_PIXEL_SIZE),
         )
     }
 
-    /// Convert an index within the canvas storage to screen coordinates.
-    fn idx_to_screen_coords(idx: usize) -> druid::Point {
-        let y = (idx / Self::COLS) as f64;
-        let x = (idx % Self::COLS) as f64;
-        druid::Point::new(1.0 + (x * Self::PIXELS), 1.0 + (y * Self::PIXELS))
-    }
-
     /// Convert an index within the canvas storage to a rectanble in screen coordinates.
-    fn idx_to_screen_rect(idx: usize) -> druid::Rect {
-        let origin = Self::idx_to_screen_coords(idx);
-        druid::Rect::from_origin_size(origin, (Self::PIXELS, Self::PIXELS))
+    fn screen_rect(x: usize, y: usize) -> druid::Rect {
+        let fx = x as f64;
+        let fy = y as f64;
+        let origin = Self::canvas_coords_to_screen_coords_f64(fx, fy);
+
+        druid::Rect::from_origin_size(origin, (theme::CANVAS_PIXEL_SIZE, theme::CANVAS_PIXEL_SIZE))
     }
 
-    /// Paint an index into canvas storage into the given render context.
-    fn paint_idx(ctx: &mut PaintCtx, idx: usize, color: &druid::Color) {
-        let rect = Self::idx_to_screen_rect(idx);
-
-        let (_, _, _, a) = color.as_rgba8();
-        if a != 255 {
-            let y = idx / Self::COLS;
-            let x = idx % Self::ROWS;
-
-            let fill_color = match (x + y) % 2 {
-                0 => theme::CANVAS_FILL_DARK,
-                _ => theme::CANVAS_FILL_LIGHT,
-            };
-            ctx.fill(rect, &fill_color);
+    fn read_safe(data: &AppState, p: druid::Point) -> druid::Color {
+        if data.doc().pixels().contains(p) {
+            data.doc().pixels().read(p)
+        } else {
+            druid::Color::rgba8(0, 0, 0, 0)
         }
-
-        ctx.fill(rect, color);
     }
 
     /// Paint border. The canvas does this internally instead of via border() because the
@@ -114,12 +95,33 @@ impl Canvas {
         ctx.stroke(rect, &color, 1.0);
     }
 
+    fn paint_pixel(ctx: &mut PaintCtx, x: usize, y: usize, color: &druid::Color) {
+        let rect = Self::screen_rect(x, y);
+
+        let (_, _, _, a) = color.as_rgba8();
+        if a != 255 {
+            let fill_color = match (x + y) % 2 {
+                0 => theme::CANVAS_FILL_DARK,
+                _ => theme::CANVAS_FILL_LIGHT,
+            };
+            ctx.fill(rect, &fill_color);
+        }
+
+        ctx.fill(rect, color);
+    }
+
     /// Paint pixels from storage onto the given render context. This will paint
     /// on top of the checkboard. Pixel transparency is via alpha value.
     fn paint_pixels(&self, ctx: &mut PaintCtx, data: &AppState) {
-        let pixels = data.doc().pixels();
-        for i in 0..pixels.len() {
-            Self::paint_idx(ctx, i, &pixels.read(i));
+        let header = data.doc().pixels().header();
+        let height = header.height();
+        let width = header.width();
+
+        for y in 1..height + 1 {
+            for x in 1..width + 1 {
+                let color = data.doc().pixels().read_xy(x, y);
+                Self::paint_pixel(ctx, x, y, &color);
+            }
         }
     }
 
@@ -145,10 +147,15 @@ impl Canvas {
     /// Paint the grid onto the given render context.
     fn paint_grid(&self, ctx: &mut PaintCtx, data: &AppState) {
         if data.show_grid() {
-            for i in 1..4 {
+            let header = data.doc().pixels().header();
+            let height = header.height();
+            let width = header.width();
+
+            let num_lines = width / 8 + 1;
+            for i in 1..num_lines {
                 let offset = 1 + i * 8;
-                self.paint_grid_line(ctx, offset, 1, offset, Self::ROWS + 1);
-                self.paint_grid_line(ctx, 1, offset, Self::COLS + 1, offset);
+                self.paint_grid_line(ctx, offset, 1, offset, width + 1);
+                self.paint_grid_line(ctx, 1, offset, height + 1, offset);
             }
         }
     }
@@ -181,8 +188,7 @@ impl Canvas {
     fn tool(&mut self, ctx: &mut EventCtx, data: &mut AppState, p: druid::Point) {
         match data.tool_type() {
             ToolType::Dropper => {
-                let idx = data.doc().pixels().point_to_idx(p);
-                let color = data.doc().pixels().read(idx);
+                let color = Self::read_safe(data, p);
                 data.set_brush_color(color);
             }
 
@@ -262,8 +268,7 @@ impl druid::Widget<AppState> for Canvas {
                         // canvas coords have changed (because of how big our pixels are).
                         // Avoid doing any work if we're still in the same place.
                         if p != data.current_pos() {
-                            let idx = data.doc().pixels().point_to_idx(p);
-                            let color = data.doc().pixels().read(idx);
+                            let color = Self::read_safe(data, p);
 
                             data.set_pos_color(color);
                             data.set_current_pos(p);
@@ -309,10 +314,10 @@ impl druid::Widget<AppState> for Canvas {
         &mut self,
         _layout_ctx: &mut LayoutCtx,
         bc: &BoxConstraints,
-        data: &AppState,
+        _data: &AppState,
         _env: &Env,
     ) -> Size {
-        let rect = Self::idx_to_screen_rect(data.doc().pixels().len() - 1);
+        let rect = Self::screen_rect(theme::CANVAS_ROWS, theme::CANVAS_COLS);
         let size = Size::new(rect.x1 + 1.0, rect.y1 + 1.0);
         bc.constrain(size)
     }

@@ -103,10 +103,13 @@ fn build_color_well() -> impl druid::Widget<AppState> {
 
 fn build_left_pane() -> impl druid::Widget<AppState> {
     Flex::column()
-        .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
+        .cross_axis_alignment(druid::widget::CrossAxisAlignment::Center)
         .with_child(build_tools())
         .with_default_spacer()
         .with_child(build_color_well())
+        .with_default_spacer()
+        .with_default_spacer()
+        .with_child(build_palette())
 }
 
 fn build_canvas() -> impl druid::Widget<AppState> {
@@ -120,21 +123,21 @@ fn build_palette() -> impl druid::Widget<AppState> {
 fn build_preview() -> impl druid::Widget<AppState> {
     druid::widget::Painter::new(|ctx, data: &AppState, _env| {
         let pixels = data.doc().pixels();
-        let header = pixels.header();
-        let mut i = 0;
-        for y in 0..header.height() {
-            for x in 0..header.width() {
-                let rect = druid::Rect::new(x as f64, y as f64, (x as f64) + 1.0, (y as f64) + 1.0);
+        let height = pixels.header().height();
+        let width = pixels.header().width();
 
-                let color = pixels.read(i);
+        for y in 0..height {
+            for x in 0..width {
+                let fx = x as f64;
+                let fy = y as f64;
+                let rect = druid::Rect::new(fx, fy, fx + 1.0, fy + 1.0);
+
+                let color = pixels.read_xy(x + 1, y + 1);
                 let (_, _, _, a) = color.as_rgba8();
                 if a != 255 {
                     ctx.fill(rect, &theme::PREVIEW_FILL);
                 };
-
                 ctx.fill(rect, &color);
-
-                i += 1;
             }
         }
     })
@@ -152,8 +155,6 @@ fn build_center_pane() -> impl druid::Widget<AppState> {
     Flex::column()
         .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
         .with_child(build_canvas())
-        .with_default_spacer()
-        .with_child(build_palette())
         .with_default_spacer()
         .with_child(build_status_bar())
         .with_default_spacer()
