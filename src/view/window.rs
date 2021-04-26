@@ -108,6 +108,7 @@ fn build_left_pane() -> impl druid::Widget<AppState> {
         .with_default_spacer()
         .with_child(build_color_well())
         .with_default_spacer()
+        .with_default_spacer()
         .with_child(build_palette())
 }
 

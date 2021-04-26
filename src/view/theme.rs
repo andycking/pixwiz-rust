@@ -35,7 +35,7 @@ pub const PALETTE_FILL: Color = Color::BLACK;
 pub const PALETTE_STROKE_SELECTED: Color = Color::BLACK;
 pub const PALETTE_COLS: usize = 8;
 pub const PALETTE_ROWS: usize = 32;
-pub const PALETTE_PIXEL_SIZE: f64 = 15.0;
+pub const PALETTE_PIXEL_SIZE: f64 = 12.0;
 
 pub const CANVAS_FILL_DARK: Color = Color::rgb8(80, 80, 80);
 pub const CANVAS_FILL_LIGHT: Color = Color::rgb8(96, 96, 96);
@@ -53,7 +53,7 @@ pub const BUTTON_DEFAULT_LIGHT: Color = Color::rgb8(0, 124, 252);
 pub const BUTTON_DARK: Color = Color::rgb8(180, 180, 180);
 pub const BUTTON_LIGHT: Color = Color::rgb8(200, 200, 200);
 
-pub const WINDOW_SIZE: druid::Size = druid::Size::new(980.0, 824.0);
+pub const WINDOW_SIZE: druid::Size = druid::Size::new(960.0, 816.0);
 pub const UNSAVED_FILE_ALERT_SIZE: druid::Size = druid::Size::new(208.0, 212.0);
 pub const WARNING_ALERT_SIZE: druid::Size = druid::Size::new(208.0, 108.0);
 

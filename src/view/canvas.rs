@@ -113,8 +113,9 @@ impl Canvas {
     /// Paint pixels from storage onto the given render context. This will paint
     /// on top of the checkboard. Pixel transparency is via alpha value.
     fn paint_pixels(&self, ctx: &mut PaintCtx, data: &AppState) {
-        let height = data.doc().pixels().header().height();
-        let width = data.doc().pixels().header().width();
+        let header = data.doc().pixels().header();
+        let height = header.height();
+        let width = header.width();
 
         for y in 1..height + 1 {
             for x in 1..width + 1 {
@@ -146,8 +147,9 @@ impl Canvas {
     /// Paint the grid onto the given render context.
     fn paint_grid(&self, ctx: &mut PaintCtx, data: &AppState) {
         if data.show_grid() {
-            let height = data.doc().pixels().header().height();
-            let width = data.doc().pixels().header().width();
+            let header = data.doc().pixels().header();
+            let height = header.height();
+            let width = header.width();
 
             let num_lines = width / 8 + 1;
             for i in 1..num_lines {
