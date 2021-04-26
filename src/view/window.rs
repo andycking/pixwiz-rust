@@ -123,11 +123,11 @@ fn build_preview() -> impl druid::Widget<AppState> {
         let height = pixels.header().height();
         let width = pixels.header().width();
 
-        for y in 1..height + 1 {
-            for x in 1..width + 1 {
+        for y in 0..height {
+            for x in 0..width {
                 let rect = druid::Rect::new(x as f64, y as f64, (x as f64) + 1.0, (y as f64) + 1.0);
 
-                let color = pixels.read_xy(x, y);
+                let color = pixels.read_xy(x + 1, y + 1);
                 let (_, _, _, a) = color.as_rgba8();
                 if a != 255 {
                     ctx.fill(rect, &theme::PREVIEW_FILL);
