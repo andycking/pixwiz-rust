@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/// File types that we support.
 pub const ALLOWED_FILE_TYPES: [druid::FileSpec; 1] = [druid::FileSpec::PNG];
 
-pub const DEFAULT_PIXEL_DIMS: u32 = 48;
+/// Max pixel dimensions.
 pub const MAX_PIXEL_DIMS: u32 = 48;
+
+/// Default pixel dimensions.
+pub const DEFAULT_PIXEL_DIMS: u32 = MAX_PIXEL_DIMS;
