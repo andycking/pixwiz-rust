@@ -180,8 +180,8 @@ impl PixelState {
         self.xy_to_idx(x, y) * self.header.bytes_per_pixel as usize
     }
 
-    /// Read from an xy point in pixel storage.
-    pub fn read_xy(&self, x: usize, y: usize) -> druid::Color {
+    /// Read from an xy point in pixel storage. Will panic if outside bounds.
+    pub fn read_xy_unchecked(&self, x: usize, y: usize) -> druid::Color {
         let byte_idx = self.xy_to_byte_idx(x, y);
 
         druid::Color::rgba8(
@@ -192,10 +192,19 @@ impl PixelState {
         )
     }
 
-    /// Read from a point in pixel storage.
+    /// Read from a point in pixel storage. Will panic if outside bounds.
     #[inline]
+    pub fn read_unchecked(&self, p: druid::Point) -> druid::Color {
+        self.read_xy_unchecked(p.x as usize, p.y as usize)
+    }
+
+    /// Safe way to read a point in pixel storage. Will return an empty color if outside bounds.
     pub fn read(&self, p: druid::Point) -> druid::Color {
-        self.read_xy(p.x as usize, p.y as usize)
+        if self.contains(p) {
+            self.read_unchecked(p)
+        } else {
+            druid::Color::rgba8(0, 0, 0, 0)
+        }
     }
 
     /// Read an area of storage.
