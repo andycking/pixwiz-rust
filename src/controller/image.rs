@@ -15,6 +15,7 @@
 use crate::common::commands;
 use crate::controller::undo;
 use crate::model::app::AppState;
+use crate::model::types::*;
 use crate::transforms;
 
 pub fn black_and_white(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
@@ -41,12 +42,14 @@ pub fn dither_floyd(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: 
     transforms::apply(data, transforms::colors::dither_floyd, 0.0);
 }
 
-pub fn eraser(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    let current_pos = data.current_pos();
-    undo::push_point(data, current_pos);
+pub fn eraser(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+    if *cmd.get_unchecked(commands::IMAGE_ERASER) != ToolState::Up {
+        let current_pos = data.current_pos();
+        undo::push_point(data, current_pos);
 
-    let color = druid::Color::rgba8(0, 0, 0, 0);
-    data.doc.pixels_mut().write(current_pos, &color);
+        let color = druid::Color::rgba8(0, 0, 0, 0);
+        data.doc.pixels_mut().write(current_pos, &color);
+    }
 }
 
 pub fn fill(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
@@ -77,10 +80,12 @@ pub fn marquee(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut 
 
 pub fn move_(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut AppState) {}
 
-pub fn paint(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
-    let current_pos = data.current_pos();
-    undo::push_point(data, current_pos);
+pub fn paint(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+    if *cmd.get_unchecked(commands::IMAGE_PAINT) != ToolState::Up {
+        let current_pos = data.current_pos();
+        undo::push_point(data, current_pos);
 
-    let color = data.brush_color().clone();
-    data.doc.pixels_mut().write(current_pos, &color);
+        let color = data.brush_color().clone();
+        data.doc.pixels_mut().write(current_pos, &color);
+    }
 }

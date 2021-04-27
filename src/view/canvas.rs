@@ -16,7 +16,7 @@ use druid::widget::prelude::*;
 
 use crate::common::commands;
 use crate::model::app::AppState;
-use crate::model::types::ToolType;
+use crate::model::types::*;
 use crate::view::theme;
 
 /// A canvas that allows for the display and modification of pixels. The size is currently
@@ -177,29 +177,35 @@ impl Canvas {
 
     /// Execute a tool at the given point on the canvas. The point is in
     /// canvas coordinates.
-    fn tool(&mut self, ctx: &mut EventCtx, data: &mut AppState, p: druid::Point) {
+    fn tool(&mut self, ctx: &mut EventCtx, data: &mut AppState, state: ToolState) {
         match data.tool_type() {
             ToolType::Dropper => {
-                let color = data.doc().pixels().read(p);
+                let current_pos = data.current_pos();
+                let color = data.doc().pixels().read(current_pos);
+
                 data.set_brush_color(color);
             }
 
             ToolType::Eraser => {
+                let current_pos = data.current_pos();
                 let bounds = data.doc().bounds();
-                if bounds.contains(p) {
-                    ctx.submit_command(commands::IMAGE_ERASER);
+
+                if bounds.contains(current_pos) {
+                    ctx.submit_command(commands::IMAGE_ERASER.with(state));
                 }
             }
 
             ToolType::Fill => {
+                let current_pos = data.current_pos();
                 let bounds = data.doc().bounds();
-                if bounds.contains(p) {
+
+                if bounds.contains(current_pos) {
                     ctx.submit_command(commands::IMAGE_FILL.with(true));
                 }
             }
 
             ToolType::Marquee => {
-                ctx.submit_command(commands::IMAGE_MARQUEE);
+                ctx.submit_command(commands::IMAGE_MARQUEE.with(state));
             }
 
             ToolType::Move => {
@@ -207,9 +213,11 @@ impl Canvas {
             }
 
             ToolType::Paint => {
+                let current_pos = data.current_pos();
                 let bounds = data.doc().bounds();
-                if bounds.contains(p) {
-                    ctx.submit_command(commands::IMAGE_PAINT);
+
+                if bounds.contains(current_pos) {
+                    ctx.submit_command(commands::IMAGE_PAINT.with(state));
                 }
             }
         }
@@ -236,7 +244,6 @@ impl druid::Widget<AppState> for Canvas {
                         Some(p) => {
                             data.set_start_pos(p);
                             data.set_current_pos(p);
-                            self.tool(ctx, data, p);
                         }
                         _ => {
                             data.set_start_pos(druid::Point::ZERO);
@@ -244,6 +251,7 @@ impl druid::Widget<AppState> for Canvas {
                         }
                     }
                     ctx.set_active(true);
+                    self.tool(ctx, data, ToolState::Down);
                 }
             }
 
@@ -254,33 +262,40 @@ impl druid::Widget<AppState> for Canvas {
                 };
                 ctx.set_cursor(&cursor);
 
+                let mut moved = false;
+
                 match Self::screen_coords_to_canvas_coords(e.pos) {
                     Some(p) => {
                         // The screen coords might have changed, but that doesn't mean the
                         // canvas coords have changed (because of how big our pixels are).
                         // Avoid doing any work if we're still in the same place.
                         if p != data.current_pos() {
+                            moved = true;
+
                             let color = data.doc().pixels().read(p);
 
                             data.set_pos_color(color);
                             data.set_current_pos(p);
-
-                            if ctx.is_active() {
-                                self.tool(ctx, data, p);
-                            }
                         }
                     }
                     None => {
                         if !ctx.is_active() && data.current_pos() != druid::Point::ZERO {
+                            moved = true;
+
                             data.set_pos_color(data.brush_color().clone());
                             data.set_current_pos(druid::Point::ZERO);
                         }
                     }
                 }
+
+                if ctx.is_active() && moved {
+                    self.tool(ctx, data, ToolState::Move);
+                }
             }
 
             Event::MouseUp(_e) if ctx.is_active() => {
                 ctx.set_active(false);
+                self.tool(ctx, data, ToolState::Up);
             }
 
             _ => {}

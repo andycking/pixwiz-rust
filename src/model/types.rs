@@ -28,6 +28,13 @@ pub enum ToolType {
     Paint,
 }
 
+#[derive(Clone, Copy, druid::Data, PartialEq)]
+pub enum ToolState {
+    Down,
+    Move,
+    Up,
+}
+
 /// Window state.
 #[derive(Clone, Copy, druid::Data, PartialEq)]
 pub enum WindowState {
