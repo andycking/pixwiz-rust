@@ -12,6 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub fn file_dialog_opts() -> druid::FileDialogOptions {
-    druid::FileDialogOptions::default().allowed_types(vec![druid::FileSpec::PNG])
-}
+pub mod commands;
+pub mod constants;

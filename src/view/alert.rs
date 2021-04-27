@@ -17,8 +17,8 @@ use druid::WidgetExt;
 
 use super::button::Button;
 use super::theme;
-use crate::commands;
-use crate::global;
+use crate::common::commands;
+use crate::common::constants;
 use crate::model::app::AppState;
 use crate::model::types::*;
 
@@ -50,6 +50,11 @@ pub fn unsaved_file(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
     let sub_message = build_message("Your changes will be lost if you don't save them.", false);
 
     let save = Button::new("Save", true).on_click(|ctx, data, _env| {
+        fn file_dialog_opts() -> druid::FileDialogOptions {
+            druid::FileDialogOptions::default()
+                .allowed_types(constants::ALLOWED_FILE_TYPES.to_vec())
+        }
+
         // Transition to the next state. Just do this directly in the handler.
         data.set_window_state(WindowState::UnsavedSave);
 
@@ -60,7 +65,7 @@ pub fn unsaved_file(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
         // the command is delivered to the delegate.
         ctx.submit_command(
             druid::commands::SHOW_SAVE_PANEL
-                .with(global::file_dialog_opts())
+                .with(file_dialog_opts())
                 .to(data.window_id()),
         );
     });

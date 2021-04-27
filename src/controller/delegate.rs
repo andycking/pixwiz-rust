@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::commands;
+use crate::common::commands;
 use crate::controller;
 use crate::model::app::AppState;
 use crate::view::menu;
