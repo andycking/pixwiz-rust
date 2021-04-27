@@ -14,6 +14,6 @@
 
 pub mod app;
 pub mod document;
-pub mod mods;
+pub mod mod_stack;
 pub mod pixels;
 pub mod types;
