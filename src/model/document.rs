@@ -12,15 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::sync::Arc;
+
 use crate::model::mod_stack::ModStack;
 use crate::model::pixels::PixelState;
 use crate::model::types::*;
+
+#[derive(Clone, druid::Data, Default)]
+pub struct MoveInfo {
+    start_point: druid::Point,
+    start_area: druid::Rect,
+    bytes: PixelBytes,
+}
+
+impl MoveInfo {
+    pub fn new(start_point: druid::Point, start_area: druid::Rect, bytes: Vec<u8>) -> Self {
+        Self {
+            start_point,
+            start_area,
+            bytes: Arc::new(bytes),
+        }
+    }
+
+    pub fn start_point(&self) -> druid::Point {
+        self.start_point
+    }
+
+    pub fn start_area(&self) -> druid::Rect {
+        self.start_area
+    }
+
+    pub fn bytes(&self) -> &PixelBytes {
+        &self.bytes
+    }
+}
 
 /// Per-document state.
 #[derive(Clone, druid::Data, Default)]
 pub struct Document {
     selection: Option<druid::Rect>,
-    move_bytes: Option<PixelBytes>,
+    move_info: Option<MoveInfo>,
     pixels: PixelState,
     path: Option<String>,
     new_path: Option<String>,
@@ -49,12 +80,20 @@ impl Document {
         self.selection = Some(selection);
     }
 
-    pub fn move_bytes(&self) -> &Option<PixelBytes> {
-        &self.move_bytes
+    pub fn is_moving(&self) -> bool {
+        self.move_info.is_some()
     }
 
-    pub fn clear_move_bytes(&mut self) {
-        self.move_bytes = None;
+    pub fn move_info(&self) -> &Option<MoveInfo> {
+        &self.move_info
+    }
+
+    pub fn clear_move_info(&mut self) {
+        self.move_info = None;
+    }
+
+    pub fn set_move_info(&mut self, move_info: MoveInfo) {
+        self.move_info = Some(move_info);
     }
 
     pub fn pixels(&self) -> &PixelState {

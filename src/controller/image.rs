@@ -78,7 +78,30 @@ pub fn marquee(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut 
     }
 }
 
-pub fn move_(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut AppState) {}
+pub fn move_(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+    if data.doc.selection().is_none() {
+        print!("NO SELECTION\n");
+        return;
+    }
+
+    let selection = data.doc().selection().unwrap();
+
+    match *cmd.get_unchecked(commands::IMAGE_MOVE) {
+        ToolState::Down => {
+            print!("START MOVE\n");
+            //data.doc.set_move_bytes();
+            //clear(ctx, cmd, data);
+        }
+
+        ToolState::Move => {
+            print!("MOVING\n");
+        }
+
+        ToolState::Up => {
+            print!("DONE MOVING\n");
+        }
+    };
+}
 
 pub fn paint(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
     if *cmd.get_unchecked(commands::IMAGE_PAINT) != ToolState::Up {

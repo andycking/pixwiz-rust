@@ -158,7 +158,12 @@ impl Canvas {
             let tl = Self::canvas_coords_to_screen_coords_f64(s.x0, s.y0);
             let br = Self::canvas_coords_to_screen_coords_f64(s.x1, s.y1);
 
-            let rect = druid::Rect::new(tl.x, tl.y, br.x + 16.0, br.y + 16.0);
+            let rect = druid::Rect::new(
+                tl.x,
+                tl.y,
+                br.x + theme::CANVAS_PIXEL_SIZE,
+                br.y + theme::CANVAS_PIXEL_SIZE,
+            );
 
             ctx.stroke_styled(
                 rect,
@@ -209,7 +214,7 @@ impl Canvas {
             }
 
             ToolType::Move => {
-                ctx.submit_command(commands::IMAGE_MOVE);
+                ctx.submit_command(commands::IMAGE_MOVE.with(state));
             }
 
             ToolType::Paint => {

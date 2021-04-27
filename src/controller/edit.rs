@@ -32,9 +32,10 @@ pub fn paste(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut A
 pub fn select_all(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     let bounds = data.doc().pixels().header().bounds();
     data.doc.set_selection(bounds);
+    data.doc.clear_move_info();
 }
 
 pub fn deselect(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     data.doc.clear_selection();
-    data.doc.clear_move_bytes();
+    data.doc.clear_move_info();
 }
