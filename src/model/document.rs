@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::model::mods::ModStack;
+use crate::model::mod_stack::ModStack;
 use crate::model::pixels::PixelState;
 use crate::model::types::*;
 

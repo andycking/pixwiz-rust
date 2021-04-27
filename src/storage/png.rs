@@ -20,6 +20,7 @@ use std::path::Path;
 use std::result::Result;
 
 use super::error::StorageError;
+use crate::common::constants;
 use crate::model::pixels::PixelHeader;
 use crate::model::pixels::PixelState;
 
@@ -68,6 +69,11 @@ pub fn read<R: Read>(reader: R) -> Result<PixelState, StorageError> {
 
     // We support 8-bit PNGs in RGBA format for now. Let's at least be upfront about it.
     if info.bit_depth != png::BitDepth::Eight || info.color_type != png::ColorType::RGBA {
+        return Err(StorageError::new());
+    }
+
+    // Same for the max supported pixel dimensions.
+    if info.width > constants::MAX_PIXEL_DIMS || info.height > constants::MAX_PIXEL_DIMS {
         return Err(StorageError::new());
     }
 

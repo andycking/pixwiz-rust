@@ -14,7 +14,7 @@
 
 use druid::widget::prelude::*;
 
-use crate::commands;
+use crate::common::commands;
 use crate::model::app::AppState;
 use crate::model::types::ToolType;
 use crate::view::theme;
@@ -49,7 +49,7 @@ impl Canvas {
 
         let x = pos.x as usize / (theme::CANVAS_PIXEL_SIZE as usize) + 1;
         let y = pos.y as usize / (theme::CANVAS_PIXEL_SIZE as usize) + 1;
-        if x > theme::CANVAS_COLS || y > theme::CANVAS_ROWS {
+        if x > theme::CANVAS_DIMS || y > theme::CANVAS_DIMS {
             return None;
         }
 
@@ -309,7 +309,7 @@ impl druid::Widget<AppState> for Canvas {
         _data: &AppState,
         _env: &Env,
     ) -> Size {
-        let rect = Self::screen_rect(theme::CANVAS_ROWS, theme::CANVAS_COLS);
+        let rect = Self::screen_rect(theme::CANVAS_DIMS, theme::CANVAS_DIMS);
         let size = Size::new(rect.x1 + 1.0, rect.y1 + 1.0);
         bc.constrain(size)
     }
