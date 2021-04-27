@@ -14,6 +14,8 @@
 
 use druid::Color;
 
+use crate::common::constants;
+
 pub const MAIN_FILL: Color = Color::rgb8(240, 240, 240);
 pub const MAIN_STROKE: Color = Color::rgb8(208, 208, 208);
 
@@ -29,14 +31,16 @@ pub const COLOR_WELL_SIZE: druid::Size = druid::Size::new(70.0, 30.0);
 
 pub const PREVIEW_FILL: Color = CANVAS_FILL_LIGHT;
 pub const PREVIEW_STROKE: Color = MAIN_STROKE;
-pub const PREVIEW_SIZE: druid::Size = druid::Size::new(CANVAS_ROWS as f64, CANVAS_COLS as f64);
+pub const PREVIEW_SIZE: druid::Size = druid::Size::new(CANVAS_DIMS as f64, CANVAS_DIMS as f64);
 
-pub const PALETTE_FILL: Color = Color::BLACK;
-pub const PALETTE_STROKE_SELECTED: Color = Color::BLACK;
 pub const PALETTE_COLS: usize = 8;
 pub const PALETTE_ROWS: usize = 32;
 pub const PALETTE_PIXEL_SIZE: f64 = 12.0;
+pub const PALETTE_FILL: Color = Color::BLACK;
+pub const PALETTE_STROKE_SELECTED: Color = Color::BLACK;
 
+pub const CANVAS_DIMS: usize = constants::MAX_PIXEL_DIMS as usize;
+pub const CANVAS_PIXEL_SIZE: f64 = 16.0;
 pub const CANVAS_FILL_DARK: Color = Color::rgb8(80, 80, 80);
 pub const CANVAS_FILL_LIGHT: Color = Color::rgb8(96, 96, 96);
 pub const CANVAS_STROKE: Color = MAIN_STROKE;
@@ -44,9 +48,6 @@ pub const CANVAS_STROKE_SELECTED_DARK: Color = Color::BLACK;
 pub const CANVAS_STROKE_SELECTED_LIGHT: Color = Color::WHITE;
 pub const CANVAS_STROKE_GRID_DARK: Color = Color::BLACK;
 pub const CANVAS_STROKE_GRID_LIGHT: Color = MAIN_STROKE;
-pub const CANVAS_ROWS: usize = 48;
-pub const CANVAS_COLS: usize = 48;
-pub const CANVAS_PIXEL_SIZE: f64 = 16.0;
 
 pub const BUTTON_DEFAULT_DARK: Color = Color::rgb8(0, 92, 252);
 pub const BUTTON_DEFAULT_LIGHT: Color = Color::rgb8(0, 124, 252);

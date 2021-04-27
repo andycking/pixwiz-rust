@@ -13,3 +13,6 @@
 // limitations under the License.
 
 pub const ALLOWED_FILE_TYPES: [druid::FileSpec; 1] = [druid::FileSpec::PNG];
+
+pub const DEFAULT_PIXEL_DIMS: u32 = 48;
+pub const MAX_PIXEL_DIMS: u32 = 48;

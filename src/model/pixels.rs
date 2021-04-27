@@ -14,6 +14,7 @@
 
 use std::sync::Arc;
 
+use crate::common::constants;
 use crate::model::types::PixelBytes;
 
 /// Generic pixel header.
@@ -59,8 +60,8 @@ impl PixelHeader {
 impl Default for PixelHeader {
     fn default() -> Self {
         Self {
-            width: 48,
-            height: 48,
+            width: constants::DEFAULT_PIXEL_DIMS,
+            height: constants::DEFAULT_PIXEL_DIMS,
             depth: 8,
             bytes_per_pixel: 4,
         }
