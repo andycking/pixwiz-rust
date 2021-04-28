@@ -45,7 +45,7 @@ pub fn dither_floyd(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: 
 }
 
 pub fn eraser(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
-    if *cmd.get_unchecked(commands::IMAGE_ERASER) != ToolState::Up {
+    if *cmd.get_unchecked(commands::IMAGE_ERASER) != ToolState::End {
         let current_pos = data.current_pos();
         undo::push_point(data, current_pos);
 
@@ -77,7 +77,7 @@ pub fn marquee(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut 
 pub fn move_(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
     if let Some(selection) = data.doc().selection() {
         match *cmd.get_unchecked(commands::IMAGE_MOVE) {
-            ToolState::Down => {
+            ToolState::Start => {
                 if !data.doc().is_moving() {
                     let current_pos = data.current_pos();
                     let clone_rect = shapes::inflate_rect(selection);
@@ -113,7 +113,7 @@ pub fn move_(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppS
 }
 
 pub fn paint(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
-    if *cmd.get_unchecked(commands::IMAGE_PAINT) != ToolState::Up {
+    if *cmd.get_unchecked(commands::IMAGE_PAINT) != ToolState::End {
         let current_pos = data.current_pos();
         undo::push_point(data, current_pos);
 

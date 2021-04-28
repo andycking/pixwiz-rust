@@ -290,7 +290,7 @@ impl druid::Widget<AppState> for Canvas {
                         }
                     }
                     ctx.set_active(true);
-                    self.tool(ctx, data, ToolState::Down);
+                    self.tool(ctx, data, ToolState::Start);
                 }
             }
 
@@ -334,7 +334,7 @@ impl druid::Widget<AppState> for Canvas {
 
             Event::MouseUp(_e) if ctx.is_active() => {
                 ctx.set_active(false);
-                self.tool(ctx, data, ToolState::Up);
+                self.tool(ctx, data, ToolState::End);
             }
 
             _ => {}

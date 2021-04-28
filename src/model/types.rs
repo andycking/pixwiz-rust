@@ -30,9 +30,9 @@ pub enum ToolType {
 
 #[derive(Clone, Copy, druid::Data, PartialEq)]
 pub enum ToolState {
-    Down,
+    Start,
     Move,
-    Up,
+    End,
 }
 
 /// Window state.
