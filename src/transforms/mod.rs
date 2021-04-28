@@ -30,11 +30,19 @@ where
     let bounds = data.doc().bounds();
     undo::push(data, bounds);
 
+    apply_no_undo(data, f, param);
+}
+
+pub fn apply_no_undo<F>(data: &mut AppState, f: F, param: f64)
+where
+    F: Fn(&PixelHeader, &PixelEnv, &mut Vec<u8>),
+{
     // The transform function gets copies of the header and the bytes. We don't want
     // it mucking directly with our pixels.
     let header = data.doc().pixels().header().clone();
     let brush_color = data.brush_color().clone();
     let current_pos = data.current_pos();
+    let bounds = data.doc().bounds();
     let env = PixelEnv::new(brush_color, current_pos, bounds, param);
     let mut bytes = data.doc().pixels().bytes().to_vec();
 

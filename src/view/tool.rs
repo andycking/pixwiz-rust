@@ -16,6 +16,7 @@ use std::sync::Arc;
 
 use druid::widget::prelude::*;
 
+use crate::common::commands;
 use crate::model::app::AppState;
 use crate::model::types::ToolType;
 use crate::view::theme;
@@ -122,7 +123,7 @@ impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for ToolsContro
         child.event(ctx, event, data, env);
 
         if tool_type != data.tool_type() {
-            data.doc.clear_move_info();
+            ctx.submit_command(commands::IMAGE_MOVE_DROP);
             ctx.request_paint();
         }
     }

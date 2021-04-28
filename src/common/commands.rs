@@ -31,6 +31,7 @@ pub const IMAGE_ERASER: Selector<ToolState> = Selector::new("image-eraser");
 pub const IMAGE_FILL: Selector<bool> = Selector::new("image-fill");
 pub const IMAGE_MARQUEE: Selector<ToolState> = Selector::new("image-marquee");
 pub const IMAGE_MOVE: Selector<ToolState> = Selector::new("image-move");
+pub const IMAGE_MOVE_DROP: Selector = Selector::new("image-move-drop");
 pub const IMAGE_PAINT: Selector<ToolState> = Selector::new("image-paint");
 
 pub const VIEW_SHOW_GRID: Selector = Selector::new("view-show-grid");

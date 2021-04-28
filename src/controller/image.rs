@@ -74,7 +74,7 @@ pub fn marquee(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut 
     }
 }
 
-pub fn move_(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+pub fn move_(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
     if let Some(selection) = data.doc().selection() {
         match *cmd.get_unchecked(commands::IMAGE_MOVE) {
             ToolState::Start => {
@@ -86,7 +86,17 @@ pub fn move_(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppS
                     let move_info = MoveInfo::new(current_pos, selection, pixels);
                     data.doc.set_move_info(move_info);
 
-                    clear(ctx, cmd, data);
+                    // FIXME: Yikes, we're always pushing the entire image onto the undo
+                    // stack. The problem is that we need to remember the pixels that we're
+                    // about to drag, *and* the pixels that we'll replace when we eventually
+                    // drop the drag. These might be non-overlapping areas, which our undo
+                    // stack doesn't support. One alternative is to use two undo records, but
+                    // that gets super messy. Another alternative is to push the union onto the
+                    // undo stack at the time we drop.
+                    let bounds = data.doc().pixels().header().bounds();
+                    undo::push(data, bounds);
+
+                    transforms::apply_no_undo(data, transforms::simple::clear, 0.0);
                 }
             }
 
@@ -110,6 +120,18 @@ pub fn move_(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppS
             _ => {}
         };
     }
+}
+
+pub fn move_drop(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+    if data.doc().is_moving() {
+        let selection = shapes::inflate_rect(data.doc().selection().unwrap());
+        let move_info = data.doc().move_info().unwrap().to_owned();
+        let bytes = move_info.pixels().bytes();
+
+        data.doc.pixels_mut().write_area(selection, bytes);
+    }
+
+    data.doc.clear_move_info();
 }
 
 pub fn paint(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
