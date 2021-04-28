@@ -34,16 +34,12 @@ impl MoveInfo {
         }
     }
 
-    pub fn start_point(&self) -> druid::Point {
-        self.start_point
-    }
-
-    pub fn start_area(&self) -> druid::Rect {
-        self.start_area
-    }
-
-    pub fn bytes(&self) -> &PixelBytes {
+    pub fn _bytes(&self) -> &PixelBytes {
         &self.bytes
+    }
+
+    pub fn offset(&self) -> druid::Point {
+        self.start_point - (self.start_area.x0, self.start_area.y0)
     }
 }
 
@@ -80,12 +76,12 @@ impl Document {
         self.selection = Some(selection);
     }
 
-    pub fn is_moving(&self) -> bool {
+    pub fn _is_moving(&self) -> bool {
         self.move_info.is_some()
     }
 
-    pub fn move_info(&self) -> &Option<MoveInfo> {
-        &self.move_info
+    pub fn move_info(&self) -> Option<&MoveInfo> {
+        self.move_info.as_ref()
     }
 
     pub fn clear_move_info(&mut self) {

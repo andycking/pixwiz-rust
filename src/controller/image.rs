@@ -15,6 +15,7 @@
 use crate::common::commands;
 use crate::controller::undo;
 use crate::model::app::AppState;
+use crate::model::document::MoveInfo;
 use crate::model::types::*;
 use crate::transforms;
 
@@ -79,28 +80,39 @@ pub fn marquee(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut 
 }
 
 pub fn move_(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
-    if data.doc.selection().is_none() {
-        print!("NO SELECTION\n");
-        return;
+    if let Some(selection) = data.doc().selection() {
+        match *cmd.get_unchecked(commands::IMAGE_MOVE) {
+            ToolState::Down => {
+                let current_pos = data.current_pos();
+                let bytes = data.doc().pixels().read_area(selection);
+                let move_info = MoveInfo::new(current_pos, selection, bytes);
+                data.doc.set_move_info(move_info);
+
+                clear(ctx, cmd, data);
+            }
+
+            ToolState::Move => {
+                if let Some(move_info) = data.doc().move_info() {
+                    let bounds = data.doc().pixels().header().bounds();
+                    let current_pos = data.current_pos();
+                    let offset = move_info.offset();
+
+                    let rect = druid::Rect::new(
+                        current_pos.x - offset.x,
+                        current_pos.y - offset.y,
+                        (current_pos.x - offset.x) + selection.width(),
+                        (current_pos.y - offset.y) + selection.height(),
+                    );
+
+                    let new_selection = constrain(rect, bounds);
+
+                    data.doc.set_selection(new_selection);
+                }
+            }
+
+            ToolState::Up => {}
+        };
     }
-
-    let selection = data.doc().selection().unwrap();
-
-    match *cmd.get_unchecked(commands::IMAGE_MOVE) {
-        ToolState::Down => {
-            print!("START MOVE\n");
-            //data.doc.set_move_bytes();
-            //clear(ctx, cmd, data);
-        }
-
-        ToolState::Move => {
-            print!("MOVING\n");
-        }
-
-        ToolState::Up => {
-            print!("DONE MOVING\n");
-        }
-    };
 }
 
 pub fn paint(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
@@ -111,4 +123,31 @@ pub fn paint(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut App
         let color = data.brush_color().clone();
         data.doc.pixels_mut().write(current_pos, &color);
     }
+}
+
+fn constrain(area: druid::Rect, bounds: druid::Rect) -> druid::Rect {
+    let width = area.width();
+    let height = area.height();
+
+    let mut tl = (area.x0, area.y0);
+    let mut br = (area.x1, area.y1);
+
+    if tl.0 < bounds.x0 {
+        tl.0 = bounds.x0;
+        br.0 = 1.0 + width;
+    }
+    if tl.1 < bounds.y0 {
+        tl.1 = bounds.y0;
+        br.1 = 1.0 + height;
+    }
+    if br.0 > bounds.x1 {
+        tl.0 = bounds.x1 - width;
+        br.0 = bounds.x1;
+    }
+    if br.1 > bounds.y1 {
+        tl.1 = bounds.y1 - height;
+        br.1 = bounds.y1;
+    }
+
+    druid::Rect::from_points(tl, br)
 }

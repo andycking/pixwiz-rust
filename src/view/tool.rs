@@ -109,7 +109,14 @@ impl druid::Widget<AppState> for ToolButton {
 pub struct ToolsController;
 
 impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for ToolsController {
-    fn event(&mut self, child: &mut W, ctx: &mut EventCtx, event: &Event, data: &mut AppState, env: &Env) {
+    fn event(
+        &mut self,
+        child: &mut W,
+        ctx: &mut EventCtx,
+        event: &Event,
+        data: &mut AppState,
+        env: &Env,
+    ) {
         let tool_type = data.tool_type();
 
         child.event(ctx, event, data, env);
