@@ -18,6 +18,7 @@ use crate::model::app::AppState;
 use crate::model::document::MoveInfo;
 use crate::model::types::*;
 use crate::transforms;
+use crate::util::shapes;
 
 pub fn black_and_white(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
     transforms::apply(data, transforms::colors::black_and_white, 0.5);
@@ -65,14 +66,8 @@ pub fn marquee(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut 
     let start_pos = data.start_pos();
     let current_pos = data.current_pos();
 
-    let x0 = start_pos.x.min(current_pos.x);
-    let y0 = start_pos.y.min(current_pos.y);
-    let x1 = start_pos.x.max(current_pos.x);
-    let y1 = start_pos.y.max(current_pos.y);
-
-    let new_selection = druid::Rect::new(x0, y0, x1, y1);
-
     let old_selection = data.doc().selection().unwrap_or(druid::Rect::ZERO);
+    let new_selection = shapes::enclosing_rect(start_pos, current_pos);
 
     if old_selection != new_selection {
         data.doc.set_selection(new_selection);
@@ -101,8 +96,8 @@ pub fn move_(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppS
                         (current_pos.x, current_pos.y),
                         (selection.width(), selection.height()),
                     );
-                    let rect = offset_rect(point_rect, offset);
-                    let new_selection = constrain_rect(rect, bounds);
+                    let rect = shapes::offset_rect(point_rect, offset);
+                    let new_selection = shapes::constrain_rect(rect, bounds);
 
                     data.doc.set_selection(new_selection);
                 }
@@ -121,40 +116,4 @@ pub fn paint(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut App
         let color = data.brush_color().clone();
         data.doc.pixels_mut().write(current_pos, &color);
     }
-}
-
-fn offset_rect(area: druid::Rect, by: druid::Point) -> druid::Rect {
-    druid::Rect::new(
-        area.x0 - by.x,
-        area.y0 - by.y,
-        area.x1 - by.x,
-        area.y1 - by.y,
-    )
-}
-
-fn constrain_rect(area: druid::Rect, bounds: druid::Rect) -> druid::Rect {
-    let width = area.width();
-    let height = area.height();
-
-    let mut tl = (area.x0, area.y0);
-    let mut br = (area.x1, area.y1);
-
-    if tl.0 < bounds.x0 {
-        tl.0 = bounds.x0;
-        br.0 = 1.0 + width;
-    }
-    if tl.1 < bounds.y0 {
-        tl.1 = bounds.y0;
-        br.1 = 1.0 + height;
-    }
-    if br.0 > bounds.x1 {
-        tl.0 = bounds.x1 - width;
-        br.0 = bounds.x1;
-    }
-    if br.1 > bounds.y1 {
-        tl.1 = bounds.y1 - height;
-        br.1 = bounds.y1;
-    }
-
-    druid::Rect::from_points(tl, br)
 }
