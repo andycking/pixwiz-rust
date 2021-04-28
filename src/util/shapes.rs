@@ -21,21 +21,25 @@ pub fn enclosing_rect(a: druid::Point, b: druid::Point) -> druid::Rect {
     druid::Rect::new(x0, y0, x1, y1)
 }
 
-pub fn offset_rect(area: druid::Rect, by: druid::Point) -> druid::Rect {
+pub fn inflate_rect(rect: druid::Rect) -> druid::Rect {
+    rect.with_size((rect.width() + 1.0, rect.height() + 1.0))
+}
+
+pub fn offset_rect(rect: druid::Rect, by: druid::Point) -> druid::Rect {
     druid::Rect::new(
-        area.x0 - by.x,
-        area.y0 - by.y,
-        area.x1 - by.x,
-        area.y1 - by.y,
+        rect.x0 - by.x,
+        rect.y0 - by.y,
+        rect.x1 - by.x,
+        rect.y1 - by.y,
     )
 }
 
-pub fn constrain_rect(area: druid::Rect, bounds: druid::Rect) -> druid::Rect {
-    let width = area.width();
-    let height = area.height();
+pub fn constrain_rect(rect: druid::Rect, bounds: druid::Rect) -> druid::Rect {
+    let width = rect.width();
+    let height = rect.height();
 
-    let mut tl = (area.x0, area.y0);
-    let mut br = (area.x1, area.y1);
+    let mut tl = (rect.x0, rect.y0);
+    let mut br = (rect.x1, rect.y1);
 
     if tl.0 < bounds.x0 {
         tl.0 = bounds.x0;
