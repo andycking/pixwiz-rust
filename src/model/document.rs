@@ -76,7 +76,7 @@ impl Document {
         self.selection = Some(selection);
     }
 
-    pub fn _is_moving(&self) -> bool {
+    pub fn is_moving(&self) -> bool {
         self.move_info.is_some()
     }
 

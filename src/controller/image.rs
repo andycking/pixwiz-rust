@@ -78,12 +78,14 @@ pub fn move_(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppS
     if let Some(selection) = data.doc().selection() {
         match *cmd.get_unchecked(commands::IMAGE_MOVE) {
             ToolState::Down => {
-                let current_pos = data.current_pos();
-                let bytes = data.doc().pixels().read_area(selection);
-                let move_info = MoveInfo::new(current_pos, selection, bytes);
-                data.doc.set_move_info(move_info);
+                if !data.doc().is_moving() {
+                    let current_pos = data.current_pos();
+                    let bytes = data.doc().pixels().read_area(selection);
+                    let move_info = MoveInfo::new(current_pos, selection, bytes);
+                    data.doc.set_move_info(move_info);
 
-                clear(ctx, cmd, data);
+                    clear(ctx, cmd, data);
+                }
             }
 
             ToolState::Move => {
@@ -103,7 +105,7 @@ pub fn move_(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppS
                 }
             }
 
-            ToolState::Up => {}
+            _ => {}
         };
     }
 }

@@ -17,6 +17,7 @@ use druid::widget::prelude::*;
 use crate::common::commands;
 use crate::model::app::AppState;
 use crate::model::types::*;
+use crate::util::shapes;
 use crate::view::theme;
 
 /// A canvas that allows for the display and modification of pixels. The size is currently
@@ -109,9 +110,25 @@ impl Canvas {
         let height = header.height();
         let width = header.width();
 
+        let moving = data.doc().is_moving();
+        let dragged_rect = if moving {
+            shapes::inflate_rect(data.doc().selection().unwrap())
+        } else {
+            druid::Rect::ZERO
+        };
+
         for y in 1..height + 1 {
             for x in 1..width + 1 {
-                let color = data.doc().pixels().read_xy_unchecked(x, y);
+                let color = if moving {
+                    let p = druid::Point::new(x as f64, y as f64);
+                    if !dragged_rect.contains(p) {
+                        data.doc().pixels().read_xy_unchecked(x, y)
+                    } else {
+                        druid::Color::rgba8(0, 0, 0, 0)
+                    }
+                } else {
+                    data.doc().pixels().read_xy_unchecked(x, y)
+                };
                 Self::paint_pixel(ctx, x, y, &color);
             }
         }
