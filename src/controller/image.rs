@@ -20,27 +20,33 @@ use crate::model::types::*;
 use crate::transforms;
 use crate::util::shapes;
 
-pub fn black_and_white(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+pub fn black_and_white(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+    move_drop(ctx, cmd, data);
     transforms::apply(data, transforms::colors::black_and_white, 0.5);
 }
 
-pub fn brighten(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+pub fn brighten(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+    move_drop(ctx, cmd, data);
     transforms::apply(data, transforms::colors::brightness, 0.05);
 }
 
-pub fn clear(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+pub fn clear(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+    move_drop(ctx, cmd, data);
     transforms::apply(data, transforms::simple::clear, 0.0);
 }
 
-pub fn darken(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+pub fn darken(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+    move_drop(ctx, cmd, data);
     transforms::apply(data, transforms::colors::brightness, -0.05);
 }
 
-pub fn desaturate(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+pub fn desaturate(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+    move_drop(ctx, cmd, data);
     transforms::apply(data, transforms::colors::desaturate, 0.0);
 }
 
-pub fn dither_floyd(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+pub fn dither_floyd(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+    move_drop(ctx, cmd, data);
     transforms::apply(data, transforms::colors::dither_floyd, 0.0);
 }
 
@@ -54,11 +60,14 @@ pub fn eraser(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut Ap
     }
 }
 
-pub fn fill(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+pub fn fill(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+    move_drop(ctx, cmd, data);
+
     let f = match *cmd.get_unchecked(commands::IMAGE_FILL) {
         true => transforms::colors::flood_fill,
         _ => transforms::colors::fill,
     };
+
     transforms::apply(data, f, 0.0);
 }
 
