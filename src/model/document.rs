@@ -14,13 +14,37 @@
 
 use crate::model::mod_stack::ModStack;
 use crate::model::pixels::PixelState;
-use crate::model::types::*;
+
+#[derive(Clone, druid::Data, Default)]
+pub struct MoveInfo {
+    start_point: druid::Point,
+    start_area: druid::Rect,
+    pixels: PixelState,
+}
+
+impl MoveInfo {
+    pub fn new(start_point: druid::Point, start_area: druid::Rect, pixels: PixelState) -> Self {
+        Self {
+            start_point,
+            start_area,
+            pixels,
+        }
+    }
+
+    pub fn offset(&self) -> druid::Point {
+        self.start_point - (self.start_area.x0, self.start_area.y0)
+    }
+
+    pub fn pixels(&self) -> &PixelState {
+        &self.pixels
+    }
+}
 
 /// Per-document state.
 #[derive(Clone, druid::Data, Default)]
 pub struct Document {
     selection: Option<druid::Rect>,
-    move_bytes: Option<PixelBytes>,
+    move_info: Option<MoveInfo>,
     pixels: PixelState,
     path: Option<String>,
     new_path: Option<String>,
@@ -49,12 +73,20 @@ impl Document {
         self.selection = Some(selection);
     }
 
-    pub fn move_bytes(&self) -> &Option<PixelBytes> {
-        &self.move_bytes
+    pub fn is_moving(&self) -> bool {
+        self.move_info.is_some()
     }
 
-    pub fn clear_move_bytes(&mut self) {
-        self.move_bytes = None;
+    pub fn move_info(&self) -> Option<&MoveInfo> {
+        self.move_info.as_ref()
+    }
+
+    pub fn clear_move_info(&mut self) {
+        self.move_info = None;
+    }
+
+    pub fn set_move_info(&mut self, move_info: MoveInfo) {
+        self.move_info = Some(move_info);
     }
 
     pub fn pixels(&self) -> &PixelState {

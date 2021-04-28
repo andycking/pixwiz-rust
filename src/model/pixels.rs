@@ -130,6 +130,21 @@ impl PixelState {
         }
     }
 
+    pub fn clone_area(&self, area: druid::Rect) -> Self {
+        let header = PixelHeader::new(
+            area.width() as u32,
+            area.height() as u32,
+            self.header.depth,
+            self.header.bytes_per_pixel,
+        );
+
+        Self {
+            header,
+            dirty: false,
+            bytes: Arc::new(self.read_area(area)),
+        }
+    }
+
     /// Are pixels dirty?
     pub fn dirty(&self) -> bool {
         self.dirty

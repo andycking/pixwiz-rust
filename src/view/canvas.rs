@@ -16,7 +16,8 @@ use druid::widget::prelude::*;
 
 use crate::common::commands;
 use crate::model::app::AppState;
-use crate::model::types::ToolType;
+use crate::model::types::*;
+use crate::util::shapes;
 use crate::view::theme;
 
 /// A canvas that allows for the display and modification of pixels. The size is currently
@@ -102,9 +103,32 @@ impl Canvas {
         ctx.fill(rect, color);
     }
 
-    /// Paint pixels from storage onto the given render context. This will paint
-    /// on top of the checkboard. Pixel transparency is via alpha value.
-    fn paint_pixels(&self, ctx: &mut PaintCtx, data: &AppState) {
+    fn paint_pixels_moving(&self, ctx: &mut PaintCtx, data: &AppState) {
+        let header = data.doc().pixels().header();
+        let height = header.height();
+        let width = header.width();
+
+        let move_info = data.doc().move_info().unwrap();
+        let selection = shapes::inflate_rect(data.doc().selection().unwrap());
+
+        for y in 1..height + 1 {
+            for x in 1..width + 1 {
+                let p = druid::Point::new(x as f64, y as f64);
+
+                let color = if selection.contains(p) {
+                    let off_x = (x - selection.x0 as usize) + 1;
+                    let off_y = (y - selection.y0 as usize) + 1;
+                    move_info.pixels().read_xy_unchecked(off_x, off_y)
+                } else {
+                    data.doc().pixels().read_xy_unchecked(x, y)
+                };
+
+                Self::paint_pixel(ctx, x, y, &color);
+            }
+        }
+    }
+
+    fn paint_pixels_static(&self, ctx: &mut PaintCtx, data: &AppState) {
         let header = data.doc().pixels().header();
         let height = header.height();
         let width = header.width();
@@ -114,6 +138,16 @@ impl Canvas {
                 let color = data.doc().pixels().read_xy_unchecked(x, y);
                 Self::paint_pixel(ctx, x, y, &color);
             }
+        }
+    }
+
+    /// Paint pixels from storage onto the given render context. This will paint
+    /// on top of the checkboard. Pixel transparency is via alpha value.
+    fn paint_pixels(&self, ctx: &mut PaintCtx, data: &AppState) {
+        if data.doc().is_moving() {
+            self.paint_pixels_moving(ctx, data);
+        } else {
+            self.paint_pixels_static(ctx, data);
         }
     }
 
@@ -158,7 +192,12 @@ impl Canvas {
             let tl = Self::canvas_coords_to_screen_coords_f64(s.x0, s.y0);
             let br = Self::canvas_coords_to_screen_coords_f64(s.x1, s.y1);
 
-            let rect = druid::Rect::new(tl.x, tl.y, br.x + 16.0, br.y + 16.0);
+            let rect = druid::Rect::new(
+                tl.x,
+                tl.y,
+                br.x + theme::CANVAS_PIXEL_SIZE,
+                br.y + theme::CANVAS_PIXEL_SIZE,
+            );
 
             ctx.stroke_styled(
                 rect,
@@ -177,39 +216,47 @@ impl Canvas {
 
     /// Execute a tool at the given point on the canvas. The point is in
     /// canvas coordinates.
-    fn tool(&mut self, ctx: &mut EventCtx, data: &mut AppState, p: druid::Point) {
+    fn tool(&mut self, ctx: &mut EventCtx, data: &mut AppState, state: ToolState) {
         match data.tool_type() {
             ToolType::Dropper => {
-                let color = data.doc().pixels().read(p);
+                let current_pos = data.current_pos();
+                let color = data.doc().pixels().read(current_pos);
+
                 data.set_brush_color(color);
             }
 
             ToolType::Eraser => {
+                let current_pos = data.current_pos();
                 let bounds = data.doc().bounds();
-                if bounds.contains(p) {
-                    ctx.submit_command(commands::IMAGE_ERASER);
+
+                if bounds.contains(current_pos) {
+                    ctx.submit_command(commands::IMAGE_ERASER.with(state));
                 }
             }
 
             ToolType::Fill => {
+                let current_pos = data.current_pos();
                 let bounds = data.doc().bounds();
-                if bounds.contains(p) {
+
+                if bounds.contains(current_pos) {
                     ctx.submit_command(commands::IMAGE_FILL.with(true));
                 }
             }
 
             ToolType::Marquee => {
-                ctx.submit_command(commands::IMAGE_MARQUEE);
+                ctx.submit_command(commands::IMAGE_MARQUEE.with(state));
             }
 
             ToolType::Move => {
-                ctx.submit_command(commands::IMAGE_MOVE);
+                ctx.submit_command(commands::IMAGE_MOVE.with(state));
             }
 
             ToolType::Paint => {
+                let current_pos = data.current_pos();
                 let bounds = data.doc().bounds();
-                if bounds.contains(p) {
-                    ctx.submit_command(commands::IMAGE_PAINT);
+
+                if bounds.contains(current_pos) {
+                    ctx.submit_command(commands::IMAGE_PAINT.with(state));
                 }
             }
         }
@@ -236,7 +283,6 @@ impl druid::Widget<AppState> for Canvas {
                         Some(p) => {
                             data.set_start_pos(p);
                             data.set_current_pos(p);
-                            self.tool(ctx, data, p);
                         }
                         _ => {
                             data.set_start_pos(druid::Point::ZERO);
@@ -244,6 +290,7 @@ impl druid::Widget<AppState> for Canvas {
                         }
                     }
                     ctx.set_active(true);
+                    self.tool(ctx, data, ToolState::Start);
                 }
             }
 
@@ -254,33 +301,40 @@ impl druid::Widget<AppState> for Canvas {
                 };
                 ctx.set_cursor(&cursor);
 
+                let mut moved = false;
+
                 match Self::screen_coords_to_canvas_coords(e.pos) {
                     Some(p) => {
                         // The screen coords might have changed, but that doesn't mean the
                         // canvas coords have changed (because of how big our pixels are).
                         // Avoid doing any work if we're still in the same place.
                         if p != data.current_pos() {
+                            moved = true;
+
                             let color = data.doc().pixels().read(p);
 
                             data.set_pos_color(color);
                             data.set_current_pos(p);
-
-                            if ctx.is_active() {
-                                self.tool(ctx, data, p);
-                            }
                         }
                     }
                     None => {
                         if !ctx.is_active() && data.current_pos() != druid::Point::ZERO {
+                            moved = true;
+
                             data.set_pos_color(data.brush_color().clone());
                             data.set_current_pos(druid::Point::ZERO);
                         }
                     }
                 }
+
+                if ctx.is_active() && moved {
+                    self.tool(ctx, data, ToolState::Move);
+                }
             }
 
             Event::MouseUp(_e) if ctx.is_active() => {
                 ctx.set_active(false);
+                self.tool(ctx, data, ToolState::End);
             }
 
             _ => {}

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::image;
 use crate::controller::undo;
 use crate::model::app::AppState;
 
@@ -29,12 +30,15 @@ pub fn copy(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut Ap
 
 pub fn paste(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, _data: &mut AppState) {}
 
-pub fn select_all(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+pub fn select_all(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+    image::move_drop(ctx, cmd, data);
+
     let bounds = data.doc().pixels().header().bounds();
     data.doc.set_selection(bounds);
 }
 
-pub fn deselect(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppState) {
+pub fn deselect(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
+    image::move_drop(ctx, cmd, data);
+
     data.doc.clear_selection();
-    data.doc.clear_move_bytes();
 }

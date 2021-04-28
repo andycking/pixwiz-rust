@@ -16,6 +16,7 @@ use std::sync::Arc;
 
 use druid::widget::prelude::*;
 
+use crate::common::commands;
 use crate::model::app::AppState;
 use crate::model::types::ToolType;
 use crate::view::theme;
@@ -52,12 +53,6 @@ impl druid::Widget<AppState> for ToolButton {
             Event::MouseUp(_e) if ctx.is_active() => {
                 if ctx.is_hot() {
                     data.set_tool_type(self.tool_type);
-
-                    // Don't forget to clear out the move bytes. There has to be a better
-                    // place to put this.
-                    if data.tool_type() != ToolType::Move && data.doc().move_bytes().is_some() {
-                        data.doc.clear_move_bytes();
-                    }
                 }
                 ctx.set_active(false);
             }
@@ -115,18 +110,21 @@ impl druid::Widget<AppState> for ToolButton {
 pub struct ToolsController;
 
 impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for ToolsController {
-    fn update(
+    fn event(
         &mut self,
         child: &mut W,
-        ctx: &mut UpdateCtx,
-        old_data: &AppState,
-        data: &AppState,
+        ctx: &mut EventCtx,
+        event: &Event,
+        data: &mut AppState,
         env: &Env,
     ) {
-        if old_data.tool_type() != data.tool_type() {
+        let tool_type = data.tool_type();
+
+        child.event(ctx, event, data, env);
+
+        if tool_type != data.tool_type() {
+            ctx.submit_command(commands::IMAGE_MOVE_DROP);
             ctx.request_paint();
         }
-
-        child.update(ctx, old_data, data, env);
     }
 }
