@@ -97,14 +97,12 @@ pub fn move_(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppS
                     let current_pos = data.current_pos();
                     let offset = move_info.offset();
 
-                    let rect = druid::Rect::new(
-                        current_pos.x - offset.x,
-                        current_pos.y - offset.y,
-                        (current_pos.x - offset.x) + selection.width(),
-                        (current_pos.y - offset.y) + selection.height(),
+                    let point_rect = druid::Rect::from_origin_size(
+                        (current_pos.x, current_pos.y),
+                        (selection.width(), selection.height()),
                     );
-
-                    let new_selection = constrain(rect, bounds);
+                    let rect = offset_rect(point_rect, offset);
+                    let new_selection = constrain_rect(rect, bounds);
 
                     data.doc.set_selection(new_selection);
                 }
@@ -125,7 +123,16 @@ pub fn paint(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut App
     }
 }
 
-fn constrain(area: druid::Rect, bounds: druid::Rect) -> druid::Rect {
+fn offset_rect(area: druid::Rect, by: druid::Point) -> druid::Rect {
+    druid::Rect::new(
+        area.x0 - by.x,
+        area.y0 - by.y,
+        area.x1 - by.x,
+        area.y1 - by.y,
+    )
+}
+
+fn constrain_rect(area: druid::Rect, bounds: druid::Rect) -> druid::Rect {
     let width = area.width();
     let height = area.height();
 
