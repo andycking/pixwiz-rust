@@ -80,8 +80,10 @@ pub fn move_(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppS
             ToolState::Down => {
                 if !data.doc().is_moving() {
                     let current_pos = data.current_pos();
-                    let bytes = data.doc().pixels().read_area(selection);
-                    let move_info = MoveInfo::new(current_pos, selection, bytes);
+                    let clone_rect = shapes::inflate_rect(selection);
+                    let pixels = data.doc().pixels().clone_area(clone_rect);
+
+                    let move_info = MoveInfo::new(current_pos, selection, pixels);
                     data.doc.set_move_info(move_info);
 
                     clear(ctx, cmd, data);

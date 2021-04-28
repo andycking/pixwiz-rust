@@ -12,34 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::sync::Arc;
-
 use crate::model::mod_stack::ModStack;
 use crate::model::pixels::PixelState;
-use crate::model::types::*;
 
 #[derive(Clone, druid::Data, Default)]
 pub struct MoveInfo {
     start_point: druid::Point,
     start_area: druid::Rect,
-    bytes: PixelBytes,
+    pixels: PixelState,
 }
 
 impl MoveInfo {
-    pub fn new(start_point: druid::Point, start_area: druid::Rect, bytes: Vec<u8>) -> Self {
+    pub fn new(start_point: druid::Point, start_area: druid::Rect, pixels: PixelState) -> Self {
         Self {
             start_point,
             start_area,
-            bytes: Arc::new(bytes),
+            pixels,
         }
-    }
-
-    pub fn _bytes(&self) -> &PixelBytes {
-        &self.bytes
     }
 
     pub fn offset(&self) -> druid::Point {
         self.start_point - (self.start_area.x0, self.start_area.y0)
+    }
+
+    pub fn pixels(&self) -> &PixelState {
+        &self.pixels
     }
 }
 

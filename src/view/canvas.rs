@@ -103,34 +103,51 @@ impl Canvas {
         ctx.fill(rect, color);
     }
 
-    /// Paint pixels from storage onto the given render context. This will paint
-    /// on top of the checkboard. Pixel transparency is via alpha value.
-    fn paint_pixels(&self, ctx: &mut PaintCtx, data: &AppState) {
+    fn paint_pixels_moving(&self, ctx: &mut PaintCtx, data: &AppState) {
         let header = data.doc().pixels().header();
         let height = header.height();
         let width = header.width();
 
-        let moving = data.doc().is_moving();
-        let dragged_rect = if moving {
-            shapes::inflate_rect(data.doc().selection().unwrap())
-        } else {
-            druid::Rect::ZERO
-        };
+        let move_info = data.doc().move_info().unwrap();
+        let selection = shapes::inflate_rect(data.doc().selection().unwrap());
 
         for y in 1..height + 1 {
             for x in 1..width + 1 {
-                let color = if moving {
-                    let p = druid::Point::new(x as f64, y as f64);
-                    if !dragged_rect.contains(p) {
-                        data.doc().pixels().read_xy_unchecked(x, y)
-                    } else {
-                        druid::Color::rgba8(0, 0, 0, 0)
-                    }
+                let p = druid::Point::new(x as f64, y as f64);
+
+                let color = if selection.contains(p) {
+                    let off_x = (x - selection.x0 as usize) + 1;
+                    let off_y = (y - selection.y0 as usize) + 1;
+                    move_info.pixels().read_xy_unchecked(off_x, off_y)
                 } else {
                     data.doc().pixels().read_xy_unchecked(x, y)
                 };
+
                 Self::paint_pixel(ctx, x, y, &color);
             }
+        }
+    }
+
+    fn paint_pixels_static(&self, ctx: &mut PaintCtx, data: &AppState) {
+        let header = data.doc().pixels().header();
+        let height = header.height();
+        let width = header.width();
+
+        for y in 1..height + 1 {
+            for x in 1..width + 1 {
+                let color = data.doc().pixels().read_xy_unchecked(x, y);
+                Self::paint_pixel(ctx, x, y, &color);
+            }
+        }
+    }
+
+    /// Paint pixels from storage onto the given render context. This will paint
+    /// on top of the checkboard. Pixel transparency is via alpha value.
+    fn paint_pixels(&self, ctx: &mut PaintCtx, data: &AppState) {
+        if data.doc().is_moving() {
+            self.paint_pixels_moving(ctx, data);
+        } else {
+            self.paint_pixels_static(ctx, data);
         }
     }
 
