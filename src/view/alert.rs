@@ -32,6 +32,8 @@ pub fn open_failed(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
     });
 
     let panel = Flex::column()
+        .with_child(build_warning_icon())
+        .with_default_spacer()
         .with_child(message)
         .with_default_spacer()
         .with_child(sub_message)
@@ -82,6 +84,8 @@ pub fn unsaved_file(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
     });
 
     let panel = Flex::column()
+        .with_child(build_warning_icon())
+        .with_default_spacer()
         .with_child(message)
         .with_default_spacer()
         .with_child(sub_message)
@@ -114,6 +118,15 @@ fn build_alert(
         .set_position(pos)
         .window_size(size)
         .resizable(false)
+}
+
+fn build_warning_icon() -> druid::widget::SizedBox<AppState> {
+    let bytes = include_bytes!("../assets/warning.png");
+    let data = druid::ImageBuf::from_data(bytes).unwrap();
+    let width = data.width() as f64;
+    let height = data.height() as f64;
+
+    druid::widget::Image::new(data).fix_size(width, height)
 }
 
 fn build_message(message: &'static str, bold: bool) -> druid::widget::Label<AppState> {
