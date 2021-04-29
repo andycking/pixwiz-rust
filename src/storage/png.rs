@@ -100,12 +100,12 @@ pub fn read<R: Read>(reader: R) -> Result<PixelState, StorageError> {
 
 impl From<png::EncodingError> for StorageError {
     fn from(_: png::EncodingError) -> Self {
-        Self::BadEncoding
+        Self::FailedToEncode
     }
 }
 
 impl From<png::DecodingError> for StorageError {
     fn from(_: png::DecodingError) -> Self {
-        Self::BadEncoding
+        Self::FailedToDecode
     }
 }

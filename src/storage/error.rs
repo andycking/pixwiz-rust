@@ -20,7 +20,8 @@ pub enum StorageError {
     BadBitDepth,
     BadColorType,
     BadDimensions,
-    BadEncoding,
+    FailedToDecode,
+    FailedToEncode,
     SystemError,
 }
 
@@ -30,7 +31,8 @@ impl std::fmt::Display for StorageError {
             Self::BadBitDepth => "Unsupported bit depth",
             Self::BadColorType => "Unsupported color type",
             Self::BadDimensions => "Unsuppored image dimensions",
-            Self::BadEncoding => "Failed to encode",
+            Self::FailedToDecode => "Failed to decode",
+            Self::FailedToEncode => "Failed to encode",
             Self::SystemError => "System error",
         };
 
