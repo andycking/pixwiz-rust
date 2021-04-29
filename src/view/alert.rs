@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::error::Error;
+
 use druid::widget::Flex;
 use druid::WidgetExt;
 
@@ -22,9 +24,9 @@ use crate::common::constants;
 use crate::model::app::AppState;
 use crate::model::types::*;
 
-pub fn open_failed(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
+pub fn open_failed(parent_pos: druid::Point, e: impl Error) -> druid::WindowDesc<AppState> {
     let message = build_message("Whoops!", true);
-    let sub_message = build_message("That failed.", false);
+    let sub_message = build_message(&e.to_string(), false);
 
     let dismiss = Button::new("Dismiss", true).on_click(|ctx, data, _env| {
         data.reset_window_state();
@@ -129,7 +131,7 @@ fn build_warning_icon() -> druid::widget::SizedBox<AppState> {
     druid::widget::Image::new(data).fix_size(width, height)
 }
 
-fn build_message(message: &'static str, bold: bool) -> druid::widget::Label<AppState> {
+fn build_message(message: &str, bold: bool) -> druid::widget::Label<AppState> {
     let font = match bold {
         true => theme::ALERT_MESSAGE_FONT_BOLD,
         _ => theme::ALERT_MESSAGE_FONT,

@@ -54,9 +54,9 @@ pub fn open_internal(ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: 
     if let Some(new_path) = data.doc().new_path() {
         match storage::png::read_path(&new_path) {
             Ok(pixels) => data.doc = Document::new(pixels, new_path),
-            Err(_e) => {
+            Err(e) => {
                 data.set_window_state(WindowState::OpenFailed);
-                let alert = alert::open_failed(data.window_pos());
+                let alert = alert::open_failed(data.window_pos(), e);
                 ctx.new_window(alert);
             }
         }
