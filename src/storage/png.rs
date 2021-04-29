@@ -48,9 +48,10 @@ pub fn write<W: Write>(writer: W, pixels: &PixelState) -> Result<(), StorageErro
     // Oof. If this is a file the user loaded, then we're dropping all the other fields.
     // Someone is going to be super pissed when their file isn't the same.
 
-    match encode_writer.write_image_data(pixels.bytes()) {
-        Err(_) => Err(StorageError::new()),
-        _ => Ok(()),
+    if let Err(e) = encode_writer.write_image_data(pixels.bytes()) {
+        Err(StorageError::from(e))
+    } else {
+        Ok(())
     }
 }
 
@@ -68,13 +69,17 @@ pub fn read<R: Read>(reader: R) -> Result<PixelState, StorageError> {
     let (info, mut decode_reader) = decoder.read_info()?;
 
     // We support 8-bit PNGs in RGBA format for now. Let's at least be upfront about it.
-    if info.bit_depth != png::BitDepth::Eight || info.color_type != png::ColorType::RGBA {
-        return Err(StorageError::new());
+    if info.bit_depth != png::BitDepth::Eight {
+        return Err(StorageError::BadBitDepth);
+    }
+
+    if info.color_type != png::ColorType::RGBA {
+        return Err(StorageError::BadColorType);
     }
 
     // Same for the max supported pixel dimensions.
     if info.width > constants::MAX_PIXEL_DIMS || info.height > constants::MAX_PIXEL_DIMS {
-        return Err(StorageError::new());
+        return Err(StorageError::BadDimensions);
     }
 
     let mut bytes = vec![0; info.buffer_size()];
@@ -95,12 +100,12 @@ pub fn read<R: Read>(reader: R) -> Result<PixelState, StorageError> {
 
 impl From<png::EncodingError> for StorageError {
     fn from(_: png::EncodingError) -> Self {
-        Self::new()
+        Self::FailedToEncode
     }
 }
 
 impl From<png::DecodingError> for StorageError {
     fn from(_: png::DecodingError) -> Self {
-        Self::new()
+        Self::FailedToDecode
     }
 }
