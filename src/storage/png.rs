@@ -48,8 +48,8 @@ pub fn write<W: Write>(writer: W, pixels: &PixelState) -> Result<(), StorageErro
     // Oof. If this is a file the user loaded, then we're dropping all the other fields.
     // Someone is going to be super pissed when their file isn't the same.
 
-    if let Err(_) = encode_writer.write_image_data(pixels.bytes()) {
-        Err(StorageError::BadEncoding)
+    if let Err(e) = encode_writer.write_image_data(pixels.bytes()) {
+        Err(StorageError::from(e))
     } else {
         Ok(())
     }
