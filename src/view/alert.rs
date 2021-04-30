@@ -132,9 +132,10 @@ fn build_warning_icon() -> druid::widget::SizedBox<AppState> {
 }
 
 fn build_message(message: &str, bold: bool) -> druid::widget::Label<AppState> {
-    let font = match bold {
-        true => theme::ALERT_MESSAGE_FONT_BOLD,
-        _ => theme::ALERT_MESSAGE_FONT,
+    let font = if bold {
+        theme::ALERT_MESSAGE_FONT_BOLD
+    } else {
+        theme::ALERT_MESSAGE_FONT
     };
 
     druid::widget::Label::new(message)
