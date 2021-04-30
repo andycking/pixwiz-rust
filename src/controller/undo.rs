@@ -28,24 +28,24 @@ pub fn push(data: &mut AppState, area: druid::Rect) {
     // Important: reset the redo stack!
     // This is okay: undo -> undo -> redo -> redo
     // This is not okay: undo -> paint -> redo
-    data.doc.redo().clear();
+    data.doc_mut().redo_mut().clear();
 }
 
 fn push_inner(data: &mut AppState, area: druid::Rect) {
     let bytes = data.doc().pixels().read_area(area);
     let record = ModRecord::new(area, bytes);
 
-    data.doc.undo().push(record);
+    data.doc_mut().undo_mut().push(record);
 }
 
 /// Pop a record from the undo stack and apply it.
 pub fn pop(data: &mut AppState) {
-    if let Some(record) = data.doc.undo().pop() {
+    if let Some(record) = data.doc_mut().undo_mut().pop() {
         // Before we undo, record what we just did, so that we can redo it again.
         let area = record.area();
         push_redo(data, area);
 
-        data.doc.pixels_mut().write_area(area, record.bytes());
+        data.doc_mut().pixels_mut().write_area(area, record.bytes());
     }
 }
 
@@ -53,17 +53,17 @@ fn push_redo(data: &mut AppState, area: druid::Rect) {
     let bytes = data.doc().pixels().read_area(area);
     let record = ModRecord::new(area, bytes);
 
-    data.doc.redo().push(record);
+    data.doc_mut().redo_mut().push(record);
 }
 
 /// Pop a record from the redo stack and apply it.
 pub fn pop_redo(data: &mut AppState) {
-    if let Some(record) = data.doc.redo().pop() {
+    if let Some(record) = data.doc_mut().redo_mut().pop() {
         // Before we redo, record what we just did, so that we can undo it again.
         // But call the inner function, so that we don't reset the redo stack!
         let area = record.area();
         push_inner(data, record.area());
 
-        data.doc.pixels_mut().write_area(area, record.bytes());
+        data.doc_mut().pixels_mut().write_area(area, record.bytes());
     }
 }

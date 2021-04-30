@@ -26,7 +26,7 @@ pub fn new(ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut AppSt
         let alert = alert::unsaved_file(data.window_pos());
         ctx.new_window(alert);
     } else {
-        data.doc = Default::default();
+        data.set_doc(Default::default());
     }
 }
 
@@ -37,7 +37,7 @@ pub fn open(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppSt
     let file_info = cmd.get_unchecked(druid::commands::OPEN_FILE);
     let path = file_info.path().to_str().unwrap();
 
-    data.doc.set_new_path(String::from(path));
+    data.doc_mut().set_new_path(String::from(path));
 
     if data.doc().pixels().dirty() {
         data.set_window_state(WindowState::UnsavedAlert);
@@ -53,7 +53,7 @@ pub fn open_internal(ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: 
 
     if let Some(new_path) = data.doc().new_path() {
         match storage::png::read_path(&new_path) {
-            Ok(pixels) => data.doc = Document::new(pixels, new_path),
+            Ok(pixels) => data.set_doc(Document::new(pixels, new_path)),
             Err(e) => {
                 data.set_window_state(WindowState::OpenFailed);
                 let alert = alert::open_failed(data.window_pos(), e);
@@ -61,7 +61,7 @@ pub fn open_internal(ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: 
             }
         }
     } else {
-        data.doc = Default::default();
+        data.set_doc(Default::default());
     }
 }
 
@@ -71,7 +71,7 @@ pub fn save(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut App
     if let Some(path) = data.doc().path() {
         match storage::png::write_path(&path, data.doc().pixels()) {
             Ok(()) => {
-                data.doc.pixels_mut().clear_dirty();
+                data.doc_mut().pixels_mut().clear_dirty();
             }
             Err(_e) => {}
         };
@@ -90,8 +90,8 @@ pub fn save_as(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut Ap
             if data.window_state() == WindowState::UnsavedSave {
                 open_internal(ctx, cmd, data);
             } else {
-                data.doc.pixels_mut().clear_dirty();
-                data.doc.set_path(String::from(path));
+                data.doc_mut().pixels_mut().clear_dirty();
+                data.doc_mut().set_path(String::from(path));
             }
         }
         Err(_e) => {}

@@ -26,7 +26,7 @@ pub struct AppState {
     window_state: WindowState,
     tool_type: ToolType,
     show_grid: bool,
-    pub doc: Document,
+    doc: Document,
 
     #[data(same_fn = "PartialEq::eq")]
     window_id: druid::WindowId,
@@ -122,5 +122,13 @@ impl AppState {
 
     pub fn doc(&self) -> &Document {
         &self.doc
+    }
+
+    pub fn doc_mut(&mut self) -> &mut Document {
+        &mut self.doc
+    }
+
+    pub fn set_doc(&mut self, doc: Document) {
+        self.doc = doc;
     }
 }

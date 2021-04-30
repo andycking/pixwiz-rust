@@ -49,5 +49,5 @@ where
     f(&header, &env, &mut bytes);
 
     // Write back the modified pixels.
-    data.doc.pixels_mut().set_bytes(bytes);
+    data.doc_mut().pixels_mut().set_bytes(bytes);
 }
