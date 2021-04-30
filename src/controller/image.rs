@@ -63,9 +63,10 @@ pub fn eraser(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut Ap
 pub fn fill(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
     move_drop(ctx, cmd, data);
 
-    let f = match *cmd.get_unchecked(commands::IMAGE_FILL) {
-        true => transforms::colors::flood_fill,
-        _ => transforms::colors::fill,
+    let f = if *cmd.get_unchecked(commands::IMAGE_FILL) {
+        transforms::colors::flood_fill
+    } else {
+        transforms::colors::fill
     };
 
     transforms::apply(data, f, 0.0);

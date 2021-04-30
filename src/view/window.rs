@@ -91,10 +91,12 @@ fn build_tools() -> impl druid::Widget<AppState> {
 fn build_color_well() -> impl druid::Widget<AppState> {
     druid::widget::Painter::new(|ctx, data: &AppState, _env| {
         let rect = ctx.size().to_rect();
-        let color = match data.tool_type() {
-            ToolType::Dropper => data.pos_color(),
-            _ => data.brush_color(),
+        let color = if data.tool_type() == ToolType::Dropper {
+            data.pos_color()
+        } else {
+            data.brush_color()
         };
+
         ctx.fill(rect, color);
     })
     .fix_size(theme::COLOR_WELL_SIZE.width, theme::COLOR_WELL_SIZE.height)

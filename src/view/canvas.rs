@@ -93,9 +93,10 @@ impl Canvas {
 
         let (_, _, _, a) = color.as_rgba8();
         if a != 255 {
-            let fill_color = match (x + y) % 2 {
-                0 => theme::CANVAS_FILL_DARK,
-                _ => theme::CANVAS_FILL_LIGHT,
+            let fill_color = if (x + y) % 2 == 0 {
+                theme::CANVAS_FILL_DARK
+            } else {
+                theme::CANVAS_FILL_LIGHT
             };
             ctx.fill(rect, &fill_color);
         }

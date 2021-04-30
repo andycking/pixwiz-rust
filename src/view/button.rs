@@ -29,10 +29,12 @@ pub struct Button {
 
 impl Button {
     pub fn new(text: impl Into<druid::widget::LabelText<AppState>>, is_default: bool) -> Self {
-        let label_color = match is_default {
-            true => druid::Color::WHITE,
-            _ => druid::Color::BLACK,
+        let label_color = if is_default {
+            druid::Color::WHITE
+        } else {
+            druid::Color::BLACK
         };
+
         let label = druid::widget::Label::new(text)
             .with_font(druid::FontDescriptor::new(druid::FontFamily::SYSTEM_UI))
             .with_text_color(label_color);
@@ -111,15 +113,16 @@ impl druid::Widget<AppState> for Button {
             .to_rect()
             .to_rounded_rect(env.get(druid::theme::BUTTON_BORDER_RADIUS));
 
-        let bg_color = match is_active {
-            true => match is_default {
-                true => theme::BUTTON_DEFAULT_DARK,
-                _ => theme::BUTTON_DARK,
-            },
-            _ => match is_default {
-                true => theme::BUTTON_DEFAULT_LIGHT,
-                _ => theme::BUTTON_LIGHT,
-            },
+        let bg_color = if is_active {
+            if is_default {
+                theme::BUTTON_DEFAULT_DARK
+            } else {
+                theme::BUTTON_DARK
+            }
+        } else if is_default {
+            theme::BUTTON_DEFAULT_LIGHT
+        } else {
+            theme::BUTTON_LIGHT
         };
 
         ctx.fill(rounded_rect, &bg_color);

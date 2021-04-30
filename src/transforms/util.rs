@@ -46,10 +46,8 @@ pub fn write(x: usize, y: usize, header: &PixelHeader, bytes: &mut Vec<u8>, colo
 pub fn black_and_white(color: &druid::Color, threshold: f64) -> druid::Color {
     let gray = desaturate(color);
     let (red, _, _, alpha) = gray.as_rgba();
-    let bw = match red < threshold {
-        true => 0.0,
-        _ => 1.0,
-    };
+    let bw = if red < threshold { 0.0 } else { 1.0 };
+
     druid::Color::rgba(bw, bw, bw, alpha)
 }
 
@@ -57,6 +55,7 @@ pub fn black_and_white(color: &druid::Color, threshold: f64) -> druid::Color {
 pub fn desaturate(color: &druid::Color) -> druid::Color {
     let (r, g, b, a) = color.as_rgba();
     let gray = r * 0.299 + g * 0.587 + b * 0.114;
+
     druid::Color::rgba(gray, gray, gray, a)
 }
 
@@ -92,16 +91,14 @@ pub fn rgba_to_hsla(red: f64, green: f64, blue: f64, alpha: f64) -> (f64, f64, f
     if !f64_eq(maxv, minv) {
         let d = maxv - minv;
 
-        saturation = match luminance > 0.5 {
-            true => d / (2.0 - maxv - minv),
-            _ => d / (maxv + minv),
+        saturation = if luminance > 0.5 {
+            d / (2.0 - maxv - minv)
+        } else {
+            d / (maxv + minv)
         };
 
         if f64_eq(maxv, red) {
-            let weight = match green < blue {
-                true => 6.0,
-                _ => 0.0,
-            };
+            let weight = if green < blue { 6.0 } else { 0.0 };
             hue = (green - blue) / d + weight;
         } else if f64_eq(maxv, green) {
             hue = (blue - red) / d + 2.0;
@@ -144,10 +141,12 @@ pub fn hsla_to_rgba(hue: f64, saturation: f64, luminance: f64, alpha: f64) -> (f
         return (luminance, luminance, luminance, alpha);
     }
 
-    let q = match luminance < 0.5 {
-        true => luminance * (1.0 + saturation),
-        _ => (luminance + saturation) - (luminance * saturation),
+    let q = if luminance < 0.5 {
+        luminance * (1.0 + saturation)
+    } else {
+        (luminance + saturation) - (luminance * saturation)
     };
+
     let p = 2.0 * luminance - q;
 
     let red = hue_to_rgb(p, q, hue + 1.0 / 3.0);

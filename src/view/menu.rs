@@ -41,9 +41,10 @@ impl MenuOpts {
     }
 
     pub fn disabled_or(&self, key: &'static str, default: bool) -> bool {
-        match self.disabled.contains_key(key) {
-            true => self.disabled[key],
-            _ => default,
+        if self.disabled.contains_key(key) {
+            self.disabled[key]
+        } else {
+            default
         }
     }
 
@@ -52,9 +53,10 @@ impl MenuOpts {
     }
 
     pub fn selected_or(&self, key: &'static str, default: bool) -> bool {
-        match self.selected.contains_key(key) {
-            true => self.selected[key],
-            _ => default,
+        if self.selected.contains_key(key) {
+            self.selected[key]
+        } else {
+            default
         }
     }
 }
