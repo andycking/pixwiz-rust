@@ -29,10 +29,7 @@ pub fn open_failed(parent_pos: druid::Point, e: impl Error) -> druid::WindowDesc
     let message = build_message("Whoops!", true);
     let sub_message = build_message(&e.to_string(), false);
 
-    let dismiss = Button::new("Dismiss", true).on_click(|ctx, data, _env| {
-        data.reset_window_state();
-        ctx.submit_command(druid::commands::CLOSE_WINDOW);
-    });
+    let dismiss = Button::new("Dismiss", true).on_click(dismiss);
 
     let panel = Flex::column()
         .with_child(build_warning_icon())
@@ -81,10 +78,7 @@ pub fn unsaved_file(parent_pos: druid::Point) -> druid::WindowDesc<AppState> {
         ctx.submit_command(commands::OPEN_FILE_INTERNAL);
     });
 
-    let cancel = Button::new("Cancel", false).on_click(|ctx, data, _env| {
-        data.reset_window_state();
-        ctx.submit_command(druid::commands::CLOSE_WINDOW);
-    });
+    let cancel = Button::new("Cancel", false).on_click(dismiss);
 
     let panel = Flex::column()
         .with_child(build_warning_icon())
@@ -156,7 +150,12 @@ fn center(parent_pos: druid::Point, parent_size: druid::Size, size: druid::Size)
     druid::Point::new(center.x - size.width / 2.0, center.y - size.width / 2.0)
 }
 
-pub struct AlertController {}
+fn dismiss(ctx: &mut EventCtx, data: &mut AppState, _env: &Env) {
+    data.reset_window_state();
+    ctx.submit_command(druid::commands::CLOSE_WINDOW);
+}
+
+struct AlertController {}
 
 impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for AlertController {
     fn event(

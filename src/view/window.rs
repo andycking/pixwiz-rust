@@ -206,7 +206,7 @@ fn build_status_bar() -> impl druid::Widget<AppState> {
         .background(theme::STATUS_BAR_FILL)
 }
 
-pub struct WindowController {}
+struct WindowController {}
 
 impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for WindowController {
     fn event(
