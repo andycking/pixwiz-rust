@@ -220,20 +220,24 @@ impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for WindowContr
         // Remember where this window is, just in case we need to center an alert.
         data.set_window_pos(ctx.window().get_position());
 
-        let block = matches!(
-            event,
-            Event::MouseUp(_)
-                | Event::MouseDown(_)
-                | Event::MouseMove(_)
-                | Event::KeyUp(_)
-                | Event::KeyDown(_)
-                | Event::Paste(_)
-                | Event::Wheel(_)
-                | Event::Zoom(_)
-        );
-
-        if data.window_state() == WindowState::Normal || !block {
+        if data.window_state() == WindowState::Normal {
             child.event(ctx, event, data, env);
+        } else {
+            let block = matches!(
+                event,
+                Event::MouseUp(_)
+                    | Event::MouseDown(_)
+                    | Event::MouseMove(_)
+                    | Event::KeyUp(_)
+                    | Event::KeyDown(_)
+                    | Event::Paste(_)
+                    | Event::Wheel(_)
+                    | Event::Zoom(_)
+            );
+
+            if !block {
+                child.event(ctx, event, data, env);
+            }
         }
     }
 }

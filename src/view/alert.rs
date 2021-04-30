@@ -14,6 +14,7 @@
 
 use std::error::Error;
 
+use druid::widget::prelude::*;
 use druid::widget::Flex;
 use druid::WidgetExt;
 
@@ -110,7 +111,8 @@ fn build_alert(
 ) -> druid::WindowDesc<AppState> {
     let themed = panel
         .border(theme::MAIN_FILL, druid::theme::WIDGET_PADDING_VERTICAL)
-        .background(theme::MAIN_FILL);
+        .background(theme::MAIN_FILL)
+        .controller(AlertController {});
 
     let pos = center(parent_pos, theme::WINDOW_SIZE, size);
 
@@ -152,4 +154,31 @@ fn center(parent_pos: druid::Point, parent_size: druid::Size, size: druid::Size)
     );
 
     druid::Point::new(center.x - size.width / 2.0, center.y - size.width / 2.0)
+}
+
+pub struct AlertController {}
+
+impl<W: Widget<AppState>> druid::widget::Controller<AppState, W> for AlertController {
+    fn event(
+        &mut self,
+        child: &mut W,
+        ctx: &mut EventCtx<'_, '_>,
+        event: &Event,
+        data: &mut AppState,
+        env: &Env,
+    ) {
+        if let Event::WindowConnected = event {
+            ctx.request_focus();
+        }
+
+        if let Event::KeyUp(e) = event {
+            if e.code == druid::Code::Escape {
+                data.reset_window_state();
+                ctx.submit_command(druid::commands::CLOSE_WINDOW);
+                return;
+            }
+        }
+
+        child.event(ctx, event, data, env);
+    }
 }
