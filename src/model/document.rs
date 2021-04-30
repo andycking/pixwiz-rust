@@ -113,11 +113,19 @@ impl Document {
         self.new_path = Some(new_path);
     }
 
-    pub fn undo(&mut self) -> &mut ModStack {
+    pub fn undo(&self) -> &ModStack {
+        &self.undo
+    }
+
+    pub fn undo_mut(&mut self) -> &mut ModStack {
         &mut self.undo
     }
 
-    pub fn redo(&mut self) -> &mut ModStack {
+    pub fn redo(&self) -> &ModStack {
+        &self.redo
+    }
+
+    pub fn redo_mut(&mut self) -> &mut ModStack {
         &mut self.redo
     }
 

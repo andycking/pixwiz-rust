@@ -56,7 +56,7 @@ pub fn eraser(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut Ap
         undo::push_point(data, current_pos);
 
         let color = druid::Color::rgba8(0, 0, 0, 0);
-        data.doc.pixels_mut().write(current_pos, &color);
+        data.doc_mut().pixels_mut().write(current_pos, &color);
     }
 }
 
@@ -80,7 +80,7 @@ pub fn marquee(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mut 
     let new_selection = shapes::enclosing_rect(start_pos, current_pos);
 
     if old_selection != new_selection {
-        data.doc.set_selection(new_selection);
+        data.doc_mut().set_selection(new_selection);
     }
 }
 
@@ -94,7 +94,7 @@ pub fn move_(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut App
                     let pixels = data.doc().pixels().clone_area(clone_rect);
 
                     let move_info = MoveInfo::new(current_pos, selection, pixels);
-                    data.doc.set_move_info(move_info);
+                    data.doc_mut().set_move_info(move_info);
 
                     // FIXME: Yikes, we're always pushing the entire image onto the undo
                     // stack. The problem is that we need to remember the pixels that we're
@@ -123,7 +123,7 @@ pub fn move_(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut App
                     let rect = shapes::offset_rect(point_rect, offset);
                     let new_selection = shapes::constrain_rect(rect, bounds);
 
-                    data.doc.set_selection(new_selection);
+                    data.doc_mut().set_selection(new_selection);
                 }
             }
 
@@ -138,10 +138,10 @@ pub fn move_drop(_ctx: &mut druid::DelegateCtx, _cmd: &druid::Command, data: &mu
         let move_info = data.doc().move_info().unwrap().to_owned();
         let bytes = move_info.pixels().bytes();
 
-        data.doc.pixels_mut().write_area(selection, bytes);
+        data.doc_mut().pixels_mut().write_area(selection, bytes);
     }
 
-    data.doc.clear_move_info();
+    data.doc_mut().clear_move_info();
 }
 
 pub fn paint(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
@@ -150,6 +150,6 @@ pub fn paint(_ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut App
         undo::push_point(data, current_pos);
 
         let color = data.brush_color().clone();
-        data.doc.pixels_mut().write(current_pos, &color);
+        data.doc_mut().pixels_mut().write(current_pos, &color);
     }
 }

@@ -34,11 +34,11 @@ pub fn select_all(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut
     image::move_drop(ctx, cmd, data);
 
     let bounds = data.doc().pixels().header().bounds();
-    data.doc.set_selection(bounds);
+    data.doc_mut().set_selection(bounds);
 }
 
 pub fn deselect(ctx: &mut druid::DelegateCtx, cmd: &druid::Command, data: &mut AppState) {
     image::move_drop(ctx, cmd, data);
 
-    data.doc.clear_selection();
+    data.doc_mut().clear_selection();
 }
